@@ -103,7 +103,7 @@ void Settings::load() {
   }
 
   QStringList defaultNodesList;
-  defaultNodesList << "node-00.qwertycoin.org:8196" << "node-01.qwertycoin.org:8196" << "46.38.242.66:8196"; // "pool2.democats.org:7671"
+  defaultNodesList << "node-00.qwertycoin.org:8197" << "node-01.qwertycoin.org:8197" << "46.38.242.66:8197";
   if (!m_settings.contains(OPTION_RPCNODES)) {
     setRpcNodesList(QStringList() << defaultNodesList);
   } else {
