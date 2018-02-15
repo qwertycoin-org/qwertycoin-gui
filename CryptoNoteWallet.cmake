@@ -3,3 +3,6 @@ set(CN_PROJECT_NAME "Qwertycoin")
 set(CN_CURRENCY_DISPLAY_NAME "Qwertycoin")
 set(CN_CURRENCY_TICKER "QWC")
 set(CN_VERSION 1.2.1)
+
+
+set(CMAKE_PREFIX_PATH "C:\\Qt\\Qt5.9.0\\5.9\\msvc2017_64")
