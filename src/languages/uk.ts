@@ -1571,7 +1571,7 @@ Are you sure?</source>
         </translation>
     </message>
     <message>
-        <source>Karbo Wallet %1</source>
+        <source>Qwertycoin Wallet %1</source>
         <translation>Карбованець в. %1</translation>
     </message>
     <message>
@@ -1587,7 +1587,7 @@ Are you sure?</source>
         <translation type="vanished">Сума: %1, хеш: %2</translation>
     </message>
     <message>
-        <source>Karbo Wallet</source>
+        <source>Qwertycoin Wallet</source>
         <translation type="vanished">Карбованець</translation>
     </message>
     <message>

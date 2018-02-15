@@ -606,7 +606,7 @@ Proszę czekać...</translation>
     </message>
     <message>
         <source>Start pool mining automatically</source>
-        <translation>Uruchamiać karbowanie automatycznie</translation>
+        <translation>Uruchamiać Qwertycoin automatycznie</translation>
     </message>
 </context>
 <context>
@@ -617,7 +617,7 @@ Proszę czekać...</translation>
     </message>
     <message>
         <source>Mining status</source>
-        <translation type="vanished">Stan karbowania</translation>
+        <translation type="vanished">Stan Qwertycoin</translation>
     </message>
     <message>
         <source>CPU cores</source>
@@ -637,11 +637,11 @@ Proszę czekać...</translation>
     </message>
     <message>
         <source>Start mining</source>
-        <translation>Zacznij karbować</translation>
+        <translation>Zacznij Qwertycoin</translation>
     </message>
     <message>
         <source>Pause mining</source>
-        <translation type="vanished">Przerwij karbowanie</translation>
+        <translation type="vanished">Przerwij Qwertycoin</translation>
     </message>
     <message>
         <source>Settings</source>
@@ -1244,7 +1244,7 @@ Czy chesz otworzyć stronę pobierania w przeglądarce?</translation>
     <name>WalletGui::AboutDialog</name>
     <message>
         <source>About %1 Wallet</source>
-        <translation>O portfelu Karbowańca</translation>
+        <translation>O portfelu Qwertycoin</translation>
     </message>
 </context>
 <context>
@@ -1391,7 +1391,7 @@ Czy chesz otworzyć stronę pobierania w przeglądarce?</translation>
     </message>
     <message>
         <source>Qwertycoin wallet</source>
-        <translation>Portfel karbowańca</translation>
+        <translation>Portfel Qwertycoin</translation>
     </message>
     <message>
         <source>External port for p2p network protocol (if port forwarding used with NAT)</source>
@@ -1469,7 +1469,7 @@ Czy chesz otworzyć stronę pobierania w przeglądarce?</translation>
     <name>WalletGui::MainWindow</name>
     <message>
         <source>About %1 Wallet</source>
-        <translation>O portfelu Karbowańca</translation>
+        <translation>O portfelu Qwertycoin</translation>
     </message>
     <message>
         <source>New wallet file</source>
@@ -1578,8 +1578,8 @@ Jesteś pewien?</translation>
         </translation>
     </message>
     <message>
-        <source>Karbo Wallet %1</source>
-        <translation>Karbowaneć v. %1</translation>
+        <source>Qwertycoin Wallet %1</source>
+        <translation>Qwertycoin v. %1</translation>
     </message>
     <message numerus="yes">
         <source>%n active connection(s)</source>
@@ -1602,8 +1602,8 @@ Jesteś pewien?</translation>
         <translation type="vanished">Kwota: %1, hash: %2</translation>
     </message>
     <message>
-        <source>Karbo Wallet</source>
-        <translation type="vanished">Karbowaniec</translation>
+        <source>Qwertycoin Wallet</source>
+        <translation type="vanished">Qwertycoin</translation>
     </message>
     <message>
         <source>New transaction received</source>
@@ -1682,15 +1682,15 @@ Jesteś pewien?</translation>
     </message>
     <message>
         <source>Mining solo. Hashrate: %1 H/s</source>
-        <translation>Trwa karbowanie solo. Hashrate: %1 H/s</translation>
+        <translation>Trwa Qwertycoin solo. Hashrate: %1 H/s</translation>
     </message>
     <message>
         <source>Starting solo minining...</source>
-        <translation>Uruchamia się karbowanie solo...</translation>
+        <translation>Uruchamia się Qwertycoin solo...</translation>
     </message>
     <message>
         <source>Mining in pool. Hashrate: %1 H/s</source>
-        <translation>Trwa karbowanie w kopalni. Hashrate: %1 H/s</translation>
+        <translation>Trwa Qwertycoin w kopalni. Hashrate: %1 H/s</translation>
     </message>
 </context>
 <context>

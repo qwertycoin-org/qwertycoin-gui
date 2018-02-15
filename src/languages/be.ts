@@ -1578,8 +1578,8 @@ Are you sure?</source>
         </translation>
     </message>
     <message>
-        <source>Karbo Wallet %1</source>
-        <translation>Карбованець в. %1</translation>
+        <source>Qwertycoin Wallet %1</source>
+        <translation>Qwertycoin в. %1</translation>
     </message>
     <message numerus="yes">
         <source>%n active connection(s)</source>
@@ -1602,7 +1602,7 @@ Are you sure?</source>
         <translation type="vanished">Сума: %1, хэш: %2</translation>
     </message>
     <message>
-        <source>Karbo Wallet</source>
+        <source>Qwertycoin Wallet</source>
         <translation type="vanished">Карбованець</translation>
     </message>
     <message>

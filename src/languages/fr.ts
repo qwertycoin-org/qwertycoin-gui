@@ -1408,7 +1408,7 @@ Voulez-vous aller à la page de téléchargement?</translation>
     </message>
     <message>
         <source>Qwertycoin wallet</source>
-        <translation>Karbowanec portefeuille</translation>
+        <translation>QWertycoin portefeuille</translation>
     </message>
     <message>
         <source>External port for p2p network protocol (if port forwarding used with NAT)</source>
@@ -1594,8 +1594,8 @@ Are you sure?</source>
         </translation>
     </message>
     <message>
-        <source>Karbo Wallet %1</source>
-        <translation>Karbo Portefeuille %1</translation>
+        <source>Qwertycoin Wallet %1</source>
+        <translation>Qwertycoin Portefeuille %1</translation>
     </message>
     <message>
         <source>&amp;Show / Hide</source>
@@ -1610,8 +1610,8 @@ Are you sure?</source>
         <translation type="vanished">Montant total: %1, hash: %2</translation>
     </message>
     <message>
-        <source>Karbo Wallet</source>
-        <translation type="vanished">Portefeuille Karbo</translation>
+        <source>Qwertycoin Wallet</source>
+        <translation type="vanished">Portefeuille Qwertycoin</translation>
     </message>
     <message>
         <source>New transaction received</source>
