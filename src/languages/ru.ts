@@ -1229,7 +1229,7 @@ Do you want to go to download page?</source>
     <name>WalletGui::AboutDialog</name>
     <message>
         <source>About %1 Wallet</source>
-        <translation>О кошельке Карбованца</translation>
+        <translation>О кошельке Qwertycoin</translation>
     </message>
 </context>
 <context>
@@ -1458,7 +1458,7 @@ Do you want to go to download page?</source>
     <name>WalletGui::MainWindow</name>
     <message>
         <source>About %1 Wallet</source>
-        <translation>О кошельке Карбованца</translation>
+        <translation>О кошельке Qwertycoin</translation>
     </message>
     <message>
         <source>New wallet file</source>
