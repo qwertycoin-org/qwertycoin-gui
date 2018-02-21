@@ -873,7 +873,7 @@ Bitte warten...</translation>
     <name>PaymentServer</name>
     <message>
         <source>Cannot start qwertycoin: click-to-pay handler</source>
-        <translation>Karbowanec konnte nicht gestartet werden: klicken um handler zu bezahlen</translation>
+        <translation>Qwertycoin konnte nicht gestartet werden: klicken um handler zu bezahlen</translation>
     </message>
 </context>
 <context>
@@ -1582,8 +1582,8 @@ Bist du sicher?</translation>
         </translation>
     </message>
     <message>
-        <source>Karbo Wallet %1</source>
-        <translation>Karbo Brieftasche %1</translation>
+        <source>Qwertycoin Wallet %1</source>
+        <translation>Qwertycoin Brieftasche %1</translation>
     </message>
     <message>
         <source>&amp;Show / Hide</source>
@@ -1598,8 +1598,8 @@ Bist du sicher?</translation>
         <translation type="vanished">Total Betrag: %1, hash: %2</translation>
     </message>
     <message>
-        <source>Karbo Wallet</source>
-        <translation type="vanished">Karbo Wallet</translation>
+        <source>Qwertycoin Wallet</source>
+        <translation type="vanished">Qwertycoin Wallet</translation>
     </message>
     <message>
         <source>New transaction received</source>
@@ -1763,7 +1763,7 @@ Bist du sicher?</translation>
     </message>
     <message>
         <source>Payment request should start with qwertycoin:</source>
-        <translation>Zahlungsanfrage muss mit Karbowanec beginnen:</translation>
+        <translation>Zahlungsanfrage muss mit QWC beginnen:</translation>
     </message>
     <message>
         <source>Insufficient balance</source>

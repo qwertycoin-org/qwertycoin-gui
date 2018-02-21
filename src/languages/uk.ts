@@ -5,7 +5,7 @@
     <name>AboutDialog</name>
     <message>
         <source>About %1</source>
-        <translation>Про Карбованець</translation>
+        <translation>Про Qwertycoin</translation>
     </message>
     <message>
         <source>Close</source>
@@ -40,7 +40,7 @@
     </message>
     <message>
         <source>Your receiving address</source>
-        <translation>Це ваша адреса для отримання карбованців</translation>
+        <translation>Це ваша адреса для отримання Qwertycoin</translation>
     </message>
     <message>
         <source>This is your account address</source>
@@ -910,7 +910,7 @@ Please wait...</source>
     </message>
     <message>
         <source>%1 wallet already running</source>
-        <translation>Гаманець Карбованця вже працює</translation>
+        <translation>Гаманець Qwertycoin вже працює</translation>
     </message>
     <message>
         <source>New version available</source>
@@ -1233,7 +1233,7 @@ Do you want to go to download page?</source>
     <name>WalletGui::AboutDialog</name>
     <message>
         <source>About %1 Wallet</source>
-        <translation>Про гаманець Карбованця</translation>
+        <translation>Про гаманець Qwertycoin</translation>
     </message>
 </context>
 <context>
@@ -1384,7 +1384,7 @@ Do you want to go to download page?</source>
     </message>
     <message>
         <source>Qwertycoin wallet</source>
-        <translation>Qwertycoin карбованця</translation>
+        <translation>Кошелек Qwertycoin</translation>
     </message>
     <message>
         <source>External port for p2p network protocol (if port forwarding used with NAT)</source>
@@ -1462,7 +1462,7 @@ Do you want to go to download page?</source>
     <name>WalletGui::MainWindow</name>
     <message>
         <source>About %1 Wallet</source>
-        <translation>Про гаманець Карбованця</translation>
+        <translation>Про гаманець Qwertycoin</translation>
     </message>
     <message>
         <source>New wallet file</source>
@@ -1536,7 +1536,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>%1 Wallet %2</source>
-        <translation type="vanished">Карбованець в. %2 (%1)</translation>
+        <translation type="vanished">Qwertycoin в. %2 (%1)</translation>
     </message>
     <message>
         <source>More info can be found at www.qwertycoin.org in Documentation section</source>
@@ -1572,7 +1572,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Qwertycoin Wallet %1</source>
-        <translation>Карбованець в. %1</translation>
+        <translation>Qwertycoin в. %1</translation>
     </message>
     <message>
         <source>&amp;Show / Hide</source>
@@ -1588,7 +1588,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Qwertycoin Wallet</source>
-        <translation type="vanished">Карбованець</translation>
+        <translation type="vanished">Qwertycoin</translation>
     </message>
     <message>
         <source>New transaction received</source>

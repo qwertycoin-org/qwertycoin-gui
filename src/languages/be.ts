@@ -40,7 +40,7 @@
     </message>
     <message>
         <source>Your receiving address</source>
-        <translation>Гэта ваш адрас для атрымання карбованцаў</translation>
+        <translation>Гэта ваш адрас для атрымання Qwertycoin</translation>
     </message>
     <message>
         <source>This is your account address</source>
@@ -1391,7 +1391,7 @@ Do you want to go to download page?</source>
     </message>
     <message>
         <source>Qwertycoin wallet</source>
-        <translation>Qwertycoin карбованцаў</translation>
+        <translation>Кошелек Qwertycoin</translation>
     </message>
     <message>
         <source>External port for p2p network protocol (if port forwarding used with NAT)</source>
@@ -1543,7 +1543,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>%1 Wallet %2</source>
-        <translation type="vanished">Карбованець в. %2 (%1)</translation>
+        <translation type="vanished">Qwertycoin в. %2 (%1)</translation>
     </message>
     <message>
         <source>More info can be found at www.qwertycoin.org in Documentation section</source>
@@ -1603,7 +1603,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Qwertycoin Wallet</source>
-        <translation type="vanished">Карбованець</translation>
+        <translation type="vanished">Qwertycoin</translation>
     </message>
     <message>
         <source>New transaction received</source>

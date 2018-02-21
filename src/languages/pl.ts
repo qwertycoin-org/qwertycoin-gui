@@ -518,7 +518,7 @@ Proszę czekać...</translation>
     </message>
     <message>
         <source>Mining</source>
-        <translation>Karbowanie</translation>
+        <translation>Mining</translation>
     </message>
     <message>
         <source>Reset wallet</source>
@@ -649,15 +649,15 @@ Proszę czekać...</translation>
     </message>
     <message>
         <source>Pool mining</source>
-        <translation>Karbowanie w kopalni</translation>
+        <translation>Pool Mining Qwertycoin</translation>
     </message>
     <message>
         <source>Stop mining</source>
-        <translation>Zatrzymaj karbowanie</translation>
+        <translation>Zatrzymaj Qwertycoin</translation>
     </message>
     <message>
         <source>Solo mining</source>
-        <translation>Karbowanie solo</translation>
+        <translation>Qwertycoin solo</translation>
     </message>
     <message>
         <source>Status</source>
@@ -669,7 +669,7 @@ Proszę czekać...</translation>
     </message>
     <message>
         <source>Mining status:</source>
-        <translation>Stan karbowania:</translation>
+        <translation>Stan Qwertycoin:</translation>
     </message>
 </context>
 <context>
