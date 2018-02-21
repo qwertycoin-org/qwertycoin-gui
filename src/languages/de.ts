@@ -172,7 +172,7 @@
     <name>ChangePasswordDialog</name>
     <message>
         <source>Change password</source>
-        <translation>Passwort wechseln</translation>
+        <translation>Passwort ändern</translation>
     </message>
     <message>
         <source>Ok</source>
@@ -263,7 +263,7 @@
     </message>
     <message>
         <source>Wallet will connect to local daemon on specified port.</source>
-        <translation>Brieftasche verbindet sich mit dem lokalen daemon auf einem spezifischen Port.</translation>
+        <translation>Wallet verbindet sich mit dem lokalen daemon auf einem spezifischen Port.</translation>
     </message>
     <message>
         <source>Remote daemon</source>
@@ -275,7 +275,7 @@
     </message>
     <message>
         <source>Wallet will connect to remote node running in local or global network. Please select node or specify IP address or domain name and port. In this mode wallet sends 0.25% fee from each transaction to the node, but no more than 10 QWC.</source>
-        <translation>Wallet stellt eine Verbindung zum Remote-Knoten her, der im lokalen oder globalen Netzwerk ausgeführt wird. Bitte wählen Sie einen Knoten aus oder geben Sie die IP-Adresse oder den Domänennamen und den Port an. In diesem Modus sendet die Brieftasche 0,25% Gebühr von jeder Transaktion an den Knoten, aber nicht mehr als 10 QWC.</translation>
+        <translation>Wallet stellt eine Verbindung zum Remote-Knoten her, der im lokalen oder globalen Netzwerk ausgeführt wird. Bitte wählen Sie einen Knoten aus oder geben Sie die IP-Adresse oder den Domänennamen und den Port an. In diesem Modus sendet die Wallet 0,25% Gebühr von jeder Transaktion an den Knoten, aber nicht mehr als 10 QWC.</translation>
     </message>
     <message>
         <source>Remove node</source>
@@ -291,7 +291,7 @@
     <message>
         <source>%1 wallet is saving data.
 Please wait...</source>
-        <translation>%1 Brieftasche speichert die Daten.
+        <translation>%1 Die Wallet speichert alle Daten.
 Bitte warten...</translation>
     </message>
 </context>

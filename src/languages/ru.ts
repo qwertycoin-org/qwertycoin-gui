@@ -5,7 +5,7 @@
     <name>AboutDialog</name>
     <message>
         <source>About %1</source>
-        <translation>Об %1</translation>
+        <translation>Об Qwertycoin</translation>
     </message>
     <message>
         <source>Close</source>
