@@ -1,0 +1,8 @@
+Release Notes 1.8.1
+-Added Release Notes
+-Increase TX Sizes
+-Changes in CI
+-Several Changes and Bugfixes (Update Socket Error)
+
+Release Notes 1.0.0
+Project move to Github

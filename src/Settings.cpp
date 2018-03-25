@@ -90,7 +90,7 @@ void Settings::load() {
   }
 
   QStringList defaultPoolList;
-  defaultPoolList << "qwertycoin.site:3333";
+  defaultPoolList << "qwertycoin.site:3333" << "qwcpool.partyvibe.com:5000" << "qwc.pool.ahka.net:5557";
   if (!m_settings.contains(OPTION_MINING_POOLS)) {
     setMiningPoolList(QStringList() << defaultPoolList);
   } else {
@@ -104,7 +104,7 @@ void Settings::load() {
   }
 
   QStringList defaultNodesList;
-  defaultNodesList << "eu.qwertyno.de:8197" << "as.qwertyno.de:8197" << "at.qwertyno.de:8197" << "an.qwertyno.de:8197" << "au.qwertyno.de:8197" << "sa.qwertyno.de:8197" << "af.qwertyno.de:8197" << "oc.qwertyno.de:8197";
+  defaultNodesList << "eu.qwertyno.de:8197" << "na.qwertyno.de:8197" << "sa.qwertyno.de:8197" << "au.qwertyno.de:8197" << "af.qwertyno.de:8197" << "an.qwertyno.de:8197" << "as.qwertyno.de:8197" << "oc.qwertyno.de:8197";
   if (!m_settings.contains(OPTION_RPCNODES)) {
     setRpcNodesList(QStringList() << defaultNodesList);
   } else {

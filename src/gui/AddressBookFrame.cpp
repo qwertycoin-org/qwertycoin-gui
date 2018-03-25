@@ -24,6 +24,7 @@ AddressBookFrame::AddressBookFrame(QWidget* _parent) : QFrame(_parent), m_ui(new
   m_ui->m_addressBookView->header()->setStretchLastSection(false);
   m_ui->m_addressBookView->header()->setSectionResizeMode(1, QHeaderView::Stretch);
   m_ui->m_addressBookView->setSortingEnabled(true);
+  m_ui->m_addressBookView->setStyleSheet(QStringLiteral("color: #080808;")); //tablehead
   m_ui->m_addressBookView->sortByColumn(0, Qt::AscendingOrder);
 
   connect(m_ui->m_addressBookView->selectionModel(), &QItemSelectionModel::currentChanged, this, &AddressBookFrame::currentAddressChanged);

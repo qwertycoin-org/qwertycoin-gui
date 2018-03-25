@@ -32,6 +32,7 @@ TransactionsFrame::TransactionsFrame(QWidget* _parent) : QFrame(_parent), m_ui(n
   m_ui->m_transactionsView->sortByColumn(0, Qt::AscendingOrder);
   m_transactionsModel->setSortRole(Qt::EditRole);
   m_transactionsModel->setDynamicSortFilter(true);
+  m_ui->m_transactionsView->setStyleSheet(QStringLiteral("color: #080808;")); //tablehead
   m_ui->m_transactionsView->setModel(m_transactionsModel.data());
   m_ui->m_transactionsView->header()->setSectionResizeMode(TransactionsModel::COLUMN_STATE, QHeaderView::Fixed);
   m_ui->m_transactionsView->header()->resizeSection(TransactionsModel::COLUMN_STATE, 25);

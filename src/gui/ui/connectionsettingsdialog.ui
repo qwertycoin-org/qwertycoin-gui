@@ -75,7 +75,7 @@
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>Wallet will connect to local daemon on default port. In case of no local daemon running it will launch built-in node.</string>
+        <string>&lt;span style=&quot;color:#080808&quot;&gt;Wallet will connect to local daemon on default port. In case of no local daemon running it will launch built-in node.&lt;/span&gt;</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>
@@ -95,7 +95,7 @@
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>Built-in embedded node will be used.</string>
+        <string>&lt;span style=&quot;color:#080808&quot;&gt;Built-in embedded node will be used.&lt;/span&gt;</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>
@@ -130,7 +130,7 @@
           <number>65535</number>
          </property>
          <property name="value">
-          <number>32348</number>
+          <number>8197</number>
          </property>
          <property name="displayIntegerBase">
           <number>10</number>
@@ -158,7 +158,7 @@
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>Wallet will connect to local daemon on specified port.</string>
+        <string>&lt;span style=&quot;color:#080808&quot;&gt;Wallet will connect to local daemon on specified port.&lt;/span&gt;</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>
@@ -248,7 +248,7 @@
         </size>
        </property>
        <property name="text">
-        <string>Wallet will connect to remote node running in local or global network. Please select node or specify IP address or domain name and port. In this mode wallet sends 0.25% fee from each transaction to the node, but no more than 10 QWC.</string>
+        <string>&lt;span style=&quot;color:#080808&quot;&gt;Wallet will connect to remote node running in local or global network. Please select node or specify IP address or domain name and port. In this mode wallet sends 0.25% fee from each transaction to the node, but no more than 10 QWC.&lt;/span&gt;</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>

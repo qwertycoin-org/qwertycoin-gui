@@ -96,7 +96,7 @@
         <number>1</number>
        </property>
        <property name="sliderPosition">
-        <number>5</number>
+        <number>1</number>
        </property>
        <property name="tracking">
         <bool>false</bool>
