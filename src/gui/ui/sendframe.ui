@@ -205,19 +205,19 @@
         <string/>
        </property>
        <property name="decimals">
-        <number>12</number>
+        <number>8</number>
        </property>
        <property name="minimum">
-        <double>0.000100000000000</double>
+        <double>0.00010000</double>
        </property>
        <property name="maximum">
-        <double>999999999999999.000000000000000</double>
+        <double>999999999999999.00000000</double>
        </property>
        <property name="singleStep">
-        <double>0.000100000000000</double>
+        <double>0.00010000</double>
        </property>
        <property name="value">
-        <double>0.000100000000000</double>
+        <double>0.00010000</double>
        </property>
       </widget>
      </item>
@@ -267,7 +267,7 @@
         <locale language="English" country="UnitedStates"/>
        </property>
        <property name="decimals">
-        <number>12</number>
+        <number>8</number>
        </property>
        <property name="maximum">
         <double>999999999999999.000000000000000</double>

@@ -104,7 +104,7 @@ void Settings::load() {
   }
 
   QStringList defaultNodesList;
-  defaultNodesList << "node-00.qwertycoin.org:8197" << "46.38.242.66:8197" << "node-01.qwertycoin.org:8197";
+  defaultNodesList << "eu.qwertyno.de:8197" << "as.qwertyno.de:8197" << "at.qwertyno.de:8197" << "an.qwertyno.de:8197" << "au.qwertyno.de:8197" << "sa.qwertyno.de:8197" << "af.qwertyno.de:8197" << "oc.qwertyno.de:8197";
   if (!m_settings.contains(OPTION_RPCNODES)) {
     setRpcNodesList(QStringList() << defaultNodesList);
   } else {

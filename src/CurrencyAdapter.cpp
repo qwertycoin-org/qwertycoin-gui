@@ -68,7 +68,7 @@ QString CurrencyAdapter::formatAmount(quint64 _amount) const {
   result.insert(dot_pos, ".");
   for (qint32 pos = dot_pos - 3; pos > 0; pos -= 3) {
     if (result[pos - 1].isDigit()) {
-        //result.insert(pos, ',');
+      result.insert(pos, ',');
     }
   }
 
@@ -77,7 +77,7 @@ QString CurrencyAdapter::formatAmount(quint64 _amount) const {
 
 quint64 CurrencyAdapter::parseAmount(const QString& _amountString) const {
   QString amountString = _amountString.trimmed();
-  amountString.remove(',');
+  //amountString.remove(',');
 
   int pointIndex = amountString.indexOf('.');
   int fractionSize;

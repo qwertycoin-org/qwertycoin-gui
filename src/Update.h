@@ -11,7 +11,7 @@
 #include <QNetworkReply>
 #include <QUrl>
 
-const static QString QWCCOIN_UPDATE_URL = "https://qwertycoin.org/files/update.txt";
+const static QString QWCCOIN_UPDATE_URL = "http://update.qwertycoin.org/files/update.txt";
 
 class Updater : public QObject
 {
