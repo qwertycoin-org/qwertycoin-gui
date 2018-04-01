@@ -1384,7 +1384,7 @@ Do you want to go to download page?</source>
     </message>
     <message>
         <source>Qwertycoin wallet</source>
-        <translation>Кошелек Qwertycoin</translation>
+        <translation>Qwertycoin Wallet</translation>
     </message>
     <message>
         <source>External port for p2p network protocol (if port forwarding used with NAT)</source>
@@ -1651,7 +1651,7 @@ Are you sure?</source>
     <name>WalletGui::MiningFrame</name>
     <message>
         <source>Mining. Hashrate: %1 H/s</source>
-        <translation type="vanished">Карбую. Хешрейт: %1 H/s</translation>
+        <translation type="vanished">Qwertycoin. Хешрейт: %1 H/s</translation>
     </message>
     <message>
         <source>Error: %1</source>
@@ -1667,7 +1667,7 @@ Are you sure?</source>
     </message>
     <message>
         <source>Mining solo. Hashrate: %1 H/s</source>
-        <translation>Карбую соло. Швидкість: %1 H/s</translation>
+        <translation>Qwertycoin соло. Швидкість: %1 H/s</translation>
     </message>
     <message>
         <source>Starting solo minining...</source>

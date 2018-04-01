@@ -75,7 +75,7 @@ QTreeView::item {
 QTreeView::item:hover {
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #e7effd, stop: 1 #cbdaf1);
     border: 1px solid #bfcde4;
-    text-color:#080808;
+    text-color:#FFFFFF;
 }
 
 QTreeView::item:selected {
@@ -148,6 +148,7 @@ QLineEdit {
 	background: rgba(8, 8, 8,0.9);
 	selection-background-color: #6481AA;
 	height: 23px;
+	color: #FFFFFF;
 }
 
 QTextEdit {
@@ -156,6 +157,7 @@ QTextEdit {
 	padding: 2px 8px;
 	background: rgba(8, 8, 8,0.9);
 	selection-background-color: #6481AA;
+	color: #FFFFFF;
 }
 
 
@@ -171,6 +173,7 @@ QSpinBox, QDoubleSpinBox, QComboBox {
 	padding: 2px 8px;
 	background: rgba(8, 8, 8,0.9);
 	height: 25px;
+	color: #FFFFFF;
 }
 
 QSpinBox::up-button, QDoubleSpinBox::up-button {
@@ -221,7 +224,7 @@ QComboBox::drop-down {
 QComboBox QAbstractItemView {
 	border: none;
 	background: #080808;
-	color: white;
+	color: #FFFFFF;
 	selection-background-color: #654321;
 }
 
@@ -287,7 +290,7 @@ QSlider::handle:horizontal {
 }
 
 QSlider::handle:horizontal:hover {
-
+	color: #FFFFFF;
 }
 
 QAbstractScrollArea#m_transfersScrollarea {
@@ -380,9 +383,8 @@ QStatusBar#statusBar {
 }
 
 QToolTip{
-	color: #FFFFFF;
+	text-color: #FFFFFF;
 	background-color: #080808;
 	border: none;
 	padding: 4px;
-	opacity: 230;
 }

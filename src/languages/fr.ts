@@ -266,7 +266,7 @@
     </message>
     <message>
         <source>&lt;span style=&quot;color:#080808&quot;&gt;Built-in embedded node will be used.&lt;/span&gt;</source>
-        <translation>Un built-in nœud intégré sera utilisé.</translation>
+        <translation>&lt;span style=&quot;color:#080808&quot;&gt;Un built-in nœud intégré sera utilisé.&lt;/span&gt;</translation>
     </message>
     <message>
         <source>Local daemon</source>
@@ -278,7 +278,7 @@
     </message>
     <message>
         <source>&lt;span style=&quot;color:#080808&quot;&gt;Wallet will connect to local daemon on specified port.&lt;/span&gt;</source>
-        <translation>Le portefeuille se connectera au daemon local sur le port spécifié.</translation>
+        <translation>&lt;span style=&quot;color:#080808&quot;&gt;Le portefeuille se connectera au daemon local sur le port spécifié.&lt;/span&gt;</translation>
     </message>
     <message>
         <source>Remote daemon</source>
@@ -290,7 +290,7 @@
     </message>
     <message>
         <source>&lt;span style=&quot;color:#080808&quot;&gt;Wallet will connect to remote node running in local or global network. Please select node or specify IP address or domain name and port. In this mode wallet sends 0.25% fee from each transaction to the node, but no more than 10 QWC.&lt;/span&gt;</source>
-        <translation>Le portefeuille se connecte au noeud distant en cours d&apos;exécution sur un réseau local ou global. Veuillez sélectionner un noeud ou spécifier une adresse IP ou un nom de domaine et un port. Dans ce mode, le portefeuille envoie des frais de 0,25% de chaque transaction au nœud, mais pas plus de 10 QWC.</translation>
+        <translation>&lt;span style=&quot;color:#080808&quot;&gt;Le portefeuille se connecte au noeud distant en cours d&apos;exécution sur un réseau local ou global. Veuillez sélectionner un noeud ou spécifier une adresse IP ou un nom de domaine et un port. Dans ce mode, le portefeuille envoie des frais de 0,25% de chaque transaction au nœud, mais pas plus de 10 QWC.&lt;/span&gt;</translation>
     </message>
     <message>
         <source>Remove node</source>
