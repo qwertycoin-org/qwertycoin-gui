@@ -1,4 +1,4 @@
-![image](https://qwertycoin.org/files/qwc-github.jpg)
+![image](https://cdn.qwertycoin.org/images/press/other/qwc-github.jpg)
 
 [![Build status](https://ci.appveyor.com/api/projects/status/l3o455xl2l9lhrlu/branch/master?svg=true)](https://ci.appveyor.com/project/qwertycoin-org/qwertycoin-gui/branch/master)
 
