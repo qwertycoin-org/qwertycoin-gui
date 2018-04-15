@@ -118,7 +118,7 @@ int main(int argc, char* argv[]) {
 
 #if defined(Q_OS_LINUX)
   QStringList args;
-  QProcess exec;^
+  QProcess exec;
 
   //as root
   args << "-c" << "printf '[Desktop Entry]\\nName = Qwertycoin URL Handler\\nGenericName = Qwertycoin\\nComment = Handle URL Sheme qwertycoin://\\nExec = " + QCoreApplication::applicationFilePath() + " %%u\\nTerminal = false\\nType = Application\\nMimeType = x-scheme-handler/qwertycoin;\\nIcon = Qwertycoin-Wallet' | tee /usr/share/applications/qwertycoin-handler.desktop";
