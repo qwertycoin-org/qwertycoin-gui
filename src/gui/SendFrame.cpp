@@ -1,7 +1,7 @@
 // Copyright (c) 2011-2015 The Cryptonote developers
 // Copyright (c) 2015-2016 XDN developers
 // Copyright (c) 2016-2017 The Karbowanec developers
-// Copyright (c) 2017-2018 The Qwertycoin developers
+// Copyright (c) 2018 The Qwertycoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -91,7 +91,7 @@ void SendFrame::clearAllClicked() {
   addRecipientClicked();
   amountValueChange();
   m_ui->m_paymentIdEdit->clear();
-  m_ui->m_mixinSlider->setValue(2);
+  m_ui->m_mixinSlider->setValue(1);
   m_ui->m_feeSpin->setValue(m_ui->m_feeSpin->minimum());
 }
 
@@ -259,7 +259,7 @@ void SendFrame::sendClicked() {
       // Dev donation
       if (m_ui->donateCheckBox->isChecked()) {
           CryptoNote::WalletLegacyTransfer walletTransfer;
-          walletTransfer.address = "QWC1L4aAh5i7cbB813RQpsKP6pHXT2ymrbQCwQnQ3DC4QiyuhBUZw8dhAaFp8wH1Do6J9Lmim6ePv1SYFYs97yNV2xvSbTGc7s";
+          walletTransfer.address = "QWC1K6XEhCC1WsZzT9RRVpc1MLXXdHVKt2BUGSrsmkkXAvqh52sVnNc1pYmoF2TEXsAvZnyPaZu8MW3S8EWHNfAh7X2xa63P7Y";
           walletTransfer.amount = CurrencyAdapter::instance().parseAmount(m_ui->m_donateSpin->cleanText());
           walletTransfers.push_back(walletTransfer);
       }

@@ -1,7 +1,7 @@
 // Copyright (c) 2011-2016 The Cryptonote developers
 // Copyright (c) 2015-2016 XDN developers
 // Copyright (c) 2016-2017 The Karbowanec developers
-// Copyright (c) 2017-2018 The Qwertycoin developers
+// Copyright (c) 2018 The Qwertycoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -136,7 +136,7 @@ void WalletAdapter::createWallet() {
     m_wallet->initAndGenerateDeterministic("");
 
     VerifyMnemonicSeedDialog dlg(nullptr);
-    if (dlg.exec() != QDialog::Accepted) {
+    if (!dlg.exec() == QDialog::Accepted) {
       return;
     }
   } catch (std::system_error&) {

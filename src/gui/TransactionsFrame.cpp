@@ -1,7 +1,7 @@
 // Copyright (c) 2011-2015 The Cryptonote developers
 // Copyright (c) 2011-2013 The Bitcoin developers
 // Copyright (c) 2016-2017 The Karbowanec developers
-// Copyright (c) 2017-2018 The Qwertycoin developers
+// Copyright (c) 2018 The Qwertycoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -32,7 +32,6 @@ TransactionsFrame::TransactionsFrame(QWidget* _parent) : QFrame(_parent), m_ui(n
   m_ui->m_transactionsView->sortByColumn(0, Qt::AscendingOrder);
   m_transactionsModel->setSortRole(Qt::EditRole);
   m_transactionsModel->setDynamicSortFilter(true);
-  m_ui->m_transactionsView->setStyleSheet(QStringLiteral("color: #080808;")); //tablehead
   m_ui->m_transactionsView->setModel(m_transactionsModel.data());
   m_ui->m_transactionsView->header()->setSectionResizeMode(TransactionsModel::COLUMN_STATE, QHeaderView::Fixed);
   m_ui->m_transactionsView->header()->resizeSection(TransactionsModel::COLUMN_STATE, 25);
@@ -174,7 +173,7 @@ void TransactionsFrame::computeSelected() {
     QModelIndexList selection = m_ui->m_transactionsView->selectionModel()->selectedRows();
 
     foreach (QModelIndex index, selection){
-        QString amountstring = index.sibling(index.row(), TransactionsModel::COLUMN_AMOUNT).data().toString().remove(',');
+        QString amountstring = index.sibling(index.row(), TransactionsModel::COLUMN_AMOUNT).data().toString();
         amount += amountstring.toDouble();
     }
     QString amountText = QString::number(amount, 'f', 12) + " " + CurrencyAdapter::instance().getCurrencyTicker().toUpper();

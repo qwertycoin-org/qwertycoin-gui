@@ -28,7 +28,7 @@ const QString BITCOIN_IPC_PREFIX("qwertycoin:");
 
 static QString ipcServerName()
 {
-    QString name("Qwertycoin");
+    QString name("Karbowanec");
 
     return name;
 }

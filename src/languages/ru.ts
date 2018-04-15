@@ -5,19 +5,19 @@
     <name>AboutDialog</name>
     <message>
         <source>About %1</source>
-        <translation>Об Qwertycoin</translation>
+        <translation>Об %1</translation>
     </message>
     <message>
         <source>Close</source>
         <translation>Закрыть</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Qwertycoin v. %1&lt;/p&gt;&lt;p&gt;This is the next generation anonymous cryptocurrency based on CryptoNote.&lt;/p&gt;&lt;p&gt;Copyright (c) 2012-2015. CryptoNote Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2015-2016. DigitalNote Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2016-2017. Karbowanec Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2017-2018. Qwertycoin Developers&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;http://opensource.org/licenses/MIT&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000000;&quot;&gt;http://opensource.org/licenses/MIT&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://cryptonote.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000000;&quot;&gt;https://cryptonote.org/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://qwertycoin.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000000;&quot;&gt;https://qwertycoin.org/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Qwertycoin версия %1&lt;/p&gt;&lt;p&gt;Это криптовалюта нового поколения на базе CryptoNote.&lt;/p&gt;&lt;p&gt;Copyright (c) 2012-2015. CryptoNote Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2015-2016. DigitalNote Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2016-2017. Karbowanec Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2017-2018. Qwertycoin Developers&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;http://opensource.org/licenses/MIT&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000000;&quot;&gt;http://opensource.org/licenses/MIT&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://cryptonote.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000000;&quot;&gt;https://cryptonote.org/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://qwertycoin.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000000;&quot;&gt;https://qwertycoin.org/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Qwertycoin v. %1&lt;/p&gt;&lt;p&gt;This is the next generation anonymous cryptocurrency based on CryptoNote.&lt;/p&gt;&lt;p&gt;Copyright (c) 2012-2015. CryptoNote Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2015-2016. DigitalNote Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2016-2017. Karbowanec Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2017-2018. Qwertycoin Developers&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;http://opensource.org/licenses/MIT&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://opensource.org/licenses/MIT&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://cryptonote.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://cryptonote.org/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://qwertycoin.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://qwertycoin.org/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Qwertycoin версия %1&lt;/p&gt;&lt;p&gt;Это криптовалюта нового поколения на базе CryptoNote.&lt;/p&gt;&lt;p&gt;Copyright (c) 2012-2015. CryptoNote Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2015-2016. DigitalNote Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2016-2017. Karbowanec Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2017-2018. Qwertycoin Developers&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;http://opensource.org/licenses/MIT&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://opensource.org/licenses/MIT&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://cryptonote.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://cryptonote.org/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://qwertycoin.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://qwertycoin.org/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Qwertycoin v. %1&lt;/p&gt;&lt;p&gt;This is the next generation anonymous cryptocurrency based on CryptoNote.&lt;/p&gt;&lt;p&gt;Copyright (c) 2012-2015. CryptoNote Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2012-2016. Bytecoin Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2015-2016. DigitalNote Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2016-2018. Karbo (Karbowanec) Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2017-2018. Qwertycoin Developers&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;http://opensource.org/licenses/MIT&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000000;&quot;&gt;http://opensource.org/licenses/MIT&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://cryptonote.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000000;&quot;&gt;https://cryptonote.org/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://qwertycoin.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000000;&quot;&gt;https://qwertycoin.org/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;THE SOFTWARE IS PROVIDED &amp;quot;AS IS&amp;quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Qwertycoin в. %1&lt;/p&gt;&lt;p&gt;Это криптовалюта нового поколения на базе CryptoNote.&lt;/p&gt;&lt;p&gt;Copyright (c) 2012-2015. CryptoNote Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2012-2016. Bytecoin Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2015-2016. DigitalNote Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2016-2018. Karbo (Karbowanec) Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2017-2018. Qwertycoin Developers&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;http://opensource.org/licenses/MIT&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000000;&quot;&gt;http://opensource.org/licenses/MIT&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://cryptonote.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000000;&quot;&gt;https://cryptonote.org/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://qwertycoin.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000000;&quot;&gt;https://qwertycoin.org/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;ДАННОЕ ПРОГРАММНОЕ ОБЕСПЕЧЕНИЕ ПРЕДОСТАВЛЯЕТСЯ &amp;quot;КАК ЕСТЬ&amp;quot;, БЕЗ КАКИХ-ЛИБО ГАРАНТИЙ, ЯВНО ВЫРАЖЕННЫХ ИЛИ ПОДРАЗУМЕВАЕМЫХ, ВКЛЮЧАЯ ГАРАНТИИ ТОВАРНОЙ ПРИГОДНОСТИ, СООТВЕТСТВИЯ ПО ЕГО КОНКРЕТНОМУ НАЗНАЧЕНИЮ И ОТСУТСТВИЯ НАРУШЕНИЙ, НО НЕ ОГРАНИЧИВАЯСЬ ИМИ. НИ В КАКОМ СЛУЧАЕ АВТОРЫ ИЛИ ПРАВООБЛАДАТЕЛИ НЕ НЕСУТ ОТВЕТСТВЕННОСТИ ПО КАКИМ-ЛИБО ИСКАМ, ЗА УЩЕРБ ИЛИ ПО ИНЫМ ТРЕБОВАНИЯМ, В ТОМ ЧИСЛЕ, ПРИ ДЕЙСТВИИ КОНТРАКТА, ДЕЛИКТЕ ИЛИ ИНОЙ СИТУАЦИИ, ВОЗНИКШИМ ИЗ-ЗА ИСПОЛЬЗОВАНИЯ ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ ИЛИ ИНЫХ ДЕЙСТВИЙ С ПРОГРАММНЫМ ОБЕСПЕЧЕНИЕМ.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Qwertycoin v. %1&lt;/p&gt;&lt;p&gt;This is the next generation anonymous cryptocurrency based on CryptoNote.&lt;/p&gt;&lt;p&gt;Copyright (c) 2012-2015. CryptoNote Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2012-2016. Bytecoin Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2015-2016. DigitalNote Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2016-2018. Karbo (Karbowanec) Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2017-2018. Qwertycoin Developers&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;http://opensource.org/licenses/MIT&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://opensource.org/licenses/MIT&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://cryptonote.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://cryptonote.org/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://qwertycoin.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://qwertycoin.org/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;THE SOFTWARE IS PROVIDED &amp;quot;AS IS&amp;quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Qwertycoin в. %1&lt;/p&gt;&lt;p&gt;Это криптовалюта нового поколения на базе CryptoNote.&lt;/p&gt;&lt;p&gt;Copyright (c) 2012-2015. CryptoNote Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2012-2016. Bytecoin Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2015-2016. DigitalNote Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2016-2018. Karbo (Karbowanec) Developers&lt;/p&gt;&lt;p&gt;Copyright (c) 2017-2018. Qwertycoin Developers&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;http://opensource.org/licenses/MIT&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;http://opensource.org/licenses/MIT&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://cryptonote.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://cryptonote.org/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://qwertycoin.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://qwertycoin.org/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;ДАННОЕ ПРОГРАММНОЕ ОБЕСПЕЧЕНИЕ ПРЕДОСТАВЛЯЕТСЯ &amp;quot;КАК ЕСТЬ&amp;quot;, БЕЗ КАКИХ-ЛИБО ГАРАНТИЙ, ЯВНО ВЫРАЖЕННЫХ ИЛИ ПОДРАЗУМЕВАЕМЫХ, ВКЛЮЧАЯ ГАРАНТИИ ТОВАРНОЙ ПРИГОДНОСТИ, СООТВЕТСТВИЯ ПО ЕГО КОНКРЕТНОМУ НАЗНАЧЕНИЮ И ОТСУТСТВИЯ НАРУШЕНИЙ, НО НЕ ОГРАНИЧИВАЯСЬ ИМИ. НИ В КАКОМ СЛУЧАЕ АВТОРЫ ИЛИ ПРАВООБЛАДАТЕЛИ НЕ НЕСУТ ОТВЕТСТВЕННОСТИ ПО КАКИМ-ЛИБО ИСКАМ, ЗА УЩЕРБ ИЛИ ПО ИНЫМ ТРЕБОВАНИЯМ, В ТОМ ЧИСЛЕ, ПРИ ДЕЙСТВИИ КОНТРАКТА, ДЕЛИКТЕ ИЛИ ИНОЙ СИТУАЦИИ, ВОЗНИКШИМ ИЗ-ЗА ИСПОЛЬЗОВАНИЯ ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ ИЛИ ИНЫХ ДЕЙСТВИЙ С ПРОГРАММНЫМ ОБЕСПЕЧЕНИЕМ.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -40,7 +40,7 @@
     </message>
     <message>
         <source>Your receiving address</source>
-        <translation>Ваш адрес для получения Qwertycoin</translation>
+        <translation>Ваш адрес для получения карбованцев</translation>
     </message>
     <message>
         <source>This is your account address</source>
@@ -55,8 +55,8 @@
         <translation>Баланс счета</translation>
     </message>
     <message>
-        <source> krb</source>
-        <translation> крб.</translation>
+        <source> qwc</source>
+        <translation> QWC.</translation>
     </message>
     <message>
         <source>Frame</source>
@@ -203,11 +203,11 @@
     <name>ConfirmSendDialog</name>
     <message>
         <source>Confirm sending %1 QWC</source>
-        <translation>Подтвердите отправку %1 крб.</translation>
+        <translation>Подтвердите отправку %1 QWC.</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Are you sure you want to send &lt;strong&gt;%1 QWC&lt;/strong&gt;?&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Желаете выслать &lt;strong&gt;%1 крб.&lt;/strong&gt;?&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Желаете выслать &lt;strong&gt;%1 QWC.&lt;/strong&gt;?&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>Yes</source>
@@ -237,15 +237,15 @@
         <translation>Автоматически</translation>
     </message>
     <message>
-        <source>&lt;span style=&quot;color:#080808&quot;&gt;Wallet will connect to local daemon on default port. In case of no local daemon running it will launch built-in node.&lt;/span&gt;</source>
-        <translation>&lt;span style=&quot;color:#080808&quot;&gt;Кошелек будет подключаться к локальному демону через порт по-умолчанию. Если демон не запущен, он запустит встроенный узел.&lt;/span&gt;</translation>
+        <source>Wallet will connect to local daemon on default port. In case of no local daemon running it will launch built-in node.</source>
+        <translation>Кошелек будет подключаться к локальному демону через порт по-умолчанию. Если демон не запущен, он запустит встроенный узел.</translation>
     </message>
     <message>
         <source>Embedded</source>
         <translation>Встроенный узел</translation>
     </message>
     <message>
-        <source>&lt;span style=&quot;color:#080808&quot;&gt;Built-in embedded node will be used.&lt;/span&gt;</source>
+        <source>Built-in embedded node will be used.</source>
         <translation>Будет запускаться встроенный узел.</translation>
     </message>
     <message>
@@ -257,7 +257,7 @@
         <translation>Порт: </translation>
     </message>
     <message>
-        <source>&lt;span style=&quot;color:#080808&quot;&gt;Wallet will connect to local daemon on specified port.&lt;/span&gt;</source>
+        <source>Wallet will connect to local daemon on specified port.</source>
         <translation>Кошелек будет подключаться к локальному демону через указанный порт.</translation>
     </message>
     <message>
@@ -269,8 +269,8 @@
         <translation>Добавить узел</translation>
     </message>
     <message>
-        <source>&lt;span style=&quot;color:#080808&quot;&gt;Wallet will connect to remote node running in local or global network. Please select node or specify IP address or domain name and port. In this mode wallet sends 0.25% fee from each transaction to the node, but no more than 10 QWC.&lt;/span&gt;</source>
-        <translation>Кошелек будет подключаться к удаленному узлу в локальной или глобальной сети. Выберите узел или укажите IP адрес или домен и порт чтобы добавить новый. В этом режиме кошелек платит комиссию узлу в размере 0,25% от суммы транзакции, но не более 10 крб.</translation>
+        <source>Wallet will connect to remote node running in local or global network. Please select node or specify IP address or domain name and port. In this mode wallet sends 0.25% fee from each transaction to the node, but no more than 10 QWC.</source>
+        <translation>Кошелек будет подключаться к удаленному узлу в локальной или глобальной сети. Выберите узел или укажите IP адрес или домен и порт чтобы добавить новый. В этом режиме кошелек платит комиссию узлу в размере 0,25% от суммы транзакции, но не более 10 QWC.</translation>
     </message>
     <message>
         <source>Remove node</source>
@@ -909,8 +909,8 @@ Please wait...</source>
         <translation>Загружается блокчейн...</translation>
     </message>
     <message>
-        <source>%1 wallet already running</source>
-        <translation>Кошелек Qwertycoin уже запущен</translation>
+        <source>%1 wallet already running or cannot create lock file %2. Check your permissions.</source>
+        <translation>Кошелек Qwertycoin уже запущен либо не может создать файл блокировки %2. Проверьте права на запись.</translation>
     </message>
     <message>
         <source>New version available</source>
@@ -1380,7 +1380,7 @@ Do you want to go to download page?</source>
     </message>
     <message>
         <source>Qwertycoin wallet</source>
-        <translation>Qwertycoin Wallet</translation>
+        <translation>Кошелек карбованца</translation>
     </message>
     <message>
         <source>External port for p2p network protocol (if port forwarding used with NAT)</source>
@@ -1391,7 +1391,7 @@ Do you want to go to download page?</source>
     <name>WalletGui::ConfirmSendDialog</name>
     <message>
         <source>Confirm sending %1 QWC</source>
-        <translation>Подтвердите отправку %1 крб.</translation>
+        <translation>Подтвердите отправку %1 QWC.</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Payment ID: %1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>

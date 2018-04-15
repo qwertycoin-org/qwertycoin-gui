@@ -1,6 +1,6 @@
 // Copyright (c) 2011-2015 The Cryptonote developers
 // Copyright (c) 2016-2017 The Karbowanec developers
-// Copyright (c) 2017-2018 The Qwertycoin developers
+// Copyright (c) 2018 The Qwertycoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -234,7 +234,7 @@ QVariant TransactionsModel::getDisplayRole(const QModelIndex& _index) const {
 
   case COLUMN_AMOUNT: {
     qint64 amount = _index.data(ROLE_AMOUNT).value<qint64>();
-    QString amountStr = CurrencyAdapter::instance().formatAmount(qAbs(amount));//.remove(',');
+    QString amountStr = CurrencyAdapter::instance().formatAmount(qAbs(amount));
     return (amount < 0 ? "-" + amountStr : amountStr);
   }
 
@@ -287,7 +287,7 @@ QVariant TransactionsModel::getEditRole(const QModelIndex& _index) const {
 
   case COLUMN_AMOUNT: {
     qint64 amount = _index.data(ROLE_AMOUNT).value<qint64>();
-    QString amountStr = CurrencyAdapter::instance().formatAmount(qAbs(amount));//.remove(',');
+    QString amountStr = CurrencyAdapter::instance().formatAmount(qAbs(amount));
     if (amount < 0) {
       amountStr.insert(0, "-");
     }

@@ -1,96 +1,21 @@
 * {
-	color: #FFFFFF;
+	color: #15315E;
 }
 
 *:disabled {
 	color: #41548D;
 }
 
-QLabel {
-	color: #a2a2a2;
-}
-
 QTabBar {
-	background-color: #2d3e50;
+	background-color: #a8b6cb;
 }
 
 QMainWindow {
-	background-color:#3c546e;
-	background-image:url(":/images/bg.png");
-	background-position:bottom left;
-	background-repeat:no-repeat;
-}
-
-QMenu {
-    background-color: #2d3e50; /* sets background of the menu */
-    border: 1px solid black;
-}
-
-QMenu::item {
-    /* sets background of menu item. set this to something non-transparent
-        if you want menu color and menu item color to be different */
-    background-color: transparent;
-}
-
-QMenu::item:selected { /* when user selects item using mouse or keyboard */
-    background-color: #654321;
-}
-
-QMenuBar {
-    background-color: #f0f0f0;
-    color:#080808;
-}
-
-QMenuBar::item {
-    spacing: 3px; /* spacing between menu bar items */
-    padding: 1px 4px;
-    background: transparent;
-}
-
-QMenuBar::item:selected { /* when selected using mouse or keyboard */
-    background: #a8a8a8;
-}
-
-QMenuBar::item:pressed {
-    background: #888888;
+	background:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0	rgb(255, 255, 255) stop: 1.0 rgb(156, 193, 239)) url(":/images/bg.png") no-repeat bottom left;
 }
 
 QDialog {
-	background-color:#3c546e;
-	color:#000000;
-}
-
-QTreeView {
-    show-decoration-selected: 1;
-    color:#3c546e;
-}
-
-QTreeView::item {
-    border-left: 1px solid #d9d9d9;
-    border-top-color: transparent;
-    border-bottom-color: transparent;
-    color:#3c546e;
-}
-
-QTreeView::item:hover {
-    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #e7effd, stop: 1 #cbdaf1);
-    border: 1px solid #bfcde4;
-    text-color:#FFFFFF;
-}
-
-QTreeView::item:selected {
-    border: 1px solid #567dbc;
-    color:#3c546e;
-}
-
-QTreeView::item:selected:active{
-    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #6ea1f1, stop: 1 #567dbc);
-    color:#3c546e;
-}
-
-QTreeView::item:selected:!active {
-    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #6b9be8, stop: 1 #577fbf);
-    color:#3c546e;
+	background:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0	rgb(255, 255, 255) stop: 1.0 rgb(156, 193, 239));
 }
 
 QPushButton, QToolButton {
@@ -112,7 +37,7 @@ QToolButton {
 
 QPushButton:pressed,
 QToolButton:pressed {
-	background-color: #3c546e;
+	background-color: #346392;
 }
 
 QPushButton:focus,
@@ -126,8 +51,7 @@ QToolButton:default {
 }
 
 QPushButton:hover,
-QToolButton:hover,
-QMenuBar::item:hover {
+QToolButton:hover {
 	background-color: #628bb3;
 }
 
@@ -138,42 +62,36 @@ QToolButton:disabled {
 
 QPushButton::focus:hover,
 QToolButton::focus:hover {
-	background-color: #3c546e;
+	background-color: #346392;
 }
 
 QLineEdit {
 	border: 1px solid #6496c8;
 	border-radius: 2px;
 	padding: 2px 8px;
-	background: rgba(8, 8, 8,0.9);
+	background: rgba(255,255,255,0.9);
 	selection-background-color: #6481AA;
 	height: 23px;
-	color: #FFFFFF;
 }
 
 QTextEdit {
 	border: 1px solid #6496c8;
 	border-radius: 2px;
 	padding: 2px 8px;
-	background: rgba(8, 8, 8,0.9);
+	background: rgba(255,255,255,0.9);
 	selection-background-color: #6481AA;
-	color: #FFFFFF;
 }
 
-
-QLineEdit:focus, QSpinBox:focus, QDoubleSpinBox:focus, QComboBox:focus, QComboBox:editable, QComboBox:hover, QTextEdit:focus {
+QLineEdit:focus, QSpinBox:focus, QDoubleSpinBox:focus, QComboBox:focus, QTextEdit:focus {
 	border: 1px solid #27496d;
-	background: #080808;
-	selection-background-color: #6481AA;
 }
 
 QSpinBox, QDoubleSpinBox, QComboBox {
 	border: 1px solid #6496c8;
 	border-radius: 2px;
 	padding: 2px 8px;
-	background: rgba(8, 8, 8,0.9);
+	background: rgba(255,255,255,0.9);
 	height: 25px;
-	color: #FFFFFF;
 }
 
 QSpinBox::up-button, QDoubleSpinBox::up-button {
@@ -223,9 +141,9 @@ QComboBox::drop-down {
 
 QComboBox QAbstractItemView {
 	border: none;
-	background: #080808;
-	color: #FFFFFF;
-	selection-background-color: #654321;
+	background: white;
+	color: #15315E;
+	selection-background-color: rgba(133, 167, 211, 0.2);
 }
 
 QComboBox:item {
@@ -235,7 +153,7 @@ QComboBox:item {
 }
 
 QComboBox:item:selected {
-	background-color: #654321;
+	background-color: rgba(133, 167, 211, 0.1);
 	border: none;
 }
 
@@ -270,7 +188,7 @@ QSlider::sub-page:horizontal {
 }
 
 QSlider::add-page:horizontal {
-	background: #3c546e;
+	background: #fff;
 	border: 1px solid #15315e;
 	height: 5px;
 	border-radius: 2px;
@@ -290,7 +208,7 @@ QSlider::handle:horizontal {
 }
 
 QSlider::handle:horizontal:hover {
-	color: #FFFFFF;
+
 }
 
 QAbstractScrollArea#m_transfersScrollarea {
@@ -304,7 +222,7 @@ QWidget#scrollAreaWidgetContents {
 }
 
 QToolBar#accountToolBar { 
-	background-color: rgb(52, 73, 94);
+	background-color: rgb(133, 167, 211);
 	border: 0; min-height: 71px;
 }
 
@@ -315,7 +233,7 @@ QToolBar {
 }
 
 QToolBar#toolBar {
-	background-color: #34495e;
+	background-color: rgba(32, 55, 92, 0.9);
 	width: 150px; 
 	min-width: 150px; 
 	spacing: 0; 
@@ -334,30 +252,30 @@ QToolBar#toolBar QToolButton{
 	margin: 0;
 	spacing:0px;
 	width: 150px;
-	color: #FFFFFF;
+	color: #ffffff;
 	border: none;
 	border-radius: 0;
 	min-width: 150px;
 }
 
 QToolBar#toolBar QToolButton:pressed {
-	background-color: #3c546e;
+	background-color: rgba(133, 167, 211, 0.5);
 }
 
 QToolBar#toolBar QToolButton:checked {
-	background-color: #3c546e;
+	background-color: rgba(133, 167, 211, 0.6);
 }
 
 QToolBar#toolBar QToolButton:hover {
-	background-color: #3c546e;
+	background-color: rgba(133, 167, 211, 0.1);
 }
 
 QToolBar#toolBar QToolButton::checked:hover {
-	background-color: #3c546e;
+	background-color: rgba(133, 167, 211, 0.4);
 }
 
 QStatusBar#statusBar {
-	background-color: #3c546e;
+	background-color: rgba(222, 234, 250, 0.7);
 }
 
 #m_accountFrame #m_addressEdit {
@@ -375,16 +293,17 @@ QStatusBar#statusBar {
 }
 
 #m_accountFrame #totalBalance {
-	color: #FFFFFF;
+	color: #15315e;
 }
 
 #m_accountFrame #addressStatusLabel {
-	color: #FFFFFF;
+	color: #41548D;
 }
 
 QToolTip{
-	text-color: #FFFFFF;
-	background-color: #080808;
+	color: #ffffff;
+	background-color: #233E69;
 	border: none;
 	padding: 4px;
+	opacity: 230;
 }

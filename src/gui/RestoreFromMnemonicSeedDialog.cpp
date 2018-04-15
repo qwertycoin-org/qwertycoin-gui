@@ -1,12 +1,13 @@
 // Copyright (c) 2011-2016 The Cryptonote developers
 // Copyright (c) 2015-2016 XDN developers
-// Copyright (c) 2016-2017 The Karbowanec developers
-// Copyright (c) 2017-2018 The Qwertycoin developers
+// Copyright (c) 2016-2018 The Karbowanec developers
+// Copyright (c) 2018 The Qwertycoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <QApplication>
 #include <QFileDialog>
+#include <QStandardPaths>
 #include "RestoreFromMnemonicSeedDialog.h"
 #include "ui_restorefrommnemonicseeddialog.h"
 
@@ -30,7 +31,8 @@ QString RestoreFromMnemonicSeedDialog::getFilePath() const {
 void RestoreFromMnemonicSeedDialog::selectPathClicked() {
   QString filePath = QFileDialog::getSaveFileName(this, tr("Wallet file"),
 #ifdef Q_OS_WIN
-    QApplication::applicationDirPath(),
+    //QApplication::applicationDirPath(),
+      QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation),
 #else
     QDir::homePath(),
 #endif

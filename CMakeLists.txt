@@ -220,8 +220,8 @@ elseif (UNIX)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -maes -D_DARWIN_C_SOURCE")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -framework Cocoa -framework OpenGL -framework CoreFoundation -framework Carbon -framework IOKit -L/usr/lib")
 
-    set(MACOSX_BUNDLE_ICON_FILE qwertycoinz.icns)
-    set(APPLICATION_ICON src/images/qwertycoinz.icns)
+    set(MACOSX_BUNDLE_ICON_FILE qwertycoin.icns)
+    set(APPLICATION_ICON src/images/qwertycoin.icns)
     set_source_files_properties(${APPLICATION_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
     set(BUILD_PLATFORM MACOSX_BUNDLE)
@@ -288,7 +288,7 @@ elseif (UNIX)
         set(CPACK_GENERATOR DEB)
         set(CPACK_DEBIAN_PACKAGE_NAME ${CPACK_PACKAGE_NAME})
         set(CPACK_SYSTEM_NAME 64-bit)
-        set(CPACK_DEBIAN_PACKAGE_MAINTAINER "${CPACK_PACKAGE_VENDOR} <qwertycoin@protonmail.com>")
+        set(CPACK_DEBIAN_PACKAGE_MAINTAINER "${CPACK_PACKAGE_VENDOR} <dev@qwertycoin.org>")
         set(CPACK_DEBIAN_PACKAGE_SECTION Office)
         set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
         set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Qwertycoin QWC wallet
@@ -305,7 +305,7 @@ set(CPACK_PACKAGE_FILE_NAME "${CPACK_DEBIAN_PACKAGE_NAME}-${CPACK_PACKAGE_VERSIO
         set(CPACK_RPM_PACKAGE_REQUIRES "qt5-qtbase >= 5.3.2, qt5-qtbase-gui >= 5.3.2")
         set(CPACK_RPM_PACKAGE_SUMMARY "Qwertycoin QWC wallet")
         set(CPACK_RPM_PACKAGE_DESCRIPTION "Qwertycoin QWC wallet
- Qwertycoin is a decentralized, privacy oriented peer-to-peer
+ Qwertycoin is a decentrilized, privacy oriented peer-to-peer
  cryptocurrency. It is open-source, nobody owns or controls Qwertycoin
  and everyone can take part.")
 set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${VERSION_RELEASE}${CPACK_SYSTEM_NAME}")

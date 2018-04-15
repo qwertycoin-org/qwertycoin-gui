@@ -1,6 +1,6 @@
 // Copyright (c) 2011-2015 The Cryptonote developers
 // Copyright (c) 2016-2017 The Karbowanec developers
-// Copyright (c) 2017-2018 The Qwertycoin developers
+// Copyright (c) 2018 The Qwertycoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #include <QApplication>
@@ -9,8 +9,10 @@
 #include <QTranslator>
 #include <QLockFile>
 #include <QMessageBox>
+#include <QProcess>
 #include <QSplashScreen>
 #include <QStyleFactory>
+#include <QSettings>
 
 #include "CommandLineParser.h"
 #include "CurrencyAdapter.h"
@@ -66,6 +68,8 @@ int main(int argc, char* argv[]) {
             QLocale::setDefault(QLocale("es_ES"));
         } else if(lng == "fr") {
             QLocale::setDefault(QLocale("fr_FR"));
+        } else if(lng == "pt") {
+            QLocale::setDefault(QLocale("pt_BR"));
         } else {
             QLocale::setDefault(QLocale::c());
         }
@@ -103,6 +107,28 @@ int main(int argc, char* argv[]) {
     QMessageBox::information(nullptr, QObject::tr("Help"), cmdLineParser.getHelpText());
     return app.exec();
   }
+
+  //Create registry entries for URL execution
+  QSettings qwertycoinKey("HKEY_CLASSES_ROOT\\qwertycoin", QSettings::NativeFormat);
+  qwertycoinKey.setValue(".", "Qwertycoin Wallet");
+  qwertycoinKey.setValue("URL Protocol", "");
+  QSettings qwertycoinOpenKey("HKEY_CLASSES_ROOT\\qwertycoin\\shell\\open\\command", QSettings::NativeFormat);
+  qwertycoinOpenKey.setValue(".", "\"" + QCoreApplication::applicationFilePath().replace("/", "\\") + "\" \"%1\"");
+#endif
+
+#if defined(Q_OS_LINUX)
+  QStringList args;
+  QProcess exec;^
+
+  //as root
+  args << "-c" << "printf '[Desktop Entry]\\nName = Qwertycoin URL Handler\\nGenericName = Qwertycoin\\nComment = Handle URL Sheme qwertycoin://\\nExec = " + QCoreApplication::applicationFilePath() + " %%u\\nTerminal = false\\nType = Application\\nMimeType = x-scheme-handler/qwertycoin;\\nIcon = Qwertycoin-Wallet' | tee /usr/share/applications/qwertycoin-handler.desktop";
+  exec.start("/bin/sh", args);
+  exec.waitForFinished();
+
+  args.clear();
+  args << "-c" << "update-desktop-database";
+  exec.start("/bin/sh", args);
+  exec.waitForFinished();
 #endif
 
   LoggerAdapter::instance().init();
@@ -115,7 +141,7 @@ int main(int argc, char* argv[]) {
 
   QLockFile lockFile(Settings::instance().getDataDir().absoluteFilePath(QApplication::applicationName() + ".lock"));
   if (!lockFile.tryLock()) {
-    QMessageBox::warning(nullptr, QObject::tr("Fail"), QObject::tr("%1 wallet already running").arg(CurrencyAdapter::instance().getCurrencyDisplayName()));
+    QMessageBox::warning(nullptr, QObject::tr("Fail"), QObject::tr("%1 wallet already running or cannot create lock file %2. Check your permissions.").arg(CurrencyAdapter::instance().getCurrencyDisplayName()).arg(Settings::instance().getDataDir().absoluteFilePath(QApplication::applicationName() + ".lock")));
     return 0;
   }
 
