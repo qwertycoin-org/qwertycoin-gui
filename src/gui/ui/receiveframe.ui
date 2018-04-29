@@ -172,19 +172,19 @@
             <string/>
            </property>
            <property name="decimals">
-            <number>12</number>
+            <number>8</number>
            </property>
            <property name="minimum">
-            <double>0.000000000000000</double>
+            <double>0.00000000</double>
            </property>
            <property name="maximum">
-            <double>999999999999999.000000000000000</double>
+            <double>999999999999999.00000000</double>
            </property>
            <property name="singleStep">
-            <double>1.000000000000000</double>
+            <double>1.00000000</double>
            </property>
            <property name="value">
-            <double>0.000000000000000</double>
+            <double>0.00000000</double>
            </property>
           </widget>
          </item>
