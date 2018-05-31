@@ -1,7 +1,6 @@
 // Copyright (c) 2011-2015 The Cryptonote developers
 // Copyright (c) 2015-2016 XDN developers
 // Copyright (c) 2016-2017 The Karbowanec developers
-// Copyright (c) 2018 The Qwertycoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -39,15 +38,15 @@ SendFrame::SendFrame(QWidget* _parent) : QFrame(_parent), m_ui(new Ui::SendFrame
   connect(&WalletAdapter::instance(), &WalletAdapter::walletActualBalanceUpdatedSignal, this, &SendFrame::walletActualBalanceUpdated,
     Qt::QueuedConnection);
   connect(&WalletAdapter::instance(), &WalletAdapter::walletCloseCompletedSignal, this, &SendFrame::reset);
-  connect(&WalletAdapter::instance(), &WalletAdapter::walletSynchronizationCompletedSignal, this, &SendFrame::walletSynchronized,
-    Qt::QueuedConnection);
+  connect(&WalletAdapter::instance(), &WalletAdapter::walletSynchronizationCompletedSignal, this, &SendFrame::walletSynchronized
+    , Qt::QueuedConnection);
   connect(&WalletAdapter::instance(), &WalletAdapter::walletSynchronizationProgressUpdatedSignal,
     this, &SendFrame::walletSynchronizationInProgress, Qt::QueuedConnection);
 
   m_ui->m_tickerLabel->setText(CurrencyAdapter::instance().getCurrencyTicker().toUpper());
   m_ui->m_feeSpin->setSuffix(" " + CurrencyAdapter::instance().getCurrencyTicker().toUpper());
   m_ui->m_donateSpin->setSuffix(" " + CurrencyAdapter::instance().getCurrencyTicker().toUpper());
-  m_ui->m_feeSpin->setMinimum(CurrencyAdapter::instance().formatAmount(CurrencyAdapter::instance().getMinimumFee()).toDouble());
+
   m_ui->m_remote_label->hide();
   m_ui->m_sendButton->setEnabled(false);
 
@@ -65,7 +64,7 @@ SendFrame::SendFrame(QWidget* _parent) : QFrame(_parent), m_ui(new Ui::SendFrame
 }
 
 SendFrame::~SendFrame() {
-  m_transfers.clear();
+    m_transfers.clear();
     m_glassFrame->deleteLater();
 }
 
@@ -109,8 +108,7 @@ void SendFrame::clearAllClicked() {
   addRecipientClicked();
   amountValueChange();
   m_ui->m_paymentIdEdit->clear();
-  m_ui->m_mixinSlider->setValue(1);
-  m_ui->m_feeSpin->setValue(m_ui->m_feeSpin->minimum());
+  m_ui->m_mixinSlider->setValue(5);
 }
 
 void SendFrame::reset() {
@@ -140,11 +138,11 @@ void SendFrame::amountValueChange() {
         for(QVector<quint64>::iterator it = fees.begin(); it != fees.end(); ++it) {
             remote_node_fee += *it;
         }
-        if (remote_node_fee < CurrencyAdapter::instance().getMinimumFee()) {
-            remote_node_fee = CurrencyAdapter::instance().getMinimumFee();
-        }
-        if (remote_node_fee > 10000000000000) {
-            remote_node_fee = 10000000000000;
+    if (remote_node_fee < CurrencyAdapter::instance().getMinimumFee()) {
+      remote_node_fee = CurrencyAdapter::instance().getMinimumFee();
+    }
+        if (remote_node_fee > 10000000) {
+            remote_node_fee = 10000000;
         }
     }
 
@@ -198,6 +196,7 @@ void SendFrame::openUriClicked() {
 }
 
 void SendFrame::parsePaymentRequest(QString _request) {
+    MainWindow::instance().showNormal(); //raise window if minimized
     if(_request.startsWith("qwertycoin://", Qt::CaseInsensitive))
     {
        _request.replace(0, 13, "qwertycoin:");

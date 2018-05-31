@@ -1,6 +1,5 @@
 // Copyright (c) 2011-2015 The Cryptonote developers
 // Copyright (c) 2016-2017 The Karbowanec developers
-// Copyright (c) 2018 The Qwertycoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -398,6 +397,14 @@ public:
         }
   }
 
+  CryptoNote::BlockHeaderInfo getLastLocalBlockHeaderInfo() {
+    return m_node.getLastLocalBlockHeaderInfo();
+  }
+
+  uint8_t getCurrentBlockMajorVersion() {
+    return getLastLocalBlockHeaderInfo().majorVersion;
+  }
+
   CryptoNote::IWalletLegacy* createWallet() override {
     return new CryptoNote::WalletLegacy(m_currency, m_node, m_logManager);
   }
@@ -556,6 +563,14 @@ public:
     return m_nodeServer.getPeerlistManager().get_gray_peers_count();
   }
 
+  CryptoNote::BlockHeaderInfo getLastLocalBlockHeaderInfo() {
+    return m_node.getLastLocalBlockHeaderInfo();
+  }
+
+  uint8_t getCurrentBlockMajorVersion() {
+    return getLastLocalBlockHeaderInfo().majorVersion;
+  }
+  
   CryptoNote::IWalletLegacy* createWallet() override {
     return new CryptoNote::WalletLegacy(m_currency, m_node, m_logManager);
   }

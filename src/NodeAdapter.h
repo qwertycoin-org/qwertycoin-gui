@@ -1,6 +1,5 @@
 // Copyright (c) 2011-2015 The Cryptonote developers
 // Copyright (c) 2016-2017 The Karbowanec developers
-// Copyright (c) 2018 The Qwertycoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -53,6 +52,8 @@ public:
   quint64 getIncomingConnectionsCount();
   quint64 getWhitePeerlistSize();
   quint64 getGreyPeerlistSize();
+  uint8_t getCurrentBlockMajorVersion();
+  CryptoNote::BlockHeaderInfo getLastLocalBlockHeaderInfo();
   void peerCountUpdated(Node& _node, size_t _count) Q_DECL_OVERRIDE;
   void localBlockchainUpdated(Node& _node, uint64_t _height) Q_DECL_OVERRIDE;
   void lastKnownBlockHeightUpdated(Node& _node, uint64_t _height) Q_DECL_OVERRIDE;
