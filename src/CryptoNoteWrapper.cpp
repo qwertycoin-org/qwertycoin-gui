@@ -195,11 +195,11 @@ public:
     return m_node.getLastLocalBlockTimestamp();
   }
 
-  uint64_t getPeerCount() {
+  uint64_t getPeerCount() override {
     return m_node.getPeerCount();
   }
 
-  uint64_t getDifficulty() {
+  uint64_t getDifficulty() override {
     try {
         CryptoNote::COMMAND_RPC_GET_INFO::request req;
         CryptoNote::COMMAND_RPC_GET_INFO::response res;
@@ -221,7 +221,7 @@ public:
       }
   }
 
-  uint64_t getTxCount() {
+  uint64_t getTxCount() override {
       try {
           CryptoNote::COMMAND_RPC_GET_INFO::request req;
           CryptoNote::COMMAND_RPC_GET_INFO::response res;
@@ -243,7 +243,7 @@ public:
         }
   }
 
-  uint64_t getTxPoolSize() {
+  uint64_t getTxPoolSize() override {
       try {
           CryptoNote::COMMAND_RPC_GET_INFO::request req;
           CryptoNote::COMMAND_RPC_GET_INFO::response res;
@@ -265,7 +265,7 @@ public:
         }
   }
 
-  uint64_t getAltBlocksCount() {
+  uint64_t getAltBlocksCount() override {
       try {
           CryptoNote::COMMAND_RPC_GET_INFO::request req;
           CryptoNote::COMMAND_RPC_GET_INFO::response res;
@@ -287,7 +287,7 @@ public:
         }
   }
 
-  uint64_t getConnectionsCount() {
+  uint64_t getConnectionsCount() override {
       try {
           CryptoNote::COMMAND_RPC_GET_INFO::request req;
           CryptoNote::COMMAND_RPC_GET_INFO::response res;
@@ -309,7 +309,7 @@ public:
         }
   }
 
-  uint64_t getOutgoingConnectionsCount() {
+  uint64_t getOutgoingConnectionsCount() override {
       try {
           CryptoNote::COMMAND_RPC_GET_INFO::request req;
           CryptoNote::COMMAND_RPC_GET_INFO::response res;
@@ -331,7 +331,7 @@ public:
         }
   }
 
-  uint64_t getIncomingConnectionsCount() {
+  uint64_t getIncomingConnectionsCount() override {
       try {
           CryptoNote::COMMAND_RPC_GET_INFO::request req;
           CryptoNote::COMMAND_RPC_GET_INFO::response res;
@@ -353,7 +353,7 @@ public:
         }
   }
 
-  uint64_t getWhitePeerlistSize() {
+  uint64_t getWhitePeerlistSize() override {
       try {
           CryptoNote::COMMAND_RPC_GET_INFO::request req;
           CryptoNote::COMMAND_RPC_GET_INFO::response res;
@@ -375,7 +375,7 @@ public:
         }
   }
 
-  uint64_t getGreyPeerlistSize() {
+  uint64_t getGreyPeerlistSize() override {
       try {
           CryptoNote::COMMAND_RPC_GET_INFO::request req;
           CryptoNote::COMMAND_RPC_GET_INFO::response res;
@@ -401,7 +401,7 @@ public:
     return m_node.getLastLocalBlockHeaderInfo();
   }
 
-  uint8_t getCurrentBlockMajorVersion() {
+  uint8_t getCurrentBlockMajorVersion() override {
     return getLastLocalBlockHeaderInfo().majorVersion;
   }
 

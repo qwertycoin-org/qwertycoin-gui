@@ -136,7 +136,7 @@ void WalletAdapter::createWallet() {
     m_wallet->initAndGenerateDeterministic("");
 
     VerifyMnemonicSeedDialog dlg(nullptr);
-    if (!dlg.exec() == QDialog::Accepted) {
+    if (dlg.exec() != QDialog::Accepted) {
       return;
     }
   } catch (std::system_error&) {
