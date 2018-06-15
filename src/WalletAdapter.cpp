@@ -1,21 +1,9 @@
-// Copyright (c) 2011-2015 The Cryptonote developers
-// Copyright (c) 2017-2018, The karbo developers
-// Copyright (c) 2018, The Qwertcoin developers
-//
-// This file is part of Qwertycoin.
-//
-// Qwertycoin is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Qwertycoin is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with Qwertycoin. If not, see <http://www.gnu.org/licenses/>.
+// Copyright (c) 2011-2016 The Cryptonote developers
+// Copyright (c) 2015-2016 XDN developers
+// Copyright (c) 2016-2017 The Karbowanec developers
+// Copyright (c) 2018 The Qwertycoin developers
+// Distributed under the MIT/X11 software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <QCoreApplication>
 #include <QMessageBox>
@@ -105,14 +93,6 @@ quint64 WalletAdapter::getPendingBalance() const {
   }
 }
 
-quint64 WalletAdapter::getUnmixableBalance() const {
-  try {
-    return m_wallet == nullptr ? 0 : m_wallet->dustBalance();
-  } catch (std::system_error&) {
-    return 0;
-  }
-}
-
 void WalletAdapter::open(const QString& _password) {
   Q_ASSERT(m_wallet == nullptr);
   Settings::instance().setEncrypted(!_password.isEmpty());
@@ -141,7 +121,7 @@ void WalletAdapter::open(const QString& _password) {
     }
 
   } else {
-    //createWallet();
+    createWallet();
   }
 }
 
@@ -156,7 +136,7 @@ void WalletAdapter::createWallet() {
     m_wallet->initAndGenerateDeterministic("");
 
     VerifyMnemonicSeedDialog dlg(nullptr);
-    if (!dlg.exec() == QDialog::Accepted) {
+    if (dlg.exec() != QDialog::Accepted) {
       return;
     }
   } catch (std::system_error&) {
@@ -350,17 +330,6 @@ void WalletAdapter::sendTransaction(const QVector<CryptoNote::WalletLegacyTransf
   }
 }
 
-void WalletAdapter::sweepDust(const QVector<CryptoNote::WalletLegacyTransfer>& _transfers, quint64 _fee, const QString& _paymentId, quint64 _mixin) {
-  Q_CHECK_PTR(m_wallet);
-  try {
-    lock();
-    m_wallet->sendDustTransaction(_transfers.toStdVector(), _fee, NodeAdapter::instance().convertPaymentId(_paymentId), _mixin, 0);
-    Q_EMIT walletStateChangedSignal(tr("Sweeping unmixable dust"));
-  } catch (std::system_error&) {
-    unlock();
-  }
-}
-
 bool WalletAdapter::changePassword(const QString& _oldPassword, const QString& _newPassword) {
   Q_CHECK_PTR(m_wallet);
   try {
@@ -407,7 +376,6 @@ void WalletAdapter::onWalletInitCompleted(int _error, const QString& _errorText)
   case 0: {
     Q_EMIT walletActualBalanceUpdatedSignal(m_wallet->actualBalance());
     Q_EMIT walletPendingBalanceUpdatedSignal(m_wallet->pendingBalance());
-    Q_EMIT walletUnmixableBalanceUpdatedSignal(m_wallet->dustBalance());
     Q_EMIT updateWalletAddressSignal(QString::fromStdString(m_wallet->getAddress()));
     Q_EMIT reloadWalletTransactionsSignal();
     Q_EMIT walletStateChangedSignal(tr("Ready"));
@@ -468,10 +436,6 @@ void WalletAdapter::actualBalanceUpdated(uint64_t _actual_balance) {
 
 void WalletAdapter::pendingBalanceUpdated(uint64_t _pending_balance) {
   Q_EMIT walletPendingBalanceUpdatedSignal(_pending_balance);
-}
-
-void WalletAdapter::unmixableBalanceUpdated(uint64_t _dust_balance) {
-  Q_EMIT walletUnmixableBalanceUpdatedSignal(_dust_balance);
 }
 
 void WalletAdapter::externalTransactionCreated(CryptoNote::TransactionId _transactionId) {

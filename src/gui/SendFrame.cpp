@@ -1,22 +1,8 @@
 // Copyright (c) 2011-2015 The Cryptonote developers
 // Copyright (c) 2015-2016 XDN developers
-// Copyright (c) 2017-2018, The karbo developers
-// Copyright (c) 2018, The Qwertcoin developers
-//
-// This file is part of Qwertycoin.
-//
-// Qwertycoin is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Qwertycoin is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with Qwertycoin. If not, see <http://www.gnu.org/licenses/>.
+// Copyright (c) 2016-2017 The Karbowanec developers
+// Distributed under the MIT/X11 software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "AddressBookModel.h"
 #include "CurrencyAdapter.h"
@@ -60,7 +46,6 @@ SendFrame::SendFrame(QWidget* _parent) : QFrame(_parent), m_ui(new Ui::SendFrame
   m_ui->m_tickerLabel->setText(CurrencyAdapter::instance().getCurrencyTicker().toUpper());
   m_ui->m_feeSpin->setSuffix(" " + CurrencyAdapter::instance().getCurrencyTicker().toUpper());
   m_ui->m_donateSpin->setSuffix(" " + CurrencyAdapter::instance().getCurrencyTicker().toUpper());
-  m_ui->m_feeSpin->setMinimum(CurrencyAdapter::instance().formatAmount(CurrencyAdapter::instance().getMinimumFee()).toDouble());
 
   m_ui->m_remote_label->hide();
   m_ui->m_sendButton->setEnabled(false);
@@ -124,7 +109,6 @@ void SendFrame::clearAllClicked() {
   amountValueChange();
   m_ui->m_paymentIdEdit->clear();
   m_ui->m_mixinSlider->setValue(5);
-  m_ui->m_feeSpin->setValue(m_ui->m_feeSpin->minimum());
 }
 
 void SendFrame::reset() {
@@ -157,8 +141,8 @@ void SendFrame::amountValueChange() {
     if (remote_node_fee < CurrencyAdapter::instance().getMinimumFee()) {
       remote_node_fee = CurrencyAdapter::instance().getMinimumFee();
     }
-        if (remote_node_fee > 100000000) {
-            remote_node_fee = 100000000;
+        if (remote_node_fee > 10000000) {
+            remote_node_fee = 10000000;
         }
     }
 
