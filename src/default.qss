@@ -11,7 +11,10 @@ QTabBar {
 }
 
 QMainWindow {
-	background:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0	rgb(255, 255, 255) stop: 1.0 rgb(156, 193, 239)) url(":/images/bg.png") no-repeat bottom left;
+	background-color: #f9e9bf;
+	background-image:url(":/images/bg.png");
+	background-position:bottom left;
+	background-repeat:no-repeat;
 }
 
 QDialog {
