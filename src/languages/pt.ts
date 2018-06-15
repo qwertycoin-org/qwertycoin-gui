@@ -179,6 +179,10 @@
         <source>Português</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Français</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ChangePasswordDialog</name>
@@ -228,6 +232,10 @@
     <message>
         <source>Cancel</source>
         <translation>Cancelar</translation>
+    </message>
+    <message>
+        <source>Confirm sending %1 QWC</source>
+        <translation type="unfinished">Confirmar envio de %1 QWC</translation>
     </message>
 </context>
 <context>
@@ -351,6 +359,14 @@ Por favor aguarde...</translation>
         <source>OK</source>
         <translation>Concluído</translation>
     </message>
+    <message>
+        <source>Where to save new wallet file:</source>
+        <translation>Onde salvar o novo arquivo da carteira:</translation>
+    </message>
+    <message>
+        <source>Select folder</source>
+        <translation>Selecione a pasta</translation>
+    </message>
 </context>
 <context>
     <name>ImportTrackingKeyDialog</name>
@@ -381,6 +397,14 @@ Por favor aguarde...</translation>
     <message>
         <source>OK</source>
         <translation>Concluído</translation>
+    </message>
+    <message>
+        <source>Where to save new wallet file:</source>
+        <translation>Onde salvar o novo arquivo da carteira:</translation>
+    </message>
+    <message>
+        <source>Select folder</source>
+        <translation>Selecione a pasta</translation>
     </message>
 </context>
 <context>
@@ -622,7 +646,15 @@ Por favor aguarde...</translation>
     </message>
     <message>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation>Sobre</translation>
+    </message>
+    <message>
+        <source>Wallet</source>
+        <translation>Carteira</translation>
+    </message>
+    <message>
+        <source>Sweep unmixable</source>
+        <translation>Limpar não-misturável</translation>
     </message>
 </context>
 <context>
@@ -804,6 +836,25 @@ Por favor aguarde...</translation>
     </message>
 </context>
 <context>
+    <name>NoWalletFrame</name>
+    <message>
+        <source>Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Welcome to Qwertycoin Wallet!</source>
+        <translation>Bem-vindo ao Qwertycoin carteira!</translation>
+    </message>
+    <message>
+        <source>Create wallet</source>
+        <translation>Criar carteira</translation>
+    </message>
+    <message>
+        <source>Open wallet</source>
+        <translation>Abrir carteira</translation>
+    </message>
+</context>
+<context>
     <name>OpenUriDialog</name>
     <message>
         <source>Open payment request</source>
@@ -855,6 +906,14 @@ Por favor aguarde...</translation>
     <message>
         <source>Available balance:</source>
         <translation>Saldo disponível:</translation>
+    </message>
+    <message>
+        <source>Unmixable dust:</source>
+        <translation>Não-misturável:</translation>
+    </message>
+    <message>
+        <source>0.00</source>
+        <translation>0.00</translation>
     </message>
 </context>
 <context>
@@ -1023,6 +1082,14 @@ Você quer ir à página de dowload?</translation>
     <message>
         <source>OK</source>
         <translation>Ok</translation>
+    </message>
+    <message>
+        <source>Where to save new wallet file:</source>
+        <translation>Onde salvar o novo arquivo da carteira:</translation>
+    </message>
+    <message>
+        <source>Select folder</source>
+        <translation>Selecione a pasta</translation>
     </message>
 </context>
 <context>
@@ -1407,6 +1474,10 @@ Você quer ir à página de dowload?</translation>
         <source>External port for p2p network protocol (if port forwarding used with NAT)</source>
         <translation>Porta externa para o protocolo p2p da rede (se o encaminhamento de porta for usado no NAT)</translation>
     </message>
+    <message>
+        <source>Qwertycoin wallet</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>WalletGui::ConfirmSendDialog</name>
@@ -1454,6 +1525,10 @@ Você quer ir à página de dowload?</translation>
     <message>
         <source>Tracking wallets (*.trackingwallet)</source>
         <translation>Bolsas para rastreamento (*.trackingwallet)</translation>
+    </message>
+    <message>
+        <source>Tracking wallets (*.wallet)</source>
+        <translation>Bolsas para rastreamento (*.wallet)</translation>
     </message>
 </context>
 <context>
@@ -2144,6 +2219,10 @@ Você tem certeza?</translation>
     <message>
         <source>There must be an error in mnemonic seed. Make sure you entered it correctly.</source>
         <translation>Há uma falha na frase mnemônica. Verifique se você digitou corretamente.</translation>
+    </message>
+    <message>
+        <source>Sweeping unmixable dust</source>
+        <translation>Varrendo não misturável</translation>
     </message>
 </context>
 </TS>

@@ -167,6 +167,10 @@
         <source>Français</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Português</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ChangePasswordDialog</name>
@@ -339,6 +343,14 @@ Please wait...</source>
         <source>OK</source>
         <translation>Гаразд</translation>
     </message>
+    <message>
+        <source>Where to save new wallet file:</source>
+        <translation>Куди зберегти файл  нового гаманця:</translation>
+    </message>
+    <message>
+        <source>Select folder</source>
+        <translation>Вибрати каталог</translation>
+    </message>
 </context>
 <context>
     <name>ImportTrackingKeyDialog</name>
@@ -369,6 +381,14 @@ Please wait...</source>
     <message>
         <source>OK</source>
         <translation>Гаразд</translation>
+    </message>
+    <message>
+        <source>Where to save new wallet file:</source>
+        <translation>Куди зберегти файл вашого нового гаманця:</translation>
+    </message>
+    <message>
+        <source>Select folder</source>
+        <translation>Вибрати каталог</translation>
     </message>
 </context>
 <context>
@@ -608,6 +628,14 @@ Please wait...</source>
         <source>Start pool mining automatically</source>
         <translation>Запускати карбування при старті</translation>
     </message>
+    <message>
+        <source>Wallet</source>
+        <translation>Гаманець</translation>
+    </message>
+    <message>
+        <source>Sweep unmixable</source>
+        <translation type="unfinished">Прибрати незмішуване</translation>
+    </message>
 </context>
 <context>
     <name>MiningFrame</name>
@@ -788,6 +816,25 @@ Please wait...</source>
     </message>
 </context>
 <context>
+    <name>NoWalletFrame</name>
+    <message>
+        <source>Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Welcome to Qwertycoin Wallet!</source>
+        <translation>Вітаємо в гаманці Qwertycoin!</translation>
+    </message>
+    <message>
+        <source>Create wallet</source>
+        <translation>Створити гаманець</translation>
+    </message>
+    <message>
+        <source>Open wallet</source>
+        <translation>Відкрити гаманець</translation>
+    </message>
+</context>
+<context>
     <name>OpenUriDialog</name>
     <message>
         <source>Open payment request</source>
@@ -839,6 +886,14 @@ Please wait...</source>
     <message>
         <source>Available balance:</source>
         <translation>Доступний баланс:</translation>
+    </message>
+    <message>
+        <source>Unmixable dust:</source>
+        <translation>Незмішуване:</translation>
+    </message>
+    <message>
+        <source>0.00</source>
+        <translation>0.00</translation>
     </message>
 </context>
 <context>
@@ -1007,6 +1062,14 @@ Do you want to go to download page?</source>
     <message>
         <source>OK</source>
         <translation>Гаразд</translation>
+    </message>
+    <message>
+        <source>Where to save new wallet file:</source>
+        <translation>Куди зберегти файл вашого нового гаманця:</translation>
+    </message>
+    <message>
+        <source>Select folder</source>
+        <translation>Вибрати каталог</translation>
     </message>
 </context>
 <context>
@@ -1437,6 +1500,10 @@ Do you want to go to download page?</source>
     <message>
         <source>Tracking wallets (*.trackingwallet)</source>
         <translation>Гаманці стеження (*.trackingwallet)</translation>
+    </message>
+    <message>
+        <source>Tracking wallets (*.wallet)</source>
+        <translation>Гаманці стеження (*.wallet)</translation>
     </message>
 </context>
 <context>
@@ -2133,6 +2200,10 @@ Are you sure?</source>
     <message>
         <source>There must be an error in mnemonic seed. Make sure you entered it correctly.</source>
         <translation>У мнемомічній фразі є помилка. Перевірте чи ви ввели її правильно.</translation>
+    </message>
+    <message>
+        <source>Sweeping unmixable dust</source>
+        <translation type="unfinished">Триває оптимізація незмішуваних виходів</translation>
     </message>
 </context>
 </TS>

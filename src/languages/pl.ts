@@ -167,6 +167,10 @@
         <source>Français</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Português</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ChangePasswordDialog</name>
@@ -339,6 +343,14 @@ Proszę czekać...</translation>
         <source>OK</source>
         <translation>OK</translation>
     </message>
+    <message>
+        <source>Where to save new wallet file:</source>
+        <translation>Gdzie zapisać nowy plik portfela:</translation>
+    </message>
+    <message>
+        <source>Select folder</source>
+        <translation>Wybierz katalog</translation>
+    </message>
 </context>
 <context>
     <name>ImportTrackingKeyDialog</name>
@@ -369,6 +381,14 @@ Proszę czekać...</translation>
     <message>
         <source>OK</source>
         <translation>OK</translation>
+    </message>
+    <message>
+        <source>Where to save new wallet file:</source>
+        <translation>Gdzie zapisać nowy plik portfela:</translation>
+    </message>
+    <message>
+        <source>Select folder</source>
+        <translation>Wybierz katalog</translation>
     </message>
 </context>
 <context>
@@ -608,6 +628,14 @@ Proszę czekać...</translation>
         <source>Start pool mining automatically</source>
         <translation>Uruchamiać karbowanie automatycznie</translation>
     </message>
+    <message>
+        <source>Wallet</source>
+        <translation>Portfel</translation>
+    </message>
+    <message>
+        <source>Sweep unmixable</source>
+        <translation>Zmieszaj nieosiągalne wyjścia</translation>
+    </message>
 </context>
 <context>
     <name>MiningFrame</name>
@@ -788,6 +816,25 @@ Proszę czekać...</translation>
     </message>
 </context>
 <context>
+    <name>NoWalletFrame</name>
+    <message>
+        <source>Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Welcome to Qwertycoin Wallet!</source>
+        <translation>Witaj w portfelu Qwertycoin!</translation>
+    </message>
+    <message>
+        <source>Create wallet</source>
+        <translation>Utwórz portfel</translation>
+    </message>
+    <message>
+        <source>Open wallet</source>
+        <translation>Otwórz portfel</translation>
+    </message>
+</context>
+<context>
     <name>OpenUriDialog</name>
     <message>
         <source>Open payment request</source>
@@ -839,6 +886,14 @@ Proszę czekać...</translation>
     <message>
         <source>Available balance:</source>
         <translation>Dostępne saldo:</translation>
+    </message>
+    <message>
+        <source>Unmixable dust:</source>
+        <translation>Nieosiągalne:</translation>
+    </message>
+    <message>
+        <source>0.00</source>
+        <translation>0.00</translation>
     </message>
 </context>
 <context>
@@ -1003,6 +1058,14 @@ Czy chesz otworzyć stronę pobierania w przeglądarce?</translation>
     <message>
         <source>OK</source>
         <translation>OK</translation>
+    </message>
+    <message>
+        <source>Where to save new wallet file:</source>
+        <translation>Gdzie zapisać nowy plik portfela:</translation>
+    </message>
+    <message>
+        <source>Select folder</source>
+        <translation>Wybierz katalog</translation>
     </message>
 </context>
 <context>
@@ -1444,6 +1507,10 @@ Czy chesz otworzyć stronę pobierania w przeglądarce?</translation>
     <message>
         <source>Tracking wallets (*.trackingwallet)</source>
         <translation>Porfel śledzenia (*.trackingwallet)</translation>
+    </message>
+    <message>
+        <source>Tracking wallets (*.wallet)</source>
+        <translation>Porfel śledzenia (*.wallet)</translation>
     </message>
 </context>
 <context>
@@ -2148,6 +2215,10 @@ Jesteś pewien?</translation>
     <message>
         <source>There must be an error in mnemonic seed. Make sure you entered it correctly.</source>
         <translation>Musi istnieć błąd w mnemoniku. Upewnij się, że został prawidłowo wprowadzony.</translation>
+    </message>
+    <message>
+        <source>Sweeping unmixable dust</source>
+        <translation>Optymizacja nieosiągalnych wyjść</translation>
     </message>
 </context>
 </TS>

@@ -183,6 +183,10 @@
         <source>Français</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Português</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ChangePasswordDialog</name>
@@ -359,6 +363,14 @@ S&apos;il vous plaît, patientez...</translation>
         <source>OK</source>
         <translation>OK</translation>
     </message>
+    <message>
+        <source>Where to save new wallet file:</source>
+        <translation>Où sauvegarder le nouveau fichier de portefeuille:</translation>
+    </message>
+    <message>
+        <source>Select folder</source>
+        <translation>Choisir le dossier</translation>
+    </message>
 </context>
 <context>
     <name>ImportTrackingKeyDialog</name>
@@ -389,6 +401,14 @@ S&apos;il vous plaît, patientez...</translation>
     <message>
         <source>OK</source>
         <translation>OK</translation>
+    </message>
+    <message>
+        <source>Where to save new wallet file:</source>
+        <translation>Où sauvegarder le nouveau fichier de portefeuille:</translation>
+    </message>
+    <message>
+        <source>Select folder</source>
+        <translation>Choisir le dossier</translation>
     </message>
 </context>
 <context>
@@ -628,6 +648,14 @@ S&apos;il vous plaît, patientez...</translation>
         <source>Start pool mining automatically</source>
         <translation>Démarrer l&apos;exploration de la piscine automatiquement</translation>
     </message>
+    <message>
+        <source>Wallet</source>
+        <translation>Portefeuille</translation>
+    </message>
+    <message>
+        <source>Sweep unmixable</source>
+        <translation>Balayer Non Mélangeables</translation>
+    </message>
 </context>
 <context>
     <name>MiningFrame</name>
@@ -808,6 +836,25 @@ S&apos;il vous plaît, patientez...</translation>
     </message>
 </context>
 <context>
+    <name>NoWalletFrame</name>
+    <message>
+        <source>Frame</source>
+        <translation type="unfinished">Cadre</translation>
+    </message>
+    <message>
+        <source>Welcome to Qwertycoin Wallet!</source>
+        <translation>Bienvenue sur Qwertycoin Wallet!</translation>
+    </message>
+    <message>
+        <source>Create wallet</source>
+        <translation>Créer un portefeuille</translation>
+    </message>
+    <message>
+        <source>Open wallet</source>
+        <translation>Ouvrir un portefeuille</translation>
+    </message>
+</context>
+<context>
     <name>OpenUriDialog</name>
     <message>
         <source>Open payment request</source>
@@ -859,6 +906,14 @@ S&apos;il vous plaît, patientez...</translation>
     <message>
         <source>Available balance:</source>
         <translation>Balance disponible:</translation>
+    </message>
+    <message>
+        <source>Unmixable dust:</source>
+        <translation>Non Mélangeables:</translation>
+    </message>
+    <message>
+        <source>0.00</source>
+        <translation>0.00</translation>
     </message>
 </context>
 <context>
@@ -1027,6 +1082,14 @@ Voulez-vous aller à la page de téléchargement?</translation>
     <message>
         <source>OK</source>
         <translation>OK</translation>
+    </message>
+    <message>
+        <source>Where to save new wallet file:</source>
+        <translation>Où sauvegarder le nouveau fichier de portefeuille:</translation>
+    </message>
+    <message>
+        <source>Select folder</source>
+        <translation>Choisir le dossier</translation>
     </message>
 </context>
 <context>
@@ -1461,6 +1524,10 @@ Voulez-vous aller à la page de téléchargement?</translation>
     <message>
         <source>Tracking wallets (*.trackingwallet)</source>
         <translation>Suivi des portefeuilles (*.trackingwallet)</translation>
+    </message>
+    <message>
+        <source>Tracking wallets (*.wallet)</source>
+        <translation>Suivi des portefeuilles (*.wallet)</translation>
     </message>
 </context>
 <context>
@@ -2151,6 +2218,10 @@ Are you sure?</source>
     <message>
         <source>There must be an error in mnemonic seed. Make sure you entered it correctly.</source>
         <translation>Il doit y avoir une erreur dans la graine mnémotechnique. Assurez-vous que vous l&apos;avez entré correctement.</translation>
+    </message>
+    <message>
+        <source>Sweeping unmixable dust</source>
+        <translation>Balayer non mélangeable</translation>
     </message>
 </context>
 </TS>
