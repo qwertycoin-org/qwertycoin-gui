@@ -190,6 +190,7 @@ if (WIN32)
   endif ()
   add_definitions(/D_CRT_SECURE_NO_WARNINGS /D_WIN32_WINNT=0x0600 /DSTATICLIB)
   include_directories(cryptonote/src/platform/msc)
+  
   set( CMAKE_CXX_FLAGS "-bigobj -EHsc")
   set(PLATFORM_DIR Windows)
   set(BUILD_PLATFORM WIN32)

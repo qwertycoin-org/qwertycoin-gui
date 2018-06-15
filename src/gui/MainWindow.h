@@ -1,9 +1,22 @@
 // Copyright (c) 2011-2016 The Cryptonote developers
 // Copyright (c) 2015-2016 XDN developers
-// Copyright (c) 2016-2017 The Karbowanec developers
-// Copyright (c) 2018 The Qwertycoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+// Copyright (c) 2017-2018, The karbo developers
+// Copyright (c) 2018, The Qwertcoin developers
+//
+// This file is part of Qwertycoin.
+//
+// Qwertycoin is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Qwertycoin is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with Qwertycoin. If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
@@ -85,6 +98,7 @@ private:
   void onUriOpenSignal();
   void adjustForCurrentFile(const QString& filePath);
   void updateRecentActionList();
+  void updateUnmixableBalance(quint64 _balance);
 
   Q_SLOT void createWallet();
   Q_SLOT void createNonDeterministicWallet();
@@ -113,6 +127,7 @@ private:
   Q_SLOT void showNormalIfMinimized(bool fToggleHidden = false);
   Q_SLOT void showMnemonicSeed();
   Q_SLOT void restoreFromMnemonicSeed();
+  Q_SLOT void sweepUnmixable();
 
   bool isObscured(QWidget *w);
   bool checkPoint(const QPoint &p, const QWidget *w);

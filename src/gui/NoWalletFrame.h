@@ -1,4 +1,3 @@
-// Copyright (c) 2011-2015 The Cryptonote developers
 // Copyright (c) 2017-2018, The karbo developers
 // Copyright (c) 2018, The Qwertcoin developers
 //
@@ -16,38 +15,34 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with Qwertycoin. If not, see <http://www.gnu.org/licenses/>.
+
 #pragma once
 
 #include <QFrame>
-#include <QStyledItemDelegate>
 
 namespace Ui {
-class OverviewFrame;
+  class NoWalletFrame;
 }
 
 namespace WalletGui {
 
-class RecentTransactionsModel;
-
-class OverviewFrame : public QFrame {
+class NoWalletFrame : public QFrame {
   Q_OBJECT
-  Q_DISABLE_COPY(OverviewFrame)
+  Q_DISABLE_COPY(NoWalletFrame)
 
 public:
-  OverviewFrame(QWidget* _parent);
-  ~OverviewFrame();
+  NoWalletFrame(QWidget* _parent);
+  ~NoWalletFrame();
 
+ Q_SLOT void createWallet();
+ Q_SLOT void openWallet();
+  
 private:
-  QScopedPointer<Ui::OverviewFrame> m_ui;
-  QSharedPointer<RecentTransactionsModel> m_transactionModel;
+  QScopedPointer<Ui::NoWalletFrame> m_ui;
 
-  void transactionsInserted(const QModelIndex& _parent, int _first, int _last);
-  void transactionsRemoved(const QModelIndex& _parent, int _first, int _last);
-  void layoutChanged();
-  void updateActualBalance(quint64 _balance);
-  void updatePendingBalance(quint64 _balance);
-  void updateUnmixableBalance(quint64 _balance);
-  void reset();
+Q_SIGNALS:
+  void createWalletClickedSignal();
+  void openWalletClickedSignal();
 };
 
 }

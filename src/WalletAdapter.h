@@ -1,9 +1,22 @@
 // Copyright (c) 2011-2016 The Cryptonote developers
 // Copyright (c) 2015-2016 XDN developers
-// Copyright (c) 2016-2017 The Karbowanec developers
-// Copyright (c) 2018 The Qwertycoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+// Copyright (c) 2017-2018, The karbo developers
+// Copyright (c) 2018, The Qwertcoin developers
+//
+// This file is part of Qwertycoin.
+//
+// Qwertycoin is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Qwertycoin is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with Qwertycoin. If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
@@ -38,6 +51,7 @@ public:
 
   QString getAddress() const;
   quint64 getActualBalance() const;
+  quint64 getUnmixableBalance() const;
   quint64 getPendingBalance() const;
   quint64 getTransactionCount() const;
   quint64 getTransferCount() const;
@@ -46,6 +60,7 @@ public:
   bool getAccountKeys(CryptoNote::AccountKeys& _keys);
   bool isOpen() const;
   void sendTransaction(const QVector<CryptoNote::WalletLegacyTransfer>& _transfers, quint64 _fee, const QString& _payment_id, quint64 _mixin);
+  void sweepDust(const QVector<CryptoNote::WalletLegacyTransfer>& _transfers, quint64 _fee, const QString& _payment_id, quint64 _mixin);  
   bool changePassword(const QString& _old_pass, const QString& _new_pass);
   void setWalletFile(const QString& _path);
 
@@ -55,6 +70,7 @@ public:
   void synchronizationCompleted(std::error_code _error) Q_DECL_OVERRIDE;
   void actualBalanceUpdated(uint64_t _actual_balance) Q_DECL_OVERRIDE;
   void pendingBalanceUpdated(uint64_t _pending_balance) Q_DECL_OVERRIDE;
+  void unmixableBalanceUpdated(uint64_t _dust_balance) Q_DECL_OVERRIDE;
   void externalTransactionCreated(CryptoNote::TransactionId _transaction_id) Q_DECL_OVERRIDE;
   void sendTransactionCompleted(CryptoNote::TransactionId _transaction_id, std::error_code _result) Q_DECL_OVERRIDE;
   void transactionUpdated(CryptoNote::TransactionId _transaction_id) Q_DECL_OVERRIDE;
@@ -101,6 +117,7 @@ Q_SIGNALS:
   void walletSynchronizationCompletedSignal(int _error, const QString& _error_text);
   void walletActualBalanceUpdatedSignal(quint64 _actual_balance);
   void walletPendingBalanceUpdatedSignal(quint64 _pending_balance);
+  void walletUnmixableBalanceUpdatedSignal(quint64 _dust_balance);
   void walletTransactionCreatedSignal(CryptoNote::TransactionId _transaction_id);
   void walletSendTransactionCompletedSignal(CryptoNote::TransactionId _transaction_id, int _error, const QString& _error_text);
   void walletTransactionUpdatedSignal(CryptoNote::TransactionId _transaction_id);
