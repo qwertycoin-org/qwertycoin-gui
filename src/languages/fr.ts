@@ -1380,6 +1380,10 @@ Voulez-vous aller à la page de téléchargement?</translation>
         <source>Contact with such label already exists.</source>
         <translation>Le contact avec cet label existe déjà.</translation>
     </message>
+    <message>
+        <source>&amp;Pay to</source>
+        <translation>&amp;Payer ce destinataire</translation>
+    </message>
 </context>
 <context>
     <name>WalletGui::AddressBookModel</name>
