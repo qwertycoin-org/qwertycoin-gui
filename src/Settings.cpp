@@ -91,7 +91,7 @@ void Settings::load() {
   }
 
   QStringList defaultPoolList;
-  defaultPoolList << "qwertycoin.site:3333" << "qwcpool.partyvibe.com:2000" << "qwerty.mineallcrypto.com:6076";
+  defaultPoolList << "qwertycoin.site:3333" << "pool.qwertycoin.org:3333" << "qwcpool.partyvibe.com:2000";
   if (!m_settings.contains(OPTION_MINING_POOLS)) {
     setMiningPoolList(QStringList() << defaultPoolList);
   } else {
