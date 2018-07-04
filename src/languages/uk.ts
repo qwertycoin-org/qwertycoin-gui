@@ -1741,7 +1741,7 @@ Are you sure?</source>
         <translation>Mining solo. Hashrate: %1 H/s</translation>
     </message>
     <message>
-        <source>Starting solo minining...</source>
+        <source>Starting solo mining...</source>
         <translation>Запуск карбування соло...</translation>
     </message>
     <message>

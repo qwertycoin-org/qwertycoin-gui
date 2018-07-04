@@ -1756,7 +1756,7 @@ Are you sure?</source>
         <translation>Чаканка соло. Хешрейт: %1 H/s</translation>
     </message>
     <message>
-        <source>Starting solo minining...</source>
+        <source>Starting solo mining...</source>
         <translation>Запуск чаканкі соло...</translation>
     </message>
     <message>

@@ -1756,7 +1756,7 @@ Jesteś pewien?</translation>
         <translation>Trwa karbowanie solo. Hashrate: %1 H/s</translation>
     </message>
     <message>
-        <source>Starting solo minining...</source>
+        <source>Starting solo mining...</source>
         <translation>Uruchamia się karbowanie solo...</translation>
     </message>
     <message>

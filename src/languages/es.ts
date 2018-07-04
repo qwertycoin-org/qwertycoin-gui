@@ -1748,7 +1748,7 @@ Are you sure?</source>
         <translation>Mining solo. Tasa de hash: %1 H/s</translation>
     </message>
     <message>
-        <source>Starting solo minining...</source>
+        <source>Starting solo mining...</source>
         <translation>Iniciando solo mining...</translation>
     </message>
     <message>

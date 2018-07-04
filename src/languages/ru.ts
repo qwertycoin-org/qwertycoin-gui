@@ -1745,7 +1745,7 @@ Are you sure?</source>
         <translation>Майнинг соло. Скорость: %1 H/s</translation>
     </message>
     <message>
-        <source>Starting solo minining...</source>
+        <source>Starting solo mining...</source>
         <translation>Запуск майнинга соло...</translation>
     </message>
     <message>

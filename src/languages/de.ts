@@ -1752,8 +1752,8 @@ Bist du sicher?</translation>
         <translation>Mining solo. Hashrate: %1 H/s</translation>
     </message>
     <message>
-        <source>Starting solo minining...</source>
-        <translation>Starte solo minining...</translation>
+        <source>Starting solo mining...</source>
+        <translation>Starte solo mining...</translation>
     </message>
     <message>
         <source>Mining in pool. Hashrate: %1 H/s</source>
