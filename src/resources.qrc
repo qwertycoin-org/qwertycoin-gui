@@ -67,11 +67,15 @@
         <file>languages/pt.qm</file>
         <file>languages/qt_pt.qm</file>
         <file>languages/ja.qm</file>
+        <file>languages/qt_ja.qm</file>
         <file>languages/it.qm</file>
+        <file>languages/qt_it.qm</file>
         <file>languages/ko.qm</file>
+        <file>languages/qt_ko.qm</file>
         <file>languages/zh.qm</file>
         <file>languages/hi.qm</file>
         <file>languages/ar.qm</file>
+        <file>languages/qt_ar.qm</file>
     </qresource>
     <qresource prefix="/fonts">
         <file alias="mplusm">fonts/mplus-1m-medium.ttf</file>

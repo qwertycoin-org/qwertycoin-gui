@@ -55,24 +55,36 @@ int main(int argc, char* argv[]) {
       translatorQt.load(":/languages/qt_" + lng + ".qm");
 
       if(lng == "uk") {
-            QLocale::setDefault(QLocale("uk_UA"));
-        } else if(lng == "ru") {
-            QLocale::setDefault(QLocale("ru_RU"));
-        } else if(lng == "pl") {
-            QLocale::setDefault(QLocale("pl_PL"));
-        } else if(lng == "be") {
-            QLocale::setDefault(QLocale("be_BY"));
-        } else if(lng == "de") {
-            QLocale::setDefault(QLocale("de_DE"));
-        } else if(lng == "es") {
-            QLocale::setDefault(QLocale("es_ES"));
-        } else if(lng == "fr") {
-            QLocale::setDefault(QLocale("fr_FR"));
-        } else if(lng == "pt") {
-            QLocale::setDefault(QLocale("pt_BR"));
-        } else {
-            QLocale::setDefault(QLocale::c());
-        }
+          QLocale::setDefault(QLocale("uk_UA"));
+      } else if(lng == "ru") {
+          QLocale::setDefault(QLocale("ru_RU"));
+      } else if(lng == "pl") {
+          QLocale::setDefault(QLocale("pl_PL"));
+      } else if(lng == "be") {
+          QLocale::setDefault(QLocale("be_BY"));
+      } else if(lng == "de") {
+          QLocale::setDefault(QLocale("de_DE"));
+      } else if(lng == "es") {
+          QLocale::setDefault(QLocale("es_ES"));
+      } else if(lng == "fr") {
+          QLocale::setDefault(QLocale("fr_FR"));
+      } else if(lng == "pt") {
+          QLocale::setDefault(QLocale("pt_BR"));
+      } else if(lng == "ja") {
+          QLocale::setDefault(QLocale("ja_JP"));
+      } else if(lng == "it") {
+          QLocale::setDefault(QLocale("it_IT"));
+      } else if(lng == "ko") {
+          QLocale::setDefault(QLocale("ko_KR"));
+      } else if(lng == "zh") {
+          QLocale::setDefault(QLocale("zh_CN"));
+      } else if(lng == "hi") {
+          QLocale::setDefault(QLocale("hi_IN"));
+      } else if(lng == "ar") {
+          QLocale::setDefault(QLocale("ar_AE"));
+      } else {
+          QLocale::setDefault(QLocale::c());
+      }
 
     } else {
       translator.load(":/languages/" + QLocale::system().name());
@@ -153,7 +165,7 @@ int main(int argc, char* argv[]) {
     splash->show();
   }
 
-  splash->showMessage(QObject::tr("Loading blockchain..."), Qt::AlignLeft | Qt::AlignBottom, Qt::white);
+  //splash->showMessage(QObject::tr("Loading blockchain..."), Qt::AlignLeft | Qt::AlignBottom, Qt::white);
 
   app.processEvents();
   qRegisterMetaType<CryptoNote::TransactionId>("CryptoNote::TransactionId");
