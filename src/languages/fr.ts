@@ -1131,7 +1131,7 @@ Voulez-vous aller à la page de téléchargement?</translation>
         <translation>Identifiant de paiement émis par le bénéficiaire (échange, magasin ou autre entité)</translation>
     </message>
     <message>
-        <source>Donate 0.1% to development fund:</source>
+        <source>Donate 0.1% to foundation fund:</source>
         <translation>Faire un don de 0,1% au fonds de développement:</translation>
     </message>
     <message>

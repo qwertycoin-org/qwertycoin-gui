@@ -1131,7 +1131,7 @@ Você quer ir à página de dowload?</translation>
         <translation>Identificador de pagamento emitido pelo destinatário (bolsa de valores, loja ou outra instituição)</translation>
     </message>
     <message>
-        <source>Donate 0.1% to development fund:</source>
+        <source>Donate 0.1% to foundation fund:</source>
         <translation>Faça uma contribuição de 0,1% para o desenvolvimento:</translation>
     </message>
     <message>

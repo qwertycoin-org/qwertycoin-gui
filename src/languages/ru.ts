@@ -1107,7 +1107,7 @@ Do you want to go to download page?</source>
         <translation>Идентификатор платежа выданный получателем (биржей, магазином или другим учреждением)</translation>
     </message>
     <message>
-        <source>Donate 0.1% to development fund:</source>
+        <source>Donate 0.1% to foundation fund:</source>
         <translation>Пожертвуйте 0,1% в фонд разработки:</translation>
     </message>
     <message>

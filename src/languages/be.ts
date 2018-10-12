@@ -1107,7 +1107,7 @@ Do you want to go to download page?</source>
         <translation>Ідэнтыфікатар плацяжу выдадзены атрымальнікам (біржай, крамай ці іншы)</translation>
     </message>
     <message>
-        <source>Donate 0.1% to development fund:</source>
+        <source>Donate 0.1% to foundation fund:</source>
         <translation>Ахвяруйце 0,1% у фонд развіцця:</translation>
     </message>
     <message>

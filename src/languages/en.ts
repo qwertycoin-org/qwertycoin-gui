@@ -989,7 +989,7 @@ Do you want to go to download page?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Donate 0.1% to development fund:</source>
+        <source>Donate 0.1% to foundation fund:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

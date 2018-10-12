@@ -295,7 +295,10 @@ void SendFrame::parsePaymentRequest(QString _request) {
 
 void SendFrame::sendClicked() {
  ConfirmSendDialog dlg(&MainWindow::instance());
-    dlg.showPasymentDetails(total_amount);
+    dlg.showPaymentDetails(total_amount);
+    if (m_ui->donateCheckBox->isChecked()) {
+      dlg.showConfirmDonation(total_amount*1/1000);
+    }
     if(!m_ui->m_paymentIdEdit->text().isEmpty()){
       dlg.showPaymentId(m_ui->m_paymentIdEdit->text());
     } else {

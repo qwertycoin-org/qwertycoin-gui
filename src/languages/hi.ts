@@ -1033,7 +1033,7 @@ Do you want to go to download page?</source>
         <translation>गुमनाम स्तर:</translation>
     </message>
     <message>
-        <source>Donate 0.1% to development fund:</source>
+        <source>Donate 0.1% to foundation fund:</source>
         <translation>विकास कोष में 0.1% दान करें:</translation>
     </message>
     <message>

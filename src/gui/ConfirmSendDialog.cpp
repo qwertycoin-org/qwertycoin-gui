@@ -17,17 +17,22 @@ ConfirmSendDialog::ConfirmSendDialog(QWidget* _parent) : QDialog(_parent), m_ui(
 ConfirmSendDialog::~ConfirmSendDialog() {
 }
 
-void ConfirmSendDialog::showPasymentDetails(quint64 _total) {
+void ConfirmSendDialog::showPaymentDetails(quint64 _total) {
     setWindowTitle(QString(tr("Confirm sending %1 QWC")).arg(CurrencyAdapter::instance().formatAmount(_total)));
     QString amountText = m_ui->m_confirmLabel->text();
     m_ui->m_confirmLabel->setText(amountText.arg(CurrencyAdapter::instance().formatAmount(_total)));
 }
+
 void ConfirmSendDialog::showPaymentId(QString _paymentid) {
     m_ui->m_paymentIdLabel->setText(QString(tr("<html><head/><body><p>Payment ID: %1</p></body></html>")).arg(_paymentid));
 }
 
 void ConfirmSendDialog::confirmNoPaymentId() {
     m_ui->m_paymentIdLabel->setText(QString(tr("<html><head/><body><p>Are you sure you want to send <strong>without Payment ID</strong>?</p></body></html>")));
+}
+
+void ConfirmSendDialog::showConfirmDonation(quint64 _donation) {
+    m_ui->m_confirmDonationLabel->setText(QString(tr("<html><head/><body><p>Are you sure to donate <strong>%1 QWC</strong>?</p></body></html>")).arg(CurrencyAdapter::instance().formatAmount(_donation)));
 }
 
 }

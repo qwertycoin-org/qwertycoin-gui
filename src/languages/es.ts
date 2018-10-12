@@ -1119,7 +1119,7 @@ Do you want to go to download page?</source>
         <translation>Identificador de pago emitido por beneficiario (bolsa, tienda u otra entidad)</translation>
     </message>
     <message>
-        <source>Donate 0.1% to development fund:</source>
+        <source>Donate 0.1% to foundation fund:</source>
         <translation>Donar 0.1% al fondo de desarrollo:</translation>
     </message>
     <message>

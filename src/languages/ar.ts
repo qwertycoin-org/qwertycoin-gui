@@ -1053,7 +1053,7 @@ Do you want to go to download page?</source>
         <translation>مستوى سرية الهوية:</translation>
     </message>
     <message>
-        <source>Donate 0.1% to development fund:</source>
+        <source>Donate 0.1% to foundation fund:</source>
         <translation>تبرع 0.1% لصندوق التطوير:</translation>
     </message>
     <message>

@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>474</width>
-    <height>90</height>
+    <height>120</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,6 +31,16 @@
      </item>
      <item>
       <widget class="QLabel" name="m_paymentIdLabel">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::RichText</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="m_confirmDonationLabel">
        <property name="text">
         <string/>
        </property>

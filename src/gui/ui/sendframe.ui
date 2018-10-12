@@ -82,7 +82,7 @@
      <item row="5" column="4">
       <widget class="QCheckBox" name="donateCheckBox">
        <property name="text">
-        <string>Donate 0.1% to development fund:</string>
+        <string>Donate 0.1% to foundation fund:</string>
        </property>
        <property name="checked">
         <bool>true</bool>

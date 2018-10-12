@@ -1107,7 +1107,7 @@ Czy chesz otworzyć stronę pobierania w przeglądarce?</translation>
         <translation>Identyfikator płatności wydany przez odbiorcę (giełdę, sklep czy inną jednostkę)</translation>
     </message>
     <message>
-        <source>Donate 0.1% to development fund:</source>
+        <source>Donate 0.1% to foundation fund:</source>
         <translation>Wpłać 0,1% do funduszu rozwoju:</translation>
     </message>
     <message>

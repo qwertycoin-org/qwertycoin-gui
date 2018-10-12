@@ -1012,7 +1012,7 @@ Vuoi andare alla pagina dei download?</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Donate 0.1% to development fund:</source>
+        <source>Donate 0.1% to foundation fund:</source>
         <translation>Dona lo 0,1% al fondo per lo sviluppo:</translation>
     </message>
     <message>

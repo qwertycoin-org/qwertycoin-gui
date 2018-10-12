@@ -1003,7 +1003,7 @@ Do you want to go to download page?</source>
         <translation>匿名性レベル:</translation>
     </message>
     <message>
-        <source>Donate 0.1% to development fund:</source>
+        <source>Donate 0.1% to foundation fund:</source>
         <translation>開発資金へ0.1%寄付:</translation>
     </message>
     <message>

@@ -1116,7 +1116,7 @@ Möchten Sie die Download Seite besuchen?</translation>
         <translation>Vom Zahlungsempfänger ausgestellte Zahlungskennzeichnung (Börse, Geschäft oder andere Einheit)</translation>
     </message>
     <message>
-        <source>Donate 0.1% to development fund:</source>
+        <source>Donate 0.1% to foundation fund:</source>
         <translation>0,1% an den Entwickler spenden:</translation>
     </message>
     <message>

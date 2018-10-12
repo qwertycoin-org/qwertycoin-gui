@@ -1037,7 +1037,7 @@ Do you want to go to download page?</source>
         <translation type="obsolete">匿名级别：</translation>
     </message>
     <message>
-        <source>Donate 0.1% to development fund:</source>
+        <source>Donate 0.1% to foundation fund:</source>
         <translation>向开发基金捐赠0.1%:</translation>
     </message>
     <message>

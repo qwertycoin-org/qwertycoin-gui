@@ -567,7 +567,7 @@ void MainWindow::restoreFromMnemonicSeed() {
 void MainWindow::sweepUnmixable() {
   quint64 dust = WalletAdapter::instance().getUnmixableBalance();
   ConfirmSendDialog dlg(&MainWindow::instance());
-  dlg.showPasymentDetails(dust);
+  dlg.showPaymentDetails(dust);
   if (dlg.exec() == QDialog::Accepted) {
     quint64 fee = CurrencyAdapter::instance().getMinimumFee();
     QVector<CryptoNote::WalletLegacyTransfer> walletTransfers;

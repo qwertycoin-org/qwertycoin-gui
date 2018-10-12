@@ -1037,7 +1037,7 @@ Do you want to go to download page?</source>
         <translation>익명 레벨:</translation>
     </message>
     <message>
-        <source>Donate 0.1% to development fund:</source>
+        <source>Donate 0.1% to foundation fund:</source>
         <translation>개발 자금에 0.1% 기부:</translation>
     </message>
     <message>
