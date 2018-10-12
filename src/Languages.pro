@@ -68,6 +68,8 @@ gui/MnemonicSeedDialog.cpp \
 gui/RestoreFromMnemonicSeedDialog.cpp \
 gui/VerifyMnemonicSeedDialog.cpp \
 gui/NoWalletFrame.cpp \
+gui/SendGlassFrame.cpp \
+gui/SignMessageDialog.cpp \
  
 
 HEADERS = CommandLineParser.h \
@@ -125,6 +127,8 @@ gui/MnemonicSeedDialog.h \
 gui/RestoreFromMnemonicSeedDialog.h \
 gui/VerifyMnemonicSeedDialog.h \
 gui/NoWalletFrame.h \
+gui/SendGlassFrame.h \
+gui/SignMessageDialog.h \
 
 
 FORMS = gui/ui/aboutdialog.ui \
@@ -161,6 +165,7 @@ gui/ui/mnemonicseeddialog.ui \
 gui/ui/restorefrommnemonicseeddialog.ui \
 gui/ui/verifymnemonicseeddialog.ui \
 gui/ui/nowalletframe.ui \
+gui/ui/signmessagedialog.ui \
 
 
 TRANSLATIONS = 	languages/uk.ts \
@@ -177,3 +182,4 @@ TRANSLATIONS = 	languages/uk.ts \
 				languages/zh.ts \
 				languages/hi.ts \
 				languages/ar.ts \
+				languages/fa.ts \

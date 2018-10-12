@@ -1,7 +1,6 @@
 // Copyright (c) 2011-2015 The Cryptonote developers
 // Copyright (c) 2011-2013 The Bitcoin developers
 // Copyright (c) 2016-2017 The Karbowanec developers
-// Copyright (c) 2018 The Qwertycoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -39,6 +38,7 @@ TransactionsFrame::TransactionsFrame(QWidget* _parent) : QFrame(_parent), m_ui(n
   m_ui->m_transactionsView->header()->resizeSection(TransactionsModel::COLUMN_ADDRESS, 100);
   m_ui->m_transactionsView->header()->resizeSection(TransactionsModel::COLUMN_PAYMENT_ID, 200);
   m_ui->m_transactionsView->header()->resizeSection(TransactionsModel::COLUMN_HASH, 200);
+  m_ui->m_transactionsView->header()->resizeSection(TransactionsModel::COLUMN_SECRET_KEY, 200);
 
   connect(m_ui->m_transactionsView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &TransactionsFrame::computeSelected);
 
@@ -98,32 +98,32 @@ void TransactionsFrame::exportToCsv() {
   QString file = QFileDialog::getSaveFileName(&MainWindow::instance(), tr("Select CSV file"), QDir::homePath(), "CSV (*.csv)");
   if (!file.isEmpty()) {
     QByteArray res;
-    res.append("\"State\",\"Date\",\"Amount\",\"Fee\",\"Hash\",\"Height\",\"Address\",\"Payment ID\"\n");
+    res.append("\"Date\",\"Amount\",\"Fee\",\"Hash\",\"Height\",\"Address\",\"Payment ID\",\"Key\"\n");
     QModelIndexList selection = m_ui->m_transactionsView->selectionModel()->selectedRows();
     if(selection.isEmpty()) {
       m_ui->m_transactionsView->selectAll();
       QModelIndexList all = m_ui->m_transactionsView->selectionModel()->selectedRows();
       foreach (QModelIndex index, all){
-        res.append("\"").append(index.data().toString().toUtf8()).append("\",");
         res.append("\"").append(index.sibling(index.row(), TransactionsModel::COLUMN_DATE).data().toString().toUtf8()).append("\",");
         res.append("\"").append(index.sibling(index.row(), TransactionsModel::COLUMN_AMOUNT).data().toString().toUtf8()).append("\",");
         res.append("\"").append(CurrencyAdapter::instance().formatAmount(index.data(TransactionsModel::ROLE_FEE).value<quint64>())).append("\",");
         res.append("\"").append(index.sibling(index.row(), TransactionsModel::COLUMN_HASH).data().toString().toUtf8()).append("\",");
         res.append("\"").append(index.data(TransactionsModel::ROLE_HEIGHT).toString().toUtf8()).append("\",");
         res.append("\"").append(index.sibling(index.row(), TransactionsModel::COLUMN_ADDRESS).data().toString().toUtf8()).append("\",");
-        res.append("\"").append(index.sibling(index.row(), TransactionsModel::COLUMN_PAYMENT_ID).data().toString().toUtf8()).append("\"\n");
+        res.append("\"").append(index.sibling(index.row(), TransactionsModel::COLUMN_PAYMENT_ID).data().toString().toUtf8()).append("\",");
+        res.append("\"").append(index.data(TransactionsModel::ROLE_SECRET_KEY).toByteArray().toHex().toUpper()).append("\"\n");
       }
       m_ui->m_transactionsView->clearSelection();
     } else {
       foreach (QModelIndex index, selection){
-        res.append("\"").append(index.data().toString().toUtf8()).append("\",");
         res.append("\"").append(index.sibling(index.row(), TransactionsModel::COLUMN_DATE).data().toString().toUtf8()).append("\",");
         res.append("\"").append(index.sibling(index.row(), TransactionsModel::COLUMN_AMOUNT).data().toString().toUtf8()).append("\",");
         res.append("\"").append(CurrencyAdapter::instance().formatAmount(index.data(TransactionsModel::ROLE_FEE).value<quint64>())).append("\",");
         res.append("\"").append(index.sibling(index.row(), TransactionsModel::COLUMN_HASH).data().toString().toUtf8()).append("\",");
         res.append("\"").append(index.data(TransactionsModel::ROLE_HEIGHT).toString().toUtf8()).append("\",");
         res.append("\"").append(index.sibling(index.row(), TransactionsModel::COLUMN_ADDRESS).data().toString().toUtf8()).append("\",");
-        res.append("\"").append(index.sibling(index.row(), TransactionsModel::COLUMN_PAYMENT_ID).data().toString().toUtf8()).append("\"\n");
+        res.append("\"").append(index.sibling(index.row(), TransactionsModel::COLUMN_PAYMENT_ID).data().toString().toUtf8()).append("\",");
+        res.append("\"").append(index.data(TransactionsModel::ROLE_SECRET_KEY).toByteArray().toHex().toUpper()).append("\"\n");
       }
     }
 

@@ -1,7 +1,6 @@
 // Copyright (c) 2011-2015 The Cryptonote developers
 // Copyright (c) 2015-2016 XDN developers
 // Copyright (c) 2016 The Karbowanec developers
-// Copyright (c) 2018 The Qwertycoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -203,11 +202,11 @@ QString Settings::getCurrentTheme() const {
 }
 
 QString Settings::getLanguage() const {
-  QString currentLang;
-  if (m_settings.contains(OPTION_LANGUAGE)) {
-    currentLang = m_settings.value(OPTION_LANGUAGE).toString();
-  }
-  return currentLang;
+    QString currentLang;
+    if (m_settings.contains(OPTION_LANGUAGE)) {
+        currentLang = m_settings.value(OPTION_LANGUAGE).toString();
+    }
+    return currentLang;
 }
 
 QString Settings::getConnection() const {

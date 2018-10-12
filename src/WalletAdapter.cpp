@@ -1,21 +1,8 @@
-// Copyright (c) 2011-2015 The Cryptonote developers
-// Copyright (c) 2017-2018, The karbo developers
-// Copyright (c) 2018, The Qwertcoin developers
-//
-// This file is part of Qwertycoin.
-//
-// Qwertycoin is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Qwertycoin is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with Qwertycoin. If not, see <http://www.gnu.org/licenses/>.
+// Copyright (c) 2011-2016 The Cryptonote developers
+// Copyright (c) 2015-2016 XDN developers
+// Copyright (c) 2016-2017 The Karbowanec developers
+// Distributed under the MIT/X11 software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <QCoreApplication>
 #include <QMessageBox>
@@ -26,10 +13,12 @@
 #include <QVector>
 #include <QDebug>
 
+#include <crypto/crypto.h>
 #include <Common/Base58.h>
 #include <Common/Util.h>
 #include <Wallet/WalletErrors.h>
 #include <Wallet/LegacyKeysImporter.h>
+#include "CryptoNoteCore/CryptoNoteBasic.h"
 
 #include "NodeAdapter.h"
 #include "Settings.h"
@@ -337,6 +326,16 @@ bool WalletAdapter::getAccountKeys(CryptoNote::AccountKeys& _keys) {
   }
 
   return false;
+}
+
+Crypto::SecretKey WalletAdapter::getTxKey(Crypto::Hash& txid) {
+  Q_CHECK_PTR(m_wallet);
+  try {
+    return m_wallet->getTxKey(txid);
+  } catch (std::system_error&) {
+  }
+
+  return CryptoNote::NULL_SECRET_KEY;
 }
 
 void WalletAdapter::sendTransaction(const QVector<CryptoNote::WalletLegacyTransfer>& _transfers, quint64 _fee, const QString& _paymentId, quint64 _mixin) {

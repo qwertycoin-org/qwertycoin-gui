@@ -31,7 +31,7 @@ endif(WIN32)
 
 find_package(Boost 1.55 REQUIRED COMPONENTS date_time filesystem program_options regex serialization system thread chrono)
 if ((${Boost_MAJOR_VERSION} EQUAL 1) AND (${Boost_MINOR_VERSION} EQUAL 54))
-  message(SEND_ERROR "Boost version 1.54 is unsupported, more details are available here http://goo.gl/RrCFmA")
+	message(SEND_ERROR "Boost version 1.54 is unsupported, more details are available here http://goo.gl/RrCFmA")
 endif ()
 
 include_directories(${Boost_INCLUDE_DIRS})
@@ -59,13 +59,13 @@ set(CRYPTONOTE_SOURCES
   cryptonote/external/miniupnpc/upnpreplyparse.c
   cryptonote/src/Common/Base58.cpp
   cryptonote/src/Common/CommandLine.cpp
-  cryptonote/src/Common/DnsTools.cpp
   cryptonote/src/Common/Util.cpp
   cryptonote/src/Common/StringTools.cpp
   cryptonote/src/Common/JsonValue.cpp
   cryptonote/src/Common/ConsoleTools.cpp
   cryptonote/src/Common/MemoryInputStream.cpp
   cryptonote/src/Common/PathTools.cpp
+  cryptonote/src/Common/DnsTools.cpp
   cryptonote/src/Common/StdInputStream.cpp
   cryptonote/src/Common/StdOutputStream.cpp
   cryptonote/src/Common/StreamTools.cpp
@@ -187,11 +187,10 @@ qt5_add_resources(RCC ${QRC})
 
 if (WIN32)
   if (NOT MSVC)
-  message(FATAL_ERROR "Only MSVC is supported on this platform")
+	message(FATAL_ERROR "Only MSVC is supported on this platform")
   endif ()
   add_definitions(/D_CRT_SECURE_NO_WARNINGS /D_WIN32_WINNT=0x0600 /DSTATICLIB)
   include_directories(cryptonote/src/platform/msc)
-  
   set( CMAKE_CXX_FLAGS "-bigobj -EHsc")
   set(PLATFORM_DIR Windows)
   set(BUILD_PLATFORM WIN32)
@@ -215,7 +214,7 @@ elseif (UNIX)
 
     include_directories(/usr/include/malloc)
 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -maes -std=c++11 -stdlib=libc++ -lresolv")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -maes -std=c++11 -stdlib=libc++")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -maes -D_DARWIN_C_SOURCE")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -framework Cocoa -framework OpenGL -framework CoreFoundation -framework Carbon -framework IOKit -L/usr/lib")
 
@@ -225,13 +224,13 @@ elseif (UNIX)
 
     set(BUILD_PLATFORM MACOSX_BUNDLE)
     set(BUILD_RESOURCES ${APPLICATION_ICON})
-  
+	
     GET_TARGET_PROPERTY(QT_LIB_DIR "${Qt5Widgets_LIBRARIES}" LOCATION)
     GET_FILENAME_COMPONENT(QT_LIB_DIR "${QT_LIB_DIR}" PATH)
   else(APPLE)
     set(PLATFORM_DIR Linux)
     list(REMOVE_ITEM HEADERS ${CMAKE_SOURCE_DIR}/src/gui/macdockiconhandler.h)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -maes -std=c++11 -lresolv")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -maes -std=c++11")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -maes -std=c11")
   endif (APPLE)
 endif ()
@@ -244,7 +243,12 @@ set(CRYPTONOTE_SOURCES ${CRYPTONOTE_SOURCES} ${PLATFORM_SOURCES})
 add_library(${CRYPTONOTE_LIB} STATIC ${CRYPTONOTE_SOURCES})
 add_library(Mnemonics ${Mnemonics})
 set_target_properties(${CRYPTONOTE_LIB} PROPERTIES COMPILE_DEFINITIONS _GNU_SOURCE)
+
+if (APPLE OR ${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+target_link_libraries(${CRYPTONOTE_LIB} ${Boost_LIBRARIES} -lresolv)
+else ()
 target_link_libraries(${CRYPTONOTE_LIB} ${Boost_LIBRARIES})
+endif ()
 set_target_properties(Mnemonics PROPERTIES COMPILE_DEFINITIONS _GNU_SOURCE)
 target_link_libraries(Mnemonics ${Boost_LIBRARIES})
 
@@ -282,6 +286,7 @@ elseif (UNIX)
     install(FILES src/qwertycoinwallet.desktop DESTINATION share/applications)
     install(FILES src/images/qwertycoinz.png DESTINATION share/pixmaps RENAME qwertycoin.png)
     install(FILES copyright DESTINATION share/doc/qwertycoinwallet)
+    install(DIRECTORY src/languages DESTINATION /opt/karbo/ FILES_MATCHING PATTERN "*.qm")
 
     if (NOT RPMBUILD)
         set(CPACK_GENERATOR DEB)

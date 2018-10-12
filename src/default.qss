@@ -6,15 +6,8 @@
 	color: #41548D;
 }
 
-QTabBar {
-	background-color: #a8b6cb;
-}
-
 QMainWindow {
-	background-color: #f9e9bf;
-	background-image:url(":/images/bg.png");
-	background-position:bottom left;
-	background-repeat:no-repeat;
+	background:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0	rgb(255, 255, 255) stop: 1.0 rgb(156, 193, 239)) url(":/images/bg.png") no-repeat bottom left;
 }
 
 QDialog {
@@ -309,4 +302,8 @@ QToolTip{
 	border: none;
 	padding: 4px;
 	opacity: 230;
+}
+
+QTabWidget {
+    background-color: transparent;
 }

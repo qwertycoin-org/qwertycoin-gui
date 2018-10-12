@@ -1,6 +1,5 @@
 // Copyright (c) 2009-2012 The Bitcoin developers
 // Copyright (c) 2016 The Karbowanec developers
-// Copyright (c) 2018 The Qwertycoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -28,7 +27,7 @@ const QString BITCOIN_IPC_PREFIX("qwertycoin:");
 
 static QString ipcServerName()
 {
-    QString name("Karbowanec");
+    QString name("Qwertycoin");
 
     return name;
 }

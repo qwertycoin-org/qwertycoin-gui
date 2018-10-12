@@ -1,5 +1,4 @@
 // Copyright (c) 2016 The Karbowanec developers
-// Copyright (c) 2018 The Qwertycoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #include "Update.h"
@@ -75,10 +74,8 @@ void Updater::replyFinished (QNetworkReply *reply)
 {
     if(reply->error())
     {
-        /*
         QString error = QString(tr("Error: %1")).arg(reply->errorString());
         QMessageBox::information(nullptr, tr("Unable to check for update"), error, QMessageBox::Ok);
-        */
     }
     else
     {

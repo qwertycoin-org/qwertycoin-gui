@@ -1,6 +1,5 @@
 // Copyright (c) 2011-2015 The Cryptonote developers
 // Copyright (c) 2016-2017 The Karbowanec developers
-// Copyright (c) 2018 The Qwertycoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -10,6 +9,9 @@
 #include <QPixmap>
 #include <QDebug>
 
+#include "crypto/crypto.h"
+#include "CryptoNoteCore/CryptoNoteBasic.h"
+#include "Common/StringTools.h"
 #include "CurrencyAdapter.h"
 #include "NodeAdapter.h"
 #include "TransactionsModel.h"
@@ -17,8 +19,6 @@
 #include "WalletAdapter.h"
 
 namespace WalletGui {
-
-enum class TransactionType : quint8 {MINED, INPUT, OUTPUT, INOUT};
 
 namespace {
 
@@ -91,6 +91,8 @@ QVariant TransactionsModel::headerData(int _section, Qt::Orientation _orientatio
       return tr("Type");
     case COLUMN_HASH:
       return tr("Hash");
+    case COLUMN_SECRET_KEY:
+      return tr("Key");
     case COLUMN_ADDRESS:
       return tr("Address");
     case COLUMN_AMOUNT:
@@ -111,6 +113,8 @@ QVariant TransactionsModel::headerData(int _section, Qt::Orientation _orientatio
       return tr("Type");
     case COLUMN_HASH:
       return tr("Hash");
+    case COLUMN_SECRET_KEY:
+      return tr("Key");
     case COLUMN_ADDRESS:
       return tr("Address");
     case COLUMN_AMOUNT:
@@ -188,17 +192,17 @@ QModelIndex TransactionsModel::parent(const QModelIndex& _index) const {
 
 QByteArray TransactionsModel::toCsv() const {
   QByteArray res;
-  res.append("\"State\",\"Date\",\"Amount\",\"Fee\",\"Hash\",\"Height\",\"Address\",\"Payment ID\"\n");
+  res.append("\"Date\",\"Amount\",\"Fee\",\"Hash\",\"Height\",\"Address\",\"Payment ID\",\"Key\"\n");
   for (quint32 row = 0; row < rowCount(); ++row) {
     QModelIndex ind = index(row, 0);
-    res.append("\"").append(ind.data().toString().toUtf8()).append("\",");
     res.append("\"").append(ind.sibling(row, COLUMN_DATE).data().toString().toUtf8()).append("\",");
     res.append("\"").append(ind.sibling(row, COLUMN_AMOUNT).data().toString().toUtf8()).append("\",");
     res.append("\"").append(ind.sibling(row, COLUMN_FEE).data().toString().toUtf8()).append("\",");
     res.append("\"").append(ind.sibling(row, COLUMN_HASH).data().toString().toUtf8()).append("\",");
     res.append("\"").append(ind.sibling(row, COLUMN_HEIGHT).data().toString().toUtf8()).append("\",");
     res.append("\"").append(ind.sibling(row, COLUMN_ADDRESS).data().toString().toUtf8()).append("\",");
-    res.append("\"").append(ind.sibling(row, COLUMN_PAYMENT_ID).data().toString().toUtf8()).append("\"\n");
+    res.append("\"").append(ind.sibling(row, COLUMN_PAYMENT_ID).data().toString().toUtf8()).append("\",");
+    res.append("\"").append(ind.sibling(row, COLUMN_SECRET_KEY).data().toString().toUtf8()).append("\"\n");
   }
 
   return res;
@@ -213,6 +217,9 @@ QVariant TransactionsModel::getDisplayRole(const QModelIndex& _index) const {
 
   case COLUMN_HASH:
     return _index.data(ROLE_HASH).toByteArray().toHex().toUpper();
+
+  case COLUMN_SECRET_KEY:
+    return _index.data(ROLE_SECRET_KEY).toByteArray().toHex().toUpper();
 
   case COLUMN_ADDRESS: {
     TransactionType transactionType = static_cast<TransactionType>(_index.data(ROLE_TYPE).value<quint8>());
@@ -271,6 +278,9 @@ QVariant TransactionsModel::getEditRole(const QModelIndex& _index) const {
 
   case COLUMN_HASH:
     return _index.data(ROLE_HASH).toByteArray().toHex().toUpper();
+
+  case COLUMN_SECRET_KEY:
+    return _index.data(ROLE_SECRET_KEY).toByteArray().toHex().toUpper();
 
   case COLUMN_ADDRESS: {
     TransactionType transactionType = static_cast<TransactionType>(_index.data(ROLE_TYPE).value<quint8>());
@@ -394,6 +404,15 @@ QVariant TransactionsModel::getUserRole(const QModelIndex& _index, int _role, Cr
 
   case ROLE_HASH:
     return QByteArray(reinterpret_cast<char*>(&_transaction.hash), sizeof(_transaction.hash));
+
+  case ROLE_SECRET_KEY: {
+    if (_transaction.secretKey) {
+      Crypto::SecretKey txkey = _transaction.secretKey.get();
+      if (txkey != CryptoNote::NULL_SECRET_KEY) {
+        return QByteArray(reinterpret_cast<char*>(&txkey), sizeof(txkey));
+      }
+    }
+  }
 
   case ROLE_ADDRESS:
     return QString::fromStdString(_transfer.address);
