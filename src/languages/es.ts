@@ -969,7 +969,6 @@ Por favor, espera...</translation>
     </message>
     <message>
         <source>Loading blockchain...</source>
-        <translatorcomment>Blockchain не переводится, поскольку имеет интернациональное значение</translatorcomment>
         <translation>Cargando blockchain...</translation>
     </message>
     <message>
@@ -1089,7 +1088,6 @@ Do you want to go to download page?</source>
     </message>
     <message>
         <source>Anonymity level:</source>
-        <translatorcomment>Ошибка в слове Anonimity  - правильно Anonymity</translatorcomment>
         <translation>Nivel de anonimato:</translation>
     </message>
     <message>
