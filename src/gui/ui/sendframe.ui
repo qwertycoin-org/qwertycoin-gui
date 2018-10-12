@@ -419,17 +419,17 @@
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QPushButton" name="m_sendAllButton">
-       <property name="text">
+      <item>
+        <widget class="QPushButton" name="m_sendAllButton">
+        <property name="text">
         <string>Send All</string>
-       </property>
-       <property name="icon">
+        </property>
+        <property name="icon">
         <iconset resource="../../resources.qrc">
-         <normaloff>:/icons/sweep</normaloff>:/icons/sweep</iconset>
-       </property>
-      </widget>
-     </item>
+        <normaloff>:/icons/sweep</normaloff>:/icons/sweep</iconset>
+        </property>
+        </widget>
+      </item>
      <item>
       <widget class="QPushButton" name="m_clearAllButton">
        <property name="text">

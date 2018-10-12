@@ -938,8 +938,8 @@ void MainWindow::walletOpened(bool _error, const QString& _error_text) {
     m_ui->m_resetAction->setEnabled(true);
     m_ui->m_openUriAction->setEnabled(true);
     m_ui->m_sweepUnmixableAction->setEnabled(true);
-    m_ui->m_signMessageAction->setEnabled(true);
-    m_ui->m_verifySignedMessageAction->setEnabled(true);
+    m_ui->m_signMessageAction->setEnabled(false);
+    m_ui->m_verifySignedMessageAction->setEnabled(false);
     if(WalletAdapter::instance().isDeterministic()) {
        m_ui->m_showMnemonicSeedAction->setEnabled(true);
     }
