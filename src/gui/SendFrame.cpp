@@ -46,9 +46,9 @@ SendFrame::SendFrame(QWidget* _parent) : QFrame(_parent), m_ui(new Ui::SendFrame
   m_ui->setupUi(this);
   m_glassFrame->setObjectName("m_sendGlassFrame");
   clearAllClicked();
-  m_ui->m_mixinSlider->setValue(7);
+  m_ui->m_mixinSlider->setValue(5); //default mixin
   mixinValueChanged(m_ui->m_mixinSlider->value());
-  m_ui->m_prioritySlider->setValue(2);
+  m_ui->m_prioritySlider->setValue(4);  //default fee
   priorityValueChanged(m_ui->m_prioritySlider->value());
   remote_node_fee = 0;
   amountValueChange();
