@@ -3,5 +3,5 @@
 	url = https://github.com/qwertycoin-org/qwertycoin.git
 [submodule "libqrencode"]
 	path = libqrencode
-	url = https://github.com/fukuchi/libqrencode.git
+	url = https://github.com/fukuchi/libqrencode
 	branch = 3.4
