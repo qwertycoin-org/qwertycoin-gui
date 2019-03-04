@@ -1,6 +1,6 @@
 ![image](https://cdn.qwertycoin.org/images/press/other/qwc-github.png)
 
-[![Build Status](https://travis-ci.org/qwertycoin-org/qwertycoin.svg?branch=stage_1)](https://travis-ci.org/qwertycoin-org/qwertycoin)
+[![Build Status](https://travis-ci.org/qwertycoin-org/qwertycoin-gui.svg?branch=stage_1)](https://travis-ci.org/qwertycoin-org/qwertycoin-gui)
 [![Build status](https://ci.appveyor.com/api/projects/status/l3o455xl2l9lhrlu/branch/master?svg=true)](https://ci.appveyor.com/project/qwertycoin-org/qwertycoin-gui/branch/master)
 
 ### How To Compile
