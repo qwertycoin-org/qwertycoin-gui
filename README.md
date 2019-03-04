@@ -5,6 +5,12 @@
 #### Development Build Status
 [![Build Status](https://travis-ci.org/qwertycoin-org/qwertycoin-gui.svg?branch=dev)](https://travis-ci.org/qwertycoin-org/qwertycoin-gui) [![Build status](https://ci.appveyor.com/api/projects/status/github/qwertycoin-org/qwertycoin-gui?branch=dev&svg=true)](https://ci.appveyor.com/project/qwertycoin-org/qwertycoin-gui)
 
+### Installing
+
+We offer binary images of the latest releases here: https://releases.qwertycoin.org
+
+If you would like to compile yourself, read on.
+
 ### How To Compile
 
 ##### Prerequisites
