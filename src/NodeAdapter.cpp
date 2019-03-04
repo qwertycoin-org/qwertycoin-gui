@@ -200,6 +200,8 @@ bool NodeAdapter::init() {
       m_node = nullptr;
       return initInProcessNode();
   }
+
+  return true;
 }
 
 quint64 NodeAdapter::getLastKnownBlockHeight() const {
@@ -260,6 +262,11 @@ quint64 NodeAdapter::getWhitePeerlistSize() {
 quint64 NodeAdapter::getGreyPeerlistSize() {
   Q_CHECK_PTR(m_node);
   return m_node->getGreyPeerlistSize();
+}
+
+quint64 NodeAdapter::getMinimalFee() const {
+  Q_CHECK_PTR(m_node);
+  return m_node->getMinimalFee();
 }
 
 CryptoNote::BlockHeaderInfo NodeAdapter::getLastLocalBlockHeaderInfo() {

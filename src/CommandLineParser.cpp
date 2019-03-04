@@ -105,7 +105,7 @@ QStringList CommandLineParser::getPeers() const {
   return m_parser.values(m_addPeerOption);
 }
 
-QStringList CommandLineParser::getPriorityNodes() const {
+QStringList CommandLineParser::getPiorityNodes() const {
   return m_parser.values(m_addPriorityNodeOption);
 }
 

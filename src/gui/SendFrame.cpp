@@ -46,9 +46,9 @@ SendFrame::SendFrame(QWidget* _parent) : QFrame(_parent), m_ui(new Ui::SendFrame
   m_ui->setupUi(this);
   m_glassFrame->setObjectName("m_sendGlassFrame");
   clearAllClicked();
-  m_ui->m_mixinSlider->setValue(5); //default mixin
+  m_ui->m_mixinSlider->setValue(2);
   mixinValueChanged(m_ui->m_mixinSlider->value());
-  m_ui->m_prioritySlider->setValue(4);  //default fee
+  m_ui->m_prioritySlider->setValue(2);
   priorityValueChanged(m_ui->m_prioritySlider->value());
   remote_node_fee = 0;
   amountValueChange();
@@ -66,11 +66,9 @@ SendFrame::SendFrame(QWidget* _parent) : QFrame(_parent), m_ui(new Ui::SendFrame
   m_ui->m_tickerLabel->setText(CurrencyAdapter::instance().getCurrencyTicker().toUpper());
   m_ui->m_feeSpin->setSuffix(" " + CurrencyAdapter::instance().getCurrencyTicker().toUpper());
   m_ui->m_donateSpin->setSuffix(" " + CurrencyAdapter::instance().getCurrencyTicker().toUpper());
-  // next step minimal fee
-  m_ui->m_feeSpin->setMinimum(CurrencyAdapter::instance().formatAmount(CurrencyAdapter::instance().getMinimumFee()).toDouble());
-
   m_ui->m_remote_label->hide();
   m_ui->m_sendButton->setEnabled(false);
+  m_ui->m_feeSpin->setMinimum(getMinimalFee());
 
   QLabel *label1 = new QLabel(tr("Low"), this);
   QLabel *label2 = new QLabel(tr("Normal"), this);
@@ -150,7 +148,19 @@ void SendFrame::addRecipientClicked() {
 
   connect(newTransfer, &TransferFrame::amountValueChangedSignal, this, &SendFrame::amountValueChange, Qt::QueuedConnection);
   connect(newTransfer, &TransferFrame::insertPaymentIDSignal, this, &SendFrame::insertPaymentID, Qt::QueuedConnection);
+}
 
+double SendFrame::getMinimalFee() {
+  double fee(0);
+  if (NodeAdapter::instance().getCurrentBlockMajorVersion() < CryptoNote::BLOCK_MAJOR_VERSION_6) {
+    fee = CurrencyAdapter::instance().formatAmount(CurrencyAdapter::instance().getMinimumFee()).toDouble();
+  } else {
+    fee = CurrencyAdapter::instance().formatAmount(NodeAdapter::instance().getMinimalFee()).toDouble();
+  }
+  int digits = 2; // round up fee to 2 digits after leading zeroes
+  double scale = pow(10., floor(log10(fabs(fee))) + (1 - digits));
+  double roundedFee = ceil(fee / scale) * scale;
+  return roundedFee;
 }
 
 void SendFrame::clearAllClicked() {
@@ -161,10 +171,7 @@ void SendFrame::clearAllClicked() {
   addRecipientClicked();
   amountValueChange();
   m_ui->m_paymentIdEdit->clear();
-  m_ui->m_mixinSlider->setValue(5);
-  m_ui->m_feeSpin->setValue(m_ui->m_feeSpin->minimum());
-
-  // prioritySlider
+  m_ui->m_mixinSlider->setValue(7);
   m_ui->m_prioritySlider->setValue(2);
   priorityValueChanged(m_ui->m_prioritySlider->value());
 }
@@ -193,15 +200,15 @@ void SendFrame::amountValueChange() {
       }
     remote_node_fee = 0;
     if( !remote_node_fee_address.isEmpty() ) {
-      for(QVector<quint64>::iterator it = fees.begin(); it != fees.end(); ++it) {
-        remote_node_fee += *it;
-      }
-       if (remote_node_fee < CurrencyAdapter::instance().getMinimumFee()) {
-        remote_node_fee = CurrencyAdapter::instance().getMinimumFee();
-      }
-      if (remote_node_fee > 1000000000) {
-        remote_node_fee = 1000000000;
-      }
+        for(QVector<quint64>::iterator it = fees.begin(); it != fees.end(); ++it) {
+            remote_node_fee += *it;
+        }
+        if (remote_node_fee < NodeAdapter::instance().getMinimalFee()) {
+            remote_node_fee = NodeAdapter::instance().getMinimalFee();
+        }
+        if (remote_node_fee > 10000000000) {
+            remote_node_fee = 10000000000;
+        }
     }
 
     QVector<float> donations;
@@ -215,10 +222,9 @@ void SendFrame::amountValueChange() {
     for(QVector<float>::iterator it = donations.begin(); it != donations.end(); ++it) {
         donation_amount += *it;
     }
-    float min = CurrencyAdapter::instance().formatAmount(CurrencyAdapter::instance().getMinimumFee()).toFloat();
-    if (donation_amount < min) {
+    float min = getMinimalFee();
+    if (donation_amount < min)
         donation_amount = min;
-    }
     donation_amount = floor(donation_amount * pow(10., 4) + .5) / pow(10., 4);
     m_ui->m_donateSpin->setValue(QString::number(donation_amount).toDouble());
 
@@ -315,7 +321,7 @@ void SendFrame::sendClicked() {
     }
     if (dlg.exec() == QDialog::Accepted) {
 
-      QVector<CryptoNote::WalletLegacyTransfer> walletTransfers;
+      std::vector<CryptoNote::WalletLegacyTransfer> walletTransfers;
       Q_FOREACH (TransferFrame * transfer, m_transfers) {
         QString address = transfer->getAddress();
         if (!CurrencyAdapter::instance().validateAddress(address)) {
@@ -359,7 +365,7 @@ void SendFrame::sendClicked() {
       priorityValueChanged(m_ui->m_prioritySlider->value());
       quint64 fee = CurrencyAdapter::instance().parseAmount(m_ui->m_feeSpin->cleanText());
 
-      if (fee < CurrencyAdapter::instance().getMinimumFee()) {
+	  if (fee < NodeAdapter::instance().getMinimalFee()) {
         QCoreApplication::postEvent(&MainWindow::instance(), new ShowMessageEvent(tr("Incorrect fee value"), QtCriticalMsg));
         return;
       }
@@ -390,7 +396,7 @@ void SendFrame::mixinValueChanged(int _value) {
 }
 
 void SendFrame::priorityValueChanged(int _value) {
-  double send_fee = 1 * _value;
+  double send_fee = getMinimalFee() * _value;
   m_ui->m_feeSpin->setValue(send_fee);
 }
 
@@ -449,11 +455,11 @@ void SendFrame::sendAllClicked() {
   remote_node_fee = 0;
   if(!remote_node_fee_address.isEmpty()) {
     remote_node_fee = static_cast<qint64>(actualBalance * 0.0025); // fee is 0.25%
-    if (remote_node_fee < CurrencyAdapter::instance().getMinimumFee()) {
-        remote_node_fee = CurrencyAdapter::instance().getMinimumFee();
+    if (remote_node_fee < NodeAdapter::instance().getMinimalFee()) {
+        remote_node_fee = NodeAdapter::instance().getMinimalFee();
     }
-    if (remote_node_fee > 1000000000) {
-        remote_node_fee = 1000000000;
+    if (remote_node_fee > 10000000000) {
+        remote_node_fee = 10000000000;
     }
   }
 
@@ -464,12 +470,12 @@ void SendFrame::sendAllClicked() {
     float donationpercent = amount * 0.1 / 100; // donation is 0.1%
     donations.push_back(donationpercent);
     }
-  quint64 priorityFee = CurrencyAdapter::instance().parseAmount(QString::number(1/*getMinimalFee()*/ * m_ui->m_prioritySlider->value()));
+  quint64 priorityFee = CurrencyAdapter::instance().parseAmount(QString::number(getMinimalFee() * m_ui->m_prioritySlider->value()));
   quint64 amount = actualBalance - (priorityFee + remote_node_fee);
   if (m_ui->donateCheckBox->isChecked()) {
     float donation_amount = CurrencyAdapter::instance().formatAmount(amount).toDouble() * 0.1 / 100;
     donation_amount = floor(donation_amount * pow(10., 4) + .5) / pow(10., 4);
-    float min = 1; //getMinimalFee();
+    float min = getMinimalFee();
     if (donation_amount < min)
         donation_amount = min;
     amount -= static_cast<quint64>(CurrencyAdapter::instance().parseAmount(QString::number(donation_amount)));

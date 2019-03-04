@@ -6,6 +6,7 @@
 
 #include <QCoreApplication>
 #include <QFile>
+#include <QTime>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QSettings>
@@ -20,14 +21,24 @@ namespace WalletGui {
 
 Q_DECL_CONSTEXPR char OPTION_WALLET_FILE[] = "walletFile";
 Q_DECL_CONSTEXPR char OPTION_ENCRYPTED[] = "encrypted";
-Q_DECL_CONSTEXPR char OPTION_MINING_POOLS[] = "miningPools";
 Q_DECL_CONSTEXPR char OPTION_LANGUAGE[] = "Language";
 Q_DECL_CONSTEXPR char OPTION_CONNECTION[] = "connectionMode";
 Q_DECL_CONSTEXPR char OPTION_RPCNODES[] = "remoteNodes";
 Q_DECL_CONSTEXPR char OPTION_DAEMON_PORT[] = "daemonPort";
 Q_DECL_CONSTEXPR char OPTION_REMOTE_NODE[] = "remoteNode";
-Q_DECL_CONSTEXPR char OPTION_CURRENT_POOL[] = "currentPool";
 const char OPTION_WALLET_THEME[] = "theme";
+
+const char OPTION_WALLET_OPTIMIZATION[] = "optimization";
+const char OPTION_WALLET_OPTIMIZATION_ENABLED[] = "enabled";
+const char OPTION_WALLET_OPTIMIZATION_TIME_SET_MANUALLY[] = "useCustomTime";
+const char OPTION_WALLET_OPTIMIZATION_START_TIME[] = "startTime";
+const char OPTION_WALLET_OPTIMIZATION_STOP_TIME[] = "stopTime";
+const char OPTION_WALLET_OPTIMIZATION_INTERVAL[] = "interval";
+const char OPTION_WALLET_OPTIMIZATION_THRESHOLD[] = "target";
+const char OPTION_WALLET_OPTIMIZATION_MIXIN[] = "mixin";
+const quint64 DEFAULT_OPTIMIZATION_PERIOD = 1000 * 60 * 30; // 30 minutes
+const quint64 DEFAULT_OPTIMIZATION_THRESHOLD = 10000000000000;
+const quint64 DEFAULT_OPTIMIZATION_MIXIN = 3;
 
 Settings& Settings::instance() {
   static Settings inst;
@@ -87,20 +98,6 @@ void Settings::load() {
 
   if (!m_settings.contains("tracking")) {
        m_settings.insert("tracking", false);
-  }
-
-  QStringList defaultPoolList;
-  defaultPoolList << "pool.qwertycoin.org:3333" << "loop.qwertycoin.org:3333";
-  if (!m_settings.contains(OPTION_MINING_POOLS)) {
-    setMiningPoolList(QStringList() << defaultPoolList);
-  } else {
-    QStringList poolList = getMiningPoolList();
-    Q_FOREACH (const QString& pool, defaultPoolList) {
-      if (!poolList.contains(pool)) {
-        poolList << pool;
-      }
-    }
-    setMiningPoolList(poolList);
   }
 
   QStringList defaultNodesList;
@@ -165,7 +162,7 @@ QStringList Settings::getPeers() const {
 
 QStringList Settings::getPriorityNodes() const {
   Q_ASSERT(m_cmdLineParser != nullptr);
-  return m_cmdLineParser->getPriorityNodes();
+  return m_cmdLineParser->getPiorityNodes();
 }
 
 QStringList Settings::getExclusiveNodes() const {
@@ -210,14 +207,6 @@ bool Settings::isTrackingMode() const {
 
 QString Settings::getVersion() const {
   return VERSION;
-}
-
-QStringList Settings::getMiningPoolList() const {
-  QStringList res;
-  if (m_settings.contains(OPTION_MINING_POOLS)) {
-    res << m_settings.value(OPTION_MINING_POOLS).toVariant().toStringList();
-  }
-  return res;
 }
 
 QString Settings::getCurrentTheme() const {
@@ -268,26 +257,6 @@ QString Settings::getCurrentRemoteNode() const {
     return remotenode;
 }
 
-QString Settings::getCurrentPool() const {
-  QString pool;
-  if (m_settings.contains(OPTION_CURRENT_POOL)) {
-    pool = m_settings.value(OPTION_CURRENT_POOL).toString();
-  }
-  return pool;
-}
-
-quint16 Settings::getMiningThreads() const {
-  if (m_settings.contains("miningThreads")) {
-    return m_settings.value("miningThreads").toVariant().toInt();
-  } else {
-    return 0;
-  }
-}
-
-bool Settings::isMiningOnLaunchEnabled() const {
-  return m_settings.contains("autostartMininig") ? m_settings.value("autostartMininig").toBool() : false;
-}
-
 bool Settings::isStartOnLoginEnabled() const {
   bool res = false;
 #ifdef Q_OS_MAC
@@ -334,6 +303,95 @@ bool Settings::isCloseToTrayEnabled() const {
   return m_settings.contains("closeToTray") ? m_settings.value("closeToTray").toBool() : false;
 }
 #endif
+
+bool Settings::isOptimizationEnabled() const {
+  if (!m_settings.contains(OPTION_WALLET_OPTIMIZATION)) {
+    return false;
+  }
+
+  QJsonObject optimizationObject = m_settings.value(OPTION_WALLET_OPTIMIZATION).toObject();
+  return optimizationObject.contains(OPTION_WALLET_OPTIMIZATION_ENABLED) ? optimizationObject.value(OPTION_WALLET_OPTIMIZATION_ENABLED).toBool() : false;
+}
+
+bool Settings::isOptimizationTimeSetManually() const {
+  if (!m_settings.contains(OPTION_WALLET_OPTIMIZATION)) {
+    return false;
+  }
+
+  QJsonObject optimizationObject = m_settings.value(OPTION_WALLET_OPTIMIZATION).toObject();
+  if (!optimizationObject.contains(OPTION_WALLET_OPTIMIZATION_TIME_SET_MANUALLY)) {
+    return false;
+  }
+
+  return optimizationObject.value(OPTION_WALLET_OPTIMIZATION_TIME_SET_MANUALLY).toBool();
+}
+
+QTime Settings::getOptimizationStartTime() const {
+  if (!m_settings.contains(OPTION_WALLET_OPTIMIZATION)) {
+    return QTime(0, 0);
+  }
+
+  QJsonObject optimizationObject = m_settings.value(OPTION_WALLET_OPTIMIZATION).toObject();
+  if (!optimizationObject.contains(OPTION_WALLET_OPTIMIZATION_START_TIME)) {
+    return QTime(0, 0);
+  }
+
+  QString timeString = optimizationObject.value(OPTION_WALLET_OPTIMIZATION_START_TIME).toString();
+  return QTime::fromString(timeString, Qt::ISODate);
+}
+
+QTime Settings::getOptimizationStopTime() const {
+  if (!m_settings.contains(OPTION_WALLET_OPTIMIZATION)) {
+    return QTime(0, 0);
+  }
+
+  QJsonObject optimizationObject = m_settings.value(OPTION_WALLET_OPTIMIZATION).toObject();
+  if (!optimizationObject.contains(OPTION_WALLET_OPTIMIZATION_STOP_TIME)) {
+    return QTime(0, 0);
+  }
+
+  QString timeString = optimizationObject.value(OPTION_WALLET_OPTIMIZATION_STOP_TIME).toString();
+  return QTime::fromString(timeString, Qt::ISODate);
+}
+
+quint64 Settings::getOptimizationInterval() const {
+  if (!m_settings.contains(OPTION_WALLET_OPTIMIZATION)) {
+    return DEFAULT_OPTIMIZATION_PERIOD;
+  }
+
+  QJsonObject optimizationObject = m_settings.value(OPTION_WALLET_OPTIMIZATION).toObject();
+  if (!optimizationObject.contains(OPTION_WALLET_OPTIMIZATION_INTERVAL)) {
+    return DEFAULT_OPTIMIZATION_PERIOD;
+  }
+
+  return optimizationObject.value(OPTION_WALLET_OPTIMIZATION_INTERVAL).toString().toULongLong();
+}
+
+quint64 Settings::getOptimizationThreshold() const {
+  if (!m_settings.contains(OPTION_WALLET_OPTIMIZATION)) {
+    return DEFAULT_OPTIMIZATION_THRESHOLD;
+  }
+
+  QJsonObject optimizationObject = m_settings.value(OPTION_WALLET_OPTIMIZATION).toObject();
+  if (!optimizationObject.contains(OPTION_WALLET_OPTIMIZATION_THRESHOLD)) {
+    return DEFAULT_OPTIMIZATION_THRESHOLD;
+  }
+
+  return optimizationObject.value(OPTION_WALLET_OPTIMIZATION_THRESHOLD).toString().toULongLong();
+}
+
+quint64 Settings::getOptimizationMixin() const {
+  if (!m_settings.contains(OPTION_WALLET_OPTIMIZATION)) {
+    return DEFAULT_OPTIMIZATION_MIXIN;
+  }
+
+  QJsonObject optimizationObject = m_settings.value(OPTION_WALLET_OPTIMIZATION).toObject();
+  if (!optimizationObject.contains(OPTION_WALLET_OPTIMIZATION_MIXIN)) {
+    return DEFAULT_OPTIMIZATION_MIXIN;
+  }
+
+  return optimizationObject.value(OPTION_WALLET_OPTIMIZATION_MIXIN).toString().toULongLong();
+}
 
 void Settings::setWalletFile(const QString& _file) {
   if (_file.endsWith(".wallet") || _file.endsWith(".keys")) {
@@ -388,13 +446,6 @@ void Settings::setEncrypted(bool _encrypted) {
 void Settings::setTrackingMode(bool _tracking) {
   if (isTrackingMode() != _tracking) {
     m_settings.insert("tracking", _tracking);
-    saveSettings();
-  }
-}
-
-void Settings::setMiningOnLaunchEnabled(bool _automining) {
-  if (isMiningOnLaunchEnabled() != _automining) {
-    m_settings.insert("autostartMininig", _automining);
     saveSettings();
   }
 }
@@ -463,13 +514,6 @@ void Settings::setStartOnLoginEnabled(bool _enable) {
 #endif
 }
 
-void Settings::setMiningPoolList(const QStringList &_miningPoolList) {
-  if (getMiningPoolList() != _miningPoolList) {
-    m_settings.insert(OPTION_MINING_POOLS, QJsonArray::fromStringList(_miningPoolList));
-  }
-  saveSettings();
-}
-
 void Settings::setConnection(const QString& _connection) {
     m_settings.insert(OPTION_CONNECTION, _connection);
     saveSettings();
@@ -494,20 +538,6 @@ void Settings::setRpcNodesList(const QStringList &_RpcNodesList) {
   saveSettings();
 }
 
-void Settings::setCurrentPool(const QString& _pool) {
-  if (!_pool.isEmpty()) {
-    m_settings.insert(OPTION_CURRENT_POOL, _pool);
-  }
-  saveSettings();
-}
-
-void Settings::setMiningThreads(const quint16& _threads) {
-  if (_threads != 0) {
-    m_settings.insert("miningThreads", _threads);
-  }
-  saveSettings();
-}
-
 #ifdef Q_OS_WIN
 void Settings::setMinimizeToTrayEnabled(bool _enable) {
   if (isMinimizeToTrayEnabled() != _enable) {
@@ -523,6 +553,125 @@ void Settings::setCloseToTrayEnabled(bool _enable) {
   }
 }
 #endif
+
+void Settings::setOptimizationEnabled(bool _enable) {
+  if (_enable == isOptimizationEnabled()) {
+    return;
+  }
+
+  {
+    QJsonObject optimizationObject;
+    if (m_settings.contains(OPTION_WALLET_OPTIMIZATION)) {
+      optimizationObject = m_settings.value(OPTION_WALLET_OPTIMIZATION).toObject();
+    }
+
+    optimizationObject.insert(OPTION_WALLET_OPTIMIZATION_ENABLED, _enable);
+    m_settings.insert(OPTION_WALLET_OPTIMIZATION, optimizationObject);
+    saveSettings();
+  }
+}
+
+void Settings::setOptimizationTimeSetManually(bool _enable) {
+  if (_enable == isOptimizationTimeSetManually()) {
+    return;
+  }
+
+  {
+    QJsonObject optimizationObject;
+    if (m_settings.contains(OPTION_WALLET_OPTIMIZATION)) {
+      optimizationObject = m_settings.value(OPTION_WALLET_OPTIMIZATION).toObject();
+    }
+
+    optimizationObject.insert(OPTION_WALLET_OPTIMIZATION_TIME_SET_MANUALLY, _enable);
+    m_settings.insert(OPTION_WALLET_OPTIMIZATION, optimizationObject);
+    saveSettings();
+  }
+}
+
+void Settings::setOptimizationStartTime(const QTime& _startTime) {
+  if (_startTime == getOptimizationStartTime()) {
+    return;
+  }
+
+  {
+    QJsonObject optimizationObject;
+    if (m_settings.contains(OPTION_WALLET_OPTIMIZATION)) {
+      optimizationObject = m_settings.value(OPTION_WALLET_OPTIMIZATION).toObject();
+    }
+
+    optimizationObject.insert(OPTION_WALLET_OPTIMIZATION_START_TIME, _startTime.toString(Qt::ISODate));
+    m_settings.insert(OPTION_WALLET_OPTIMIZATION, optimizationObject);
+    saveSettings();
+  }
+}
+
+void Settings::setOptimizationStopTime(const QTime& _stopTime) {
+  if (_stopTime == getOptimizationStopTime()) {
+    return;
+  }
+
+  {
+    QJsonObject optimizationObject;
+    if (m_settings.contains(OPTION_WALLET_OPTIMIZATION)) {
+      optimizationObject = m_settings.value(OPTION_WALLET_OPTIMIZATION).toObject();
+    }
+
+    optimizationObject.insert(OPTION_WALLET_OPTIMIZATION_STOP_TIME, _stopTime.toString(Qt::ISODate));
+    m_settings.insert(OPTION_WALLET_OPTIMIZATION, optimizationObject);
+    saveSettings();
+  }
+}
+
+void Settings::setOptimizationInterval(quint64 _interval) {
+  if (_interval == getOptimizationInterval()) {
+    return;
+  }
+
+  {
+    QJsonObject optimizationObject;
+    if (m_settings.contains(OPTION_WALLET_OPTIMIZATION)) {
+      optimizationObject = m_settings.value(OPTION_WALLET_OPTIMIZATION).toObject();
+    }
+
+    optimizationObject.insert(OPTION_WALLET_OPTIMIZATION_INTERVAL, QString::number(_interval));
+    m_settings.insert(OPTION_WALLET_OPTIMIZATION, optimizationObject);
+    saveSettings();
+  }
+}
+
+void Settings::setOptimizationThreshold(quint64 _threshold) {
+  if (_threshold == getOptimizationThreshold()) {
+    return;
+  }
+
+  {
+    QJsonObject optimizationObject;
+    if (m_settings.contains(OPTION_WALLET_OPTIMIZATION)) {
+      optimizationObject = m_settings.value(OPTION_WALLET_OPTIMIZATION).toObject();
+    }
+
+    optimizationObject.insert(OPTION_WALLET_OPTIMIZATION_THRESHOLD, QString::number(_threshold));
+    m_settings.insert(OPTION_WALLET_OPTIMIZATION, optimizationObject);
+    saveSettings();
+  }
+}
+
+void Settings::setOptimizationMixin(quint64 _mixin) {
+  if (_mixin == getOptimizationMixin()) {
+    return;
+  }
+
+  {
+    QJsonObject optimizationObject;
+    if (m_settings.contains(OPTION_WALLET_OPTIMIZATION)) {
+      optimizationObject = m_settings.value(OPTION_WALLET_OPTIMIZATION).toObject();
+    }
+
+    optimizationObject.insert(OPTION_WALLET_OPTIMIZATION_MIXIN, QString::number(_mixin));
+    m_settings.insert(OPTION_WALLET_OPTIMIZATION, optimizationObject);
+    saveSettings();
+  }
+}
 
 void Settings::saveSettings() const {
   QFile cfgFile(getDataDir().absoluteFilePath(QCoreApplication::applicationName() + ".cfg"));

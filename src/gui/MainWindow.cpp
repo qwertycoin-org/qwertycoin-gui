@@ -27,6 +27,7 @@
 #include "AddressBookModel.h"
 #include "ChangePasswordDialog.h"
 #include "ConnectionSettings.h"
+#include "OptimizationSettings.h"
 #include "PrivateKeysDialog.h"
 #include "ExportTrackingKeyDialog.h"
 #include "ImportTrackingKeyDialog.h"
@@ -35,6 +36,7 @@
 #include "ExitWidget.h"
 #include "ImportKeyDialog.h"
 #include "RestoreFromMnemonicSeedDialog.h"
+#include "GetBalanceProofDialog.h"
 #include "MainWindow.h"
 #include "NewPasswordDialog.h"
 #include "NodeAdapter.h"
@@ -74,7 +76,7 @@ MainWindow& MainWindow::instance() {
 }
 
 MainWindow::MainWindow() : QMainWindow(), m_ui(new Ui::MainWindow), m_trayIcon(nullptr), m_tabActionGroup(new QActionGroup(this)),
-  m_isAboutToQuit(false), paymentServer(0), maxRecentFiles(10), trayIconMenu(0), toggleHideAction(0) {
+  m_isAboutToQuit(false), paymentServer(0), optimizationManager(nullptr), maxRecentFiles(10), trayIconMenu(0), toggleHideAction(0) {
   m_ui->setupUi(this);
   m_connectionStateIconLabel = new QPushButton();
   m_connectionStateIconLabel->setFlat(true); // Make the button look like a label, but clickable
@@ -87,13 +89,14 @@ MainWindow::MainWindow() : QMainWindow(), m_ui(new Ui::MainWindow), m_trayIcon(n
   connectToSignals();
   createLanguageMenu();
   initUi();
-
   walletClosed();
 }
 
 MainWindow::~MainWindow() {
     delete paymentServer;
     paymentServer = 0;
+    delete optimizationManager;
+    optimizationManager = 0;
     //if(m_trayIcon) // Hide tray icon, as deleting will let it linger until quit (on Ubuntu)
     //  m_trayIcon->hide();
     #ifdef Q_OS_MAC
@@ -158,14 +161,12 @@ void MainWindow::initUi() {
   m_ui->m_receiveFrame->hide();
   m_ui->m_transactionsFrame->hide();
   m_ui->m_addressBookFrame->hide();
-  m_ui->m_miningFrame->hide();
 
   m_tabActionGroup->addAction(m_ui->m_overviewAction);
   m_tabActionGroup->addAction(m_ui->m_sendAction);
   m_tabActionGroup->addAction(m_ui->m_receiveAction);
   m_tabActionGroup->addAction(m_ui->m_transactionsAction);
   m_tabActionGroup->addAction(m_ui->m_addressBookAction);
-  m_tabActionGroup->addAction(m_ui->m_miningAction);
 
   m_ui->m_overviewAction->toggle();
   encryptedFlagChanged(false);
@@ -190,7 +191,6 @@ void MainWindow::initUi() {
 
   m_ui->m_showMnemonicSeedAction->setEnabled(false);
 
-  m_ui->m_miningOnLaunchAction->setChecked(Settings::instance().isMiningOnLaunchEnabled());
   m_ui->m_startOnLoginAction->setChecked(Settings::instance().isStartOnLoginEnabled());
 
   m_ui->menuRecent_wallets->setVisible(false);
@@ -224,6 +224,7 @@ void MainWindow::initUi() {
   m_ui->m_closeToTrayAction->deleteLater();
 #endif
 
+  OptimizationManager* optimizationManager = new OptimizationManager(this);
   createTrayIconMenu();
 }
 
@@ -234,7 +235,6 @@ void MainWindow::scrollToTransaction(const QModelIndex& _index) {
 
 void MainWindow::quit() {
   if (!m_isAboutToQuit) {
-    //NodeAdapter::instance().stopSoloMining();
     ExitWidget* exitWidget = new ExitWidget(nullptr);
     exitWidget->show();
     m_isAboutToQuit = true;
@@ -539,6 +539,8 @@ void MainWindow::isTrackingMode() {
   m_ui->m_openUriAction->setEnabled(false);
   m_ui->m_showMnemonicSeedAction->setEnabled(false);
   m_ui->m_sweepUnmixableAction->setEnabled(false);
+  m_ui->m_optimizationAction->setEnabled(false);
+  m_ui->m_proofBalanceAction->setEnabled(false);
   m_trackingModeIconLabel->show();
 }
 
@@ -581,7 +583,7 @@ void MainWindow::sweepUnmixable() {
   dlg.showPaymentDetails(dust);
   if (dlg.exec() == QDialog::Accepted) {
     quint64 fee = CurrencyAdapter::instance().getMinimumFee();
-    QVector<CryptoNote::WalletLegacyTransfer> walletTransfers;
+    std::vector<CryptoNote::WalletLegacyTransfer> walletTransfers;
     CryptoNote::WalletLegacyTransfer walletTransfer;
     walletTransfer.address = WalletAdapter::instance().getAddress().toStdString();
     walletTransfer.amount = dust;
@@ -680,7 +682,6 @@ void MainWindow::openConnectionSettings() {
     dlg.setRemoteNode();
     dlg.setLocalDaemonPort();
     if (dlg.exec() == QDialog::Accepted) {
-
       QString connection = dlg.setConnectionMode();
       Settings::instance().setConnection(connection);
 
@@ -692,6 +693,16 @@ void MainWindow::openConnectionSettings() {
 
       QMessageBox::information(this, tr("Connection settings changed"), tr("Connection mode will be changed after restarting the wallet."), QMessageBox::Ok);
     }
+}
+
+void MainWindow::openOptimizationSettings() {
+  OptimizationSettingsDialog dlg(&MainWindow::instance());
+  dlg.exec();
+}
+
+void MainWindow::getBalanceProof() {
+  GetBalanceProofDialog dlg(&MainWindow::instance());
+  dlg.exec();
 }
 
 void MainWindow::showStatusInfo() {
@@ -855,11 +866,6 @@ void MainWindow::setStartOnLogin(bool _on) {
   m_ui->m_startOnLoginAction->setChecked(Settings::instance().isStartOnLoginEnabled());
 }
 
-void MainWindow::setMiningOnLaunch(bool _on) {
-  Settings::instance().setMiningOnLaunchEnabled(_on);
-  m_ui->m_miningOnLaunchAction->setChecked(Settings::instance().isMiningOnLaunchEnabled());
-}
-
 void MainWindow::setMinimizeToTray(bool _on) {
 #ifdef Q_OS_WIN
   Settings::instance().setMinimizeToTrayEnabled(_on);
@@ -924,6 +930,7 @@ void MainWindow::peerCountUpdated(quint64 _peerCount) {
 void MainWindow::walletSynchronizationInProgress() {
   qobject_cast<AnimatedLabel*>(m_synchronizationStateIconLabel)->startAnimation();
   m_synchronizationStateIconLabel->setToolTip(tr("Synchronization in progress"));
+  m_ui->m_proofBalanceAction->setEnabled(false);
 }
 
 void MainWindow::walletSynchronized(int _error, const QString& _error_text) {
@@ -932,6 +939,9 @@ void MainWindow::walletSynchronized(int _error, const QString& _error_text) {
   m_synchronizationStateIconLabel->setPixmap(syncIcon);
   QString syncLabelTooltip = _error > 0 ? tr("Not synchronized") : tr("Synchronized");
   m_synchronizationStateIconLabel->setToolTip(syncLabelTooltip);
+  if (WalletAdapter::instance().getActualBalance() > 0) {
+    m_ui->m_proofBalanceAction->setEnabled(true);
+  }
 }
 
 void MainWindow::walletOpened(bool _error, const QString& _error_text) {
@@ -947,6 +957,7 @@ void MainWindow::walletOpened(bool _error, const QString& _error_text) {
     m_ui->m_resetAction->setEnabled(true);
     m_ui->m_openUriAction->setEnabled(true);
     m_ui->m_sweepUnmixableAction->setEnabled(true);
+    m_ui->m_optimizationAction->setEnabled(true);
     m_ui->m_signMessageAction->setEnabled(true);
     m_ui->m_verifySignedMessageAction->setEnabled(true);
     if(WalletAdapter::instance().isDeterministic()) {
@@ -989,15 +1000,16 @@ void MainWindow::walletClosed() {
   m_ui->m_resetAction->setEnabled(false);
   m_ui->m_showMnemonicSeedAction->setEnabled(false);
   m_ui->m_sweepUnmixableAction->setEnabled(false);
+  m_ui->m_optimizationAction->setEnabled(false);
   m_ui->m_signMessageAction->setEnabled(false);
   m_ui->m_verifySignedMessageAction->setEnabled(false);
+  m_ui->m_proofBalanceAction->setEnabled(false);
   m_ui->m_overviewFrame->hide();
   accountWidget->setVisible(false);
   m_ui->m_receiveFrame->hide();
   m_ui->m_sendFrame->hide();
   m_ui->m_transactionsFrame->hide();
   m_ui->m_addressBookFrame->hide();
-  //m_ui->m_miningFrame->hide();
   m_ui->m_noWalletFrame->show();
   m_encryptionStateIconLabel->hide();
   m_trackingModeIconLabel->hide();
@@ -1006,7 +1018,6 @@ void MainWindow::walletClosed() {
   Q_FOREACH(auto action, tabActions) {
     action->setEnabled(false);
   }
-  m_ui->m_miningAction->setEnabled(true);
   Settings::instance().setTrackingMode(false);
   updateRecentActionList();
 }
@@ -1069,7 +1080,6 @@ void MainWindow::createTrayIconMenu()
     trayIconMenu->addAction(m_ui->m_receiveAction);
     trayIconMenu->addAction(m_ui->m_transactionsAction);
     trayIconMenu->addAction(m_ui->m_addressBookAction);
-    trayIconMenu->addAction(m_ui->m_miningAction);
     trayIconMenu->addSeparator();
     trayIconMenu->addAction(m_ui->m_openWalletAction);
     trayIconMenu->addAction(m_ui->m_closeWalletAction);

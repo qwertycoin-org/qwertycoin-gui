@@ -30,7 +30,7 @@ public:
   quint16 getP2pBindPort() const;
   quint16 getP2pExternalPort() const;
   QStringList getPeers() const;
-  QStringList getPriorityNodes() const;
+  QStringList getPiorityNodes() const;
   QStringList getExclusiveNodes() const;
   QStringList getSeedNodes() const;
   QString getDataDir() const;

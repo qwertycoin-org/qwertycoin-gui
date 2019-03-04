@@ -48,6 +48,7 @@ public:
   virtual uint64_t getIncomingConnectionsCount() = 0;
   virtual uint64_t getWhitePeerlistSize() = 0;
   virtual uint64_t getGreyPeerlistSize() = 0;
+  virtual uint64_t getMinimalFee() = 0;
   virtual uint8_t getCurrentBlockMajorVersion() = 0;
   virtual CryptoNote::BlockHeaderInfo getLastLocalBlockHeaderInfo() = 0;
 

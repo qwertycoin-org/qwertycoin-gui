@@ -66,6 +66,7 @@ public:
   quint64 getIncomingConnectionsCount();
   quint64 getWhitePeerlistSize();
   quint64 getGreyPeerlistSize();
+  quint64 getMinimalFee() const;
   uint8_t getCurrentBlockMajorVersion();
   CryptoNote::BlockHeaderInfo getLastLocalBlockHeaderInfo();
   void peerCountUpdated(Node& _node, size_t _count) Q_DECL_OVERRIDE;

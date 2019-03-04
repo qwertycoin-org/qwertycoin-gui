@@ -78,14 +78,18 @@ set(CRYPTONOTE_SOURCES
   cryptonote/src/crypto/crypto-ops.c
   cryptonote/src/crypto/crypto.cpp
   cryptonote/src/crypto/groestl.c
+  cryptonote/src/crypto/hash-extra-blake.c
+  cryptonote/src/crypto/hash-extra-groestl.c
+  cryptonote/src/crypto/hash-extra-jh.c
+  cryptonote/src/crypto/hash-extra-skein.c
   cryptonote/src/crypto/hash.c
   cryptonote/src/crypto/jh.c
   cryptonote/src/crypto/keccak.c
+  cryptonote/src/crypto/oaes_lib.c
   cryptonote/src/crypto/random.c
   cryptonote/src/crypto/skein.c
-  cryptonote/src/crypto/cn_slow_hash_soft.cpp
-  cryptonote/src/crypto/cn_slow_hash_hard_intel.cpp
-  cryptonote/src/crypto/cn_slow_hash_hard_arm.cpp
+  cryptonote/src/crypto/slow-hash.c
+  cryptonote/src/crypto/slow-hash.cpp
   cryptonote/src/crypto/tree-hash.c
   cryptonote/src/CryptoNoteCore/BlockchainIndices.cpp
   cryptonote/src/CryptoNoteCore/BlockchainMessages.cpp
@@ -175,7 +179,6 @@ set(CRYPTONOTE_SOURCES
 
 file(GLOB_RECURSE SOURCES src/*.cpp)
 file(GLOB_RECURSE HEADERS src/*.h)
-file(GLOB_RECURSE HEADERS src/*.hpp)
 file(GLOB_RECURSE FORMS src/gui/ui/*.ui)
 file(GLOB_RECURSE Mnemonics cryptonote/src/mnemonics/*)
 
@@ -286,7 +289,7 @@ elseif (UNIX)
     install(FILES src/qwertycoinwallet.desktop DESTINATION share/applications)
     install(FILES src/images/qwertycoinz.png DESTINATION share/pixmaps RENAME qwertycoin.png)
     install(FILES copyright DESTINATION share/doc/qwertycoinwallet)
-    install(DIRECTORY src/languages DESTINATION /opt/karbo/ FILES_MATCHING PATTERN "*.qm")
+    install(DIRECTORY src/languages DESTINATION /opt/qwertycoin/ FILES_MATCHING PATTERN "*.qm")
 
     if (NOT RPMBUILD)
         set(CPACK_GENERATOR DEB)
@@ -309,7 +312,7 @@ set(CPACK_PACKAGE_FILE_NAME "${CPACK_DEBIAN_PACKAGE_NAME}-${CPACK_PACKAGE_VERSIO
         set(CPACK_RPM_PACKAGE_REQUIRES "qt5-qtbase >= 5.3.2, qt5-qtbase-gui >= 5.3.2")
         set(CPACK_RPM_PACKAGE_SUMMARY "Qwertycoin QWC wallet")
         set(CPACK_RPM_PACKAGE_DESCRIPTION "Qwertycoin QWC wallet
- Qwertycoin is a decentrilized, privacy oriented peer-to-peer
+ Qwertycoin is Ukrainian decentralized, privacy oriented peer-to-peer
  cryptocurrency. It is open-source, nobody owns or controls Qwertycoin
  and everyone can take part.")
 set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${VERSION_RELEASE}${CPACK_SYSTEM_NAME}")

@@ -15,8 +15,10 @@
 #include <QTimer>
 #include "CommandLineParser.h"
 #include "PaymentServer.h"
+#include "OptimizationManager.h"
 
 class QActionGroup;
+class OptimizationManager;
 
 namespace Ui {
 class MainWindow;
@@ -49,6 +51,7 @@ private slots:
 
 private:
   PaymentServer* paymentServer;
+  OptimizationManager* optimizationManager;
 
   QScopedPointer<Ui::MainWindow> m_ui;
   QPushButton* m_connectionStateIconLabel;
@@ -113,11 +116,11 @@ private:
   Q_SLOT void about();
   Q_SLOT void setStartOnLogin(bool _on);
   Q_SLOT void setMinimizeToTray(bool _on);
-  Q_SLOT void setMiningOnLaunch(bool _on);
   Q_SLOT void setCloseToTray(bool _on);
   Q_SLOT void showPrivateKeys();
   Q_SLOT void DisplayCmdLineHelp();
   Q_SLOT void openConnectionSettings();
+  Q_SLOT void openOptimizationSettings();
   Q_SLOT void exportTrackingKey();
   Q_SLOT void importTrackingKey();
   Q_SLOT void signMessage();
@@ -130,6 +133,7 @@ private:
   Q_SLOT void showMnemonicSeed();
   Q_SLOT void restoreFromMnemonicSeed();
   Q_SLOT void sweepUnmixable();
+  Q_SLOT void getBalanceProof();
 
   bool isObscured(QWidget *w);
   bool checkPoint(const QPoint &p, const QWidget *w);
