@@ -7,7 +7,7 @@ environment:
 
 clone_script:
     - cmd: git clone -q --recursive --branch=master https://github.com/qwertycoin-org/qwertycoin-gui.git
-    - cmd: dir
+    - cmd: cd qwertycoin-gui
 
 build_script:
     - md build
