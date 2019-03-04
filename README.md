@@ -1,7 +1,9 @@
-![image](https://cdn.qwertycoin.org/images/press/other/qwc-github.png)
+![image](https://cdn.qwertycoin.org/images/press/other/qwc-github-3.png)
+#### Master Build Status
+[![Build Status](https://travis-ci.org/qwertycoin-org/qwertycoin-gui.svg?branch=master)](https://travis-ci.org/qwertycoin-org/qwertycoin-gui) [![Build status](https://ci.appveyor.com/api/projects/status/github/qwertycoin-org/qwertycoin-gui?branch=master&svg=true)](https://ci.appveyor.com/project/qwertycoin-org/qwertycoin-gui)
 
-[![Build Status](https://travis-ci.org/qwertycoin-org/qwertycoin-gui.svg?branch=stage_1)](https://travis-ci.org/qwertycoin-org/qwertycoin-gui)
-[![Build status](https://ci.appveyor.com/api/projects/status/l3o455xl2l9lhrlu/branch/master?svg=true)](https://ci.appveyor.com/project/qwertycoin-org/qwertycoin-gui/branch/master)
+#### Development Build Status
+[![Build Status](https://travis-ci.org/qwertycoin-org/qwertycoin-gui.svg?branch=dev)](https://travis-ci.org/qwertycoin-org/qwertycoin-gui) [![Build status](https://ci.appveyor.com/api/projects/status/github/qwertycoin-org/qwertycoin-gui?branch=dev&svg=true)](https://ci.appveyor.com/project/qwertycoin-org/qwertycoin-gui)
 
 ### How To Compile
 
