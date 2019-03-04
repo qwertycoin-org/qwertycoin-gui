@@ -8,6 +8,7 @@ environment:
 clone_script:
     - cmd: git clone -q --recursive --branch=master https://github.com/qwertycoin-org/qwertycoin-gui.git
     - cmd: cd qwertycoin-gui
+    - cmd: rm -rf cryptonote
     - cmd: git clone -q --recursive --branch=master https://github.com/qwertycoin-org/qwertycoin.git cryptonote
     - cmd: dir
 
