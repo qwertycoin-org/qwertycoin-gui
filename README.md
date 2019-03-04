@@ -14,7 +14,7 @@
 **1. Clone wallet sources**
 
 ```
-git clone --recurse-submodules https://github.com/qwertycoin-org/qwertycoin
+git clone --recurse-submodules https://github.com/qwertycoin-org/qwertycoin-gui
 ```
 
 **2. Set symbolic link to coin sources at the same level as `src`. For example:**
