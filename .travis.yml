@@ -1,0 +1,30 @@
+language: cpp
+
+matrix:
+    include:
+        - os: linux
+          dist: xenial
+          sudo: required
+
+addons:
+    apt: # Linux
+        packages:
+            - build-essential
+            - python-dev
+            - gcc
+            - g++
+            - git
+            - cmake
+            - libboost-all-dev
+            - qtbase5-dev
+            - wget
+        sources:
+            - ubuntu-toolchain-r-test
+
+script:
+    - git clone --recurse-submodules https://github.com/qwertycoin-org/qwertycoin-gui
+    - cd qwertycoin-gui
+    - mkdir ./build
+    - cd ./build
+    - cmake ..
+    - cmake --build . --config Release
