@@ -13,7 +13,7 @@ set(CRYPTONOTE_LIB cryptonote)
 
 include_directories(${CMAKE_BINARY_DIR}
     src
-    cryptonote/external
+    external
     cryptonote/include
     cryptonote/src
     libqrencode)
@@ -44,19 +44,22 @@ configure_file("src/CryptoNoteWalletConfig.h.in" "CryptoNoteWalletConfig.h")
 add_definitions(-DVERSION=\"${CN_VERSION}\")
 add_definitions(-DGIT_REVISION=\"${GIT_REVISION}\")
 
+add_definitions(-DUPNP_VERSION_STRING="2.1")
+
 set(CMAKE_AUTOMOC ON)
 
 set(CRYPTONOTE_SOURCES
-  cryptonote/external/miniupnpc/connecthostport.c
-  cryptonote/external/miniupnpc/igd_desc_parse.c
-  cryptonote/external/miniupnpc/minisoap.c
-  cryptonote/external/miniupnpc/miniupnpc.c
-  cryptonote/external/miniupnpc/miniwget.c
-  cryptonote/external/miniupnpc/minixml.c
-  cryptonote/external/miniupnpc/portlistingparse.c
-  cryptonote/external/miniupnpc/receivedata.c
-  cryptonote/external/miniupnpc/upnpcommands.c
-  cryptonote/external/miniupnpc/upnpreplyparse.c
+  external/miniupnpc/connecthostport.c
+  external/miniupnpc/igd_desc_parse.c
+  external/miniupnpc/minisoap.c
+  external/miniupnpc/miniupnpc.c
+  external/miniupnpc/miniwget.c
+  external/miniupnpc/minixml.c
+  external/miniupnpc/portlistingparse.c
+  external/miniupnpc/receivedata.c
+  external/miniupnpc/upnpcommands.c
+  external/miniupnpc/upnpdev.c
+  external/miniupnpc/upnpreplyparse.c
   cryptonote/src/Common/Base58.cpp
   cryptonote/src/Common/CommandLine.cpp
   cryptonote/src/Common/Util.cpp
@@ -201,7 +204,7 @@ if (WIN32)
   set(QTMAIN Qt5::WinMain)
 
 elseif (UNIX)
-  set(CRYPTONOTE_SOURCES ${CRYPTONOTE_SOURCES} cryptonote/external/miniupnpc/minissdpc.c)
+  set(CRYPTONOTE_SOURCES ${CRYPTONOTE_SOURCES} external/miniupnpc/minissdpc.c)
   if (APPLE)
     enable_language(ASM)
     file(GLOB_RECURSE OBJC_SOURCES src/*.mm)
