@@ -5,15 +5,11 @@ environment:
     BOOST_LIBRARYDIR: C:\Libraries\boost_1_64_0\lib64-msvc-15
     CMAKE_PREFIX_PATH: C:\Qt\5.12.1\msvc2017_64
 
-clone_script:
-    - cmd: git clone -q --recursive --branch=master https://github.com/qwertycoin-org/qwertycoin-gui.git
-    - cmd: cd qwertycoin-gui
-    - cmd: rm -rf cryptonote
-    - cmd: git clone -q --recursive --branch=master https://github.com/qwertycoin-org/qwertycoin.git cryptonote
-    - cmd: dir
+install:
+    - git submodule update --init --recursive
 
 build_script:
     - md build
     - cd build
-    - cmake -G "Visual Studio 15 Win64" ..
-    - MSBuild Qwertycoin.sln /p:Configuration=Release /m
+    - cmake -G "Visual Studio 15 2017 Win64" ..
+    - cmake --build . --config Release
