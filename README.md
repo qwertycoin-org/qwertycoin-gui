@@ -15,33 +15,67 @@ If you would like to compile yourself, read on.
 
 ##### Prerequisites
 
-- You will need the following packages: boost (1.64 or higher), QT Library (5.9.0 orhigher) cmake (3.10 or higher), git, gcc (4.9 or higher), g++ (4.9 or higher), make, and python. Most of these should already be installed on your system.
+- You will need the following packages: boost (1.64 or higher), QT Library (5.9.0 or higher) cmake (3.10 or higher), git, gcc (4.9 or higher), g++ (4.9 or higher), make, and python. Most of these should already be installed on your system.
 - For example on ubuntu: `sudo apt-get install build-essential python-dev gcc g++ git cmake libboost-all-dev qtbase5-dev`
-- After this you can compile your Qwertycoin
+- After this you can build your Qwertycoin Zero Wallet.
 
-**1. Clone wallet sources**
+##### Building
 
+- After installing dependencies run simple script:
 ```
 git clone --recurse-submodules https://github.com/qwertycoin-org/qwertycoin-gui
+cd ./qwertycoin-gui
+mkdir ./build
+cd ./build
+cmake ..
+cmake --build . --config Release
 ```
+- If all went well, it will complete successfully, and you will find all your binaries in the `./build/Release` directory.
 
-**2. Set symbolic link to coin sources at the same level as `src`. For example:**
+#### Windows 10
 
-```
-ln -s ../qwertycoin cryptonote
-```
+##### Prerequisites
 
-Alternative way is to create git submodule:
+- Install [Visual Studio 2017 Community Edition](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=Community&rel=15&page=inlineinstall);
+- When installing Visual Studio, it is **required** that you install **Desktop development with C++** and the **VC++ v140 toolchain** when selecting features. The option to install the v140 toolchain can be found by expanding the "Desktop development with C++" node on the right. You will need this for the project to build correctly;
+- Make sure that bundled cmake version is 3.10 or higher.
 
-```
-git submodule add https://github.com/qwertycoin-org/qwertycoin.git cryptonote
-```
+##### Building
 
-**3. Build**
+- From the start menu, open "x64 Native Tools Command Prompt for vs2017";
+- And the run the following commands:
+```
+git clone https://github.com/qwertycoin-org/qwertycoin-gui
+cd qwertycoin-gui
+md build
+cd build
+cmake -G "Visual Studio 15 2017 Win64" ..
+cmake --build . --config Release
+```
+- If all went well, it will complete successfully, and you will find all your binaries in the `.\build\Release` directory;
+- Additionally, a `.sln` file will have been created in the `build` directory. If you wish to open the project in Visual Studio with this, you can.
 
+#### Apple
+
+##### Prerequisites
+
+- Install Xcode and Developer Tools;
+- Install [cmake](https://cmake.org/). See [here](https://stackoverflow.com/questions/23849962/cmake-installer-for-mac-fails-to-create-usr-bin-symlinks) if you are unable to call `cmake` from the terminal after installing;
+- Install git.
+
+##### Building
+
+- After installing dependencies run simple script:
 ```
-mkdir build && cd build && cmake .. && make
+git clone https://github.com/qwertycoin-org/qwertycoin-gui
+cd ./qwertycoin-gui
+mkdir ./build
+cd ./build
+cmake ..
+cmake --build . --config Release
 ```
+- If all went well, it will complete successfully, and you will find all your binaries in the `./build/Release` directory.
+
 
 ## Donate
 

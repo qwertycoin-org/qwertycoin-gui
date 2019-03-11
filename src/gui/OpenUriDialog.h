@@ -1,5 +1,5 @@
 // Copyright (c) 2016 The Karbowanec developers
-// Copyright (c) 2018 The Qwertycoin developers
+// Copyright (c) 2018-2019 The Qwertycoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
