@@ -53,6 +53,7 @@ set(CRYPTONOTE_SOURCES
   external/miniupnpc/connecthostport.c
   external/miniupnpc/igd_desc_parse.c
   external/miniupnpc/minisoap.c
+  external/miniupnpc/minissdpc.c
   external/miniupnpc/miniupnpc.c
   external/miniupnpc/miniwget.c
   external/miniupnpc/minixml.c
