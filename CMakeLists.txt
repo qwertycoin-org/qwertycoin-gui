@@ -45,6 +45,7 @@ add_definitions(-DVERSION=\"${CN_VERSION}\")
 add_definitions(-DGIT_REVISION=\"${GIT_REVISION}\")
 
 add_definitions(-DUPNP_VERSION_STRING="2.1")
+add_definitions(-DMINIUPNP_STATICLIB)
 
 set(CMAKE_AUTOMOC ON)
 
