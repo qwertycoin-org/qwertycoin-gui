@@ -1,3 +1,6 @@
 [submodule "cryptonote"]
 	path = cryptonote
 	url = https://github.com/qwertycoin-org/qwertycoin.git
+[submodule "libqrencode"]
+	path = libqrencode
+	url = https://github.com/qwertycoin/libqrencode
