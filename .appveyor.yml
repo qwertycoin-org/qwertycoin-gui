@@ -1,9 +1,14 @@
 os: Visual Studio 2017
 
+clone_depth: 100
+
+cache:
+    - C:\.hunter -> .appveyor.yml
+
 environment:
-    BOOST_ROOT: C:\Libraries\boost_1_64_0
-    BOOST_LIBRARYDIR: C:\Libraries\boost_1_64_0\lib64-msvc-15
-    CMAKE_PREFIX_PATH: C:\Qt\5.12.1\msvc2017_64
+    BOOST_ROOT: C:\Libraries\boost_1_66_0
+    BOOST_LIBRARYDIR: C:\Libraries\boost_1_66_0\lib64-msvc-14.1
+    Qt5_DIR: C:\Qt\5.12.1\msvc2017_64\lib\cmake\Qt5
 
 install:
     - git submodule update --init --recursive
@@ -11,5 +16,6 @@ install:
 build_script:
     - md build
     - cd build
-    - cmake -G "Visual Studio 15 2017 Win64" ..
+    - cmake -G "Visual Studio 15 2017 Win64" -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=cmake/polly/vs-15-2017-win64.cmake ..
     - cmake --build . --config Release
+    - cmake --build . --config Release --target package

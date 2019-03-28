@@ -1,30 +1,43 @@
 language: cpp
 
 matrix:
-    include:
-        - os: linux
-          dist: xenial
-          sudo: required
+  include:
+      - os: linux
+        dist: xenial
+        sudo: required
+        env:
+            - CMAKE_GENERATOR_NAME="Unix Makefiles"
+            - CMAKE_TOOLCHAIN_FILE_NAME=gcc-cxx14-c11.cmake
+            - Qt5_DIR="/usr/lib/x86_64-linux-gnu/cmake/Qt5"
+      - os: osx
+        osx_image: xcode10.1
+        env:
+            - CMAKE_GENERATOR_NAME="Unix Makefiles"
+            - CMAKE_TOOLCHAIN_FILE_NAME=clang-cxx14.cmake
+            - Qt5_DIR="/usr/local/opt/qt/lib/cmake/Qt5"
 
 addons:
     apt: # Linux
         packages:
             - build-essential
-            - python-dev
-            - gcc
-            - g++
-            - git
             - cmake
-            - libboost-all-dev
+            - git
             - qtbase5-dev
-            - wget
         sources:
             - ubuntu-toolchain-r-test
+    homebrew: # macOS
+        packages:
+            - cmake
+            - git
+            - qt5
+
+cache:
+    directories:
+        - $HOME/.hunter
 
 script:
-    - git clone --recurse-submodules https://github.com/qwertycoin-org/qwertycoin-gui
-    - cd qwertycoin-gui
     - mkdir ./build
     - cd ./build
-    - cmake ..
+    - cmake -G "$CMAKE_GENERATOR_NAME" -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=cmake/polly/$CMAKE_TOOLCHAIN_FILE_NAME ..
     - cmake --build . --config Release
+    - cmake --build . --config Release --target package
