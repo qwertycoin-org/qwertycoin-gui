@@ -7,11 +7,13 @@ matrix:
         sudo: required
         env:
             - CMAKE_GENERATOR_NAME="Unix Makefiles"
+            - CMAKE_TOOLCHAIN_FILE_NAME=gcc-cxx14-c11.cmake
             - Qt5_DIR="/usr/lib/x86_64-linux-gnu/cmake/Qt5"
       - os: osx
         osx_image: xcode10.1
         env:
             - CMAKE_GENERATOR_NAME="Unix Makefiles"
+            - CMAKE_TOOLCHAIN_FILE_NAME=clang-cxx14.cmake
             - Qt5_DIR="/usr/local/opt/qt/lib/cmake/Qt5"
 
 addons:
@@ -36,6 +38,6 @@ cache:
 script:
     - mkdir ./build
     - cd ./build
-    - cmake -G "$CMAKE_GENERATOR_NAME" ..
+    - cmake -G "$CMAKE_GENERATOR_NAME" -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=cmake/polly/$CMAKE_TOOLCHAIN_FILE_NAME ..
     - cmake --build . --config Release
     - cmake --build . --config Release --target package
