@@ -78,7 +78,11 @@ mark_as_advanced(QwertycoinFramework_INCLUDE_DIRS QwertycoinFramework_LIBS)
 
 foreach(LIB ${QwertycoinFramework_LIBS})
     set(${LIB}_filename "${CMAKE_STATIC_LIBRARY_PREFIX}QwertycoinFramework_${LIB}${CMAKE_STATIC_LIBRARY_SUFFIX}")
-    set(${LIB}_library "${BINARY_DIR}/lib/${${LIB}_filename}")
+    if(WIN32)
+        set(${LIB}_library "${BINARY_DIR}/lib/Release/${${LIB}_filename}")
+    else()
+        set(${LIB}_library "${BINARY_DIR}/lib/${${LIB}_filename}")
+    endif()
 
     add_library(QwertycoinFramework::${LIB} UNKNOWN IMPORTED GLOBAL)
     set_target_properties(QwertycoinFramework::${LIB} PROPERTIES
