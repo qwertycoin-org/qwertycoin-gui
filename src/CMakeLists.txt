@@ -250,3 +250,38 @@ target_include_directories(${TARGET_NAME} ${TARGET_INCLUDE_DIRS})
 target_link_libraries(${TARGET_NAME} ${TARGET_LINK_LIBS})
 target_compile_definitions(${TARGET_NAME} ${TARGET_COMPILE_DEFS})
 set_target_properties(${TARGET_NAME} PROPERTIES OUTPUT_NAME "Qwertycoin")
+
+if(UNIX AND NOT APPLE AND NOT ANDROID) # linux
+    install(
+        TARGETS ${TARGET_NAME}
+        DESTINATION bin
+        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                    GROUP_READ GROUP_EXECUTE
+                    WORLD_READ WORLD_EXECUTE
+    )
+    install(
+        FILES "${CMAKE_CURRENT_LIST_DIR}/qwertycoinwallet.desktop"
+        DESTINATION share/applications
+    )
+    install(
+        FILES "${CMAKE_CURRENT_LIST_DIR}/images/qwertycoinz.png"
+        DESTINATION share/pixmaps
+        RENAME qwertycoin.png
+    )
+    install(
+        DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/languages"
+        DESTINATION /opt/qwertycoin/
+        FILES_MATCHING PATTERN "*.qm"
+    )
+    install(
+        FILES "${CMAKE_SOURCE_DIR}/LICENSE.txt"
+        DESTINATION share/doc/qwertycoinwallet
+    )
+elseif(APPLE) # macos
+    install(TARGETS ${TARGET_NAME} BUNDLE DESTINATION .)
+    set_source_files_properties("${CMAKE_CURRENT_LIST_DIR}/images/qwertycoin.icns" PROPERTIES
+        MACOSX_PACKAGE_LOCATION "Resources"
+    )
+elseif(WIN32) # windows
+    install(TARGETS ${TARGET_NAME} RUNTIME DESTINATION .)
+endif()

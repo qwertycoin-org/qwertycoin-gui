@@ -13,30 +13,6 @@ set(CPACK_STRIP_FILES ON)
 if(UNIX AND NOT APPLE AND NOT ANDROID) # linux
     set(CPACK_PACKAGING_INSTALL_PREFIX "/opt/qwertycoin")
 
-    install(
-        PROGRAMS "${CMAKE_BINARY_DIR}/src/${PROJECT_DISPLAY_NAME}"
-        DESTINATION bin
-        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-    )
-    install(
-        FILES "${CMAKE_SOURCE_DIR}/src/qwertycoinwallet.desktop"
-        DESTINATION share/applications
-    )
-    install(
-        FILES "${CMAKE_SOURCE_DIR}/src/images/qwertycoinz.png"
-        DESTINATION share/pixmaps
-        RENAME qwertycoin.png
-    )
-    install(
-        FILES "${CMAKE_SOURCE_DIR}/LICENSE.txt"
-        DESTINATION share/doc/qwertycoinwallet
-    )
-    install(
-        DIRECTORY "${CMAKE_SOURCE_DIR}/src/languages"
-        DESTINATION /opt/qwertycoin/
-        FILES_MATCHING PATTERN "*.qm"
-    )
-
     if(NOT RPMBUILD)
         set(CPACK_GENERATOR DEB)
         set(CPACK_SYSTEM_NAME 64-bit)
@@ -62,21 +38,15 @@ if(UNIX AND NOT APPLE AND NOT ANDROID) # linux
  and everyone can take part.")
     endif ()
 elseif(APPLE) # macos
+    set(CPACK_GENERATOR DragNDrop)
     set(MACOSX_BUNDLE_BUNDLE_NAME "Qwertycoin")
     set(MACOSX_BUNDLE_INFO_STRING "Qwertycoin GUI Wallet")
     set(MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}")
     set(MACOSX_BUNDLE_LONG_VERSION_STRING "${PROJECT_VERSION}")
     set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}")
     set(MACOSX_BUNDLE_ICON_FILE qwertycoin.icns)
-    set_source_files_properties("${CMAKE_SOURCE_DIR}/src/images/qwertycoin.icns" PROPERTIES
-        MACOSX_PACKAGE_LOCATION "Resources"
-    )
-
-    set(CPACK_GENERATOR DragNDrop)
-    install(TARGETS ${PROJECT_DISPLAY_NAME}Executable BUNDLE DESTINATION .)
 elseif(WIN32) # windows
     set(CPACK_GENERATOR "ZIP")
-    install(TARGETS ${PROJECT_DISPLAY_NAME}Executable RUNTIME DESTINATION .)
 endif()
 
 include(CPack)
