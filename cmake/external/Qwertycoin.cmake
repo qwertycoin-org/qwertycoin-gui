@@ -128,6 +128,10 @@ target_link_libraries(QwertycoinFramework::P2p INTERFACE
     QwertycoinFramework::CryptoNoteProtocol
 )
 
+if(WIN32 AND MSVC)
+    target_link_libraries(QwertycoinFramework::P2p INTERFACE Bcrypt)
+endif()
+
 # QwertycoinFramework::PaymentGate
 target_link_libraries(QwertycoinFramework::PaymentGate INTERFACE
     QwertycoinFramework::JsonRpcServer
