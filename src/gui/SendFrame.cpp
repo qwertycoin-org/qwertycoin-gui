@@ -310,6 +310,8 @@ void SendFrame::parsePaymentRequest(QString _request) {
 
 void SendFrame::sendClicked() {
  ConfirmSendDialog dlg(&MainWindow::instance());
+ QVector<CryptoNote::TransactionMessage> walletMessages;
+
     dlg.showPaymentDetails(total_amount);
     if (m_ui->donateCheckBox->isChecked()) {
       dlg.showConfirmDonation(total_amount*1/1000);
@@ -386,7 +388,7 @@ void SendFrame::sendClicked() {
             return;
           }
 
-          WalletAdapter::instance().sendTransaction(walletTransfers, fee, m_ui->m_paymentIdEdit->text(), m_ui->m_mixinSlider->value());
+          WalletAdapter::instance().sendTransaction(walletTransfers, fee, m_ui->m_paymentIdEdit->text(), m_ui->m_mixinSlider->value(), walletMessages);
       }
   }
 }

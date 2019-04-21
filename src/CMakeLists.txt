@@ -48,6 +48,8 @@ qt5_wrap_ui(TARGET_UI ${TARGET_FORMS})
 set(TARGET_SRC
     "${CMAKE_CURRENT_LIST_DIR}/AddressProvider.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/AddressProvider.h"
+    "${CMAKE_CURRENT_LIST_DIR}/AliasProvider.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/AliasProvider.h"
     "${CMAKE_CURRENT_LIST_DIR}/CommandLineParser.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/CommandLineParser.h"
     "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteWrapper.cpp"
@@ -120,6 +122,8 @@ set(TARGET_SRC
     "${CMAKE_CURRENT_LIST_DIR}/gui/MessageDetailsDialog.h"
     "${CMAKE_CURRENT_LIST_DIR}/gui/MessagesFrame.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/gui/MessagesFrame.h"
+    "${CMAKE_CURRENT_LIST_DIR}/gui/MessagesModel.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/gui/MessagesModel.h"
     "${CMAKE_CURRENT_LIST_DIR}/gui/MnemonicSeedDialog.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/gui/MnemonicSeedDialog.h"
     "${CMAKE_CURRENT_LIST_DIR}/gui/NewAddressDialog.cpp"
@@ -164,6 +168,8 @@ set(TARGET_SRC
     "${CMAKE_CURRENT_LIST_DIR}/gui/SignMessageDialog.h"
     "${CMAKE_CURRENT_LIST_DIR}/gui/SortedAddressBookModel.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/gui/SortedAddressBookModel.h"
+    "${CMAKE_CURRENT_LIST_DIR}/gui/SortedMessagesModel.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/gui/SortedMessagesModel.h"
     "${CMAKE_CURRENT_LIST_DIR}/gui/SortedTransactionsModel.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/gui/SortedTransactionsModel.h"
     "${CMAKE_CURRENT_LIST_DIR}/gui/TransactionDetailsDialog.cpp"
@@ -180,6 +186,8 @@ set(TARGET_SRC
     "${CMAKE_CURRENT_LIST_DIR}/gui/TransferFrame.h"
     "${CMAKE_CURRENT_LIST_DIR}/gui/VerifyMnemonicSeedDialog.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/gui/VerifyMnemonicSeedDialog.h"
+    "${CMAKE_CURRENT_LIST_DIR}/gui/VisibleMessagesModel.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/gui/VisibleMessagesModel.h"
     "${CMAKE_CURRENT_LIST_DIR}/gui/WalletEvents.h"
     ${TARGET_UI}
 )

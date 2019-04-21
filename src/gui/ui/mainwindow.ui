@@ -700,6 +700,18 @@
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>WalletGui::MessagesFrame</class>
+   <extends>QFrame</extends>
+   <header>gui/MessagesFrame.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>WalletGui::SendMessageFrame</class>
+   <extends>QFrame</extends>
+   <header>gui/SendMessageFrame.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>WalletGui::ReceiveFrame</class>
    <extends>QFrame</extends>
    <header>gui/ReceiveFrame.h</header>
