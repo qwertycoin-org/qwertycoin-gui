@@ -338,12 +338,26 @@ Crypto::SecretKey WalletAdapter::getTxKey(Crypto::Hash& txid) {
   return CryptoNote::NULL_SECRET_KEY;
 }
 
-void WalletAdapter::sendTransaction(const std::vector<CryptoNote::WalletLegacyTransfer>& _transfers, quint64 _fee, const QString& _paymentId, quint64 _mixin) {
+void WalletAdapter::sendTransaction(const std::vector<CryptoNote::WalletLegacyTransfer>& _transfers, quint64 _fee, const QString& _paymentId, quint64 _mixin,
+    const QVector<CryptoNote::TransactionMessage>& _messages) {
   Q_CHECK_PTR(m_wallet);
   try {
     lock();
-    m_wallet->sendTransaction(_transfers, _fee, NodeAdapter::instance().convertPaymentId(_paymentId), _mixin, 0);
+    m_sentTransactionId = m_wallet->sendTransaction(_transfers.toStdVector(), _fee, NodeAdapter::instance().convertPaymentId(_paymentId), _mixin, 0,
+      _messages.toStdVector());
     Q_EMIT walletStateChangedSignal(tr("Sending transaction"));
+  } catch (std::system_error&) {
+    unlock();
+  }
+}
+
+void WalletAdapter::sendMessage(const QVector<CryptoNote::WalletLegacyTransfer>& _transfers, quint64 _fee, quint64 _mixin,
+  const QVector<CryptoNote::TransactionMessage>& _messages, quint64 _ttl) {
+  Q_CHECK_PTR(m_wallet);
+  try {
+    lock();
+    m_sentMessageId = m_wallet->sendTransaction(_transfers.toStdVector(), _fee, "", _mixin, 0, _messages.toStdVector(), _ttl);
+    Q_EMIT walletStateChangedSignal(tr("Sending messages"));
   } catch (std::system_error&) {
     unlock();
   }
@@ -510,9 +524,24 @@ void WalletAdapter::externalTransactionCreated(CryptoNote::TransactionId _transa
   }
 }
 
-void WalletAdapter::sendTransactionCompleted(CryptoNote::TransactionId _transaction_id, std::error_code _error) {
+void WalletAdapter::sendTransactionCompleted(CryptoNote::TransactionId _transactionId, std::error_code _error) {
+  Q_ASSERT(_transactionId == m_sentTransactionId || _transactionId == m_sentMessageId ||
+    _transactionId == m_depositId || _transactionId == m_depositWithdrawalId);
   unlock();
-  Q_EMIT walletSendTransactionCompletedSignal(_transaction_id, _error.value(), walletErrorMessage(_error.value()));
+  Q_EMIT walletSendTransactionCompletedSignal(_transactionId, _error.value(), QString::fromStdString(_error.message()));
+  if (_transactionId == m_sentTransactionId) {
+    m_sentTransactionId = CryptoNote::WALLET_LEGACY_INVALID_TRANSACTION_ID;
+  } else if (_transactionId == m_sentMessageId) {
+    Q_EMIT walletSendMessageCompletedSignal(_transactionId, _error.value(), QString::fromStdString(_error.message()));
+    m_sentMessageId = CryptoNote::WALLET_LEGACY_INVALID_TRANSACTION_ID;
+  } else if (_transactionId == m_depositId) {
+    Q_EMIT walletCreateDepositCompletedSignal(_transactionId, _error.value(), QString::fromStdString(_error.message()));
+    m_depositId = CryptoNote::WALLET_LEGACY_INVALID_TRANSACTION_ID;
+  } else if (_transactionId == m_depositWithdrawalId) {
+    Q_EMIT walletWithdrawDepositCompletedSignal(_transactionId, _error.value(), QString::fromStdString(_error.message()));
+    m_depositWithdrawalId = CryptoNote::WALLET_LEGACY_INVALID_TRANSACTION_ID;
+  }
+
   Q_EMIT updateBlockStatusTextWithDelaySignal();
 }
 
