@@ -38,7 +38,7 @@
 #include "NodeAdapter.h"
 #include "Settings.h"
 #include "WalletAdapter.h"
-#include "mnemonics/electrum-words.h"
+#include "Mnemonics/electrum-words.h"
 #include "gui/VerifyMnemonicSeedDialog.h"
 
 extern "C"
@@ -358,7 +358,7 @@ void WalletAdapter::sendTransaction(const std::vector<CryptoNote::WalletLegacyTr
   Q_CHECK_PTR(m_wallet);
   try {
     lock();
-    m_sentTransactionId = m_wallet->sendTransaction(_transfers.toStdVector(), _fee, NodeAdapter::instance().convertPaymentId(_paymentId), _mixin, 0,
+    m_sentTransactionId = m_wallet->sendTransaction(_transfers, _fee, NodeAdapter::instance().convertPaymentId(_paymentId), _mixin, 0,
       _messages.toStdVector());
     Q_EMIT walletStateChangedSignal(tr("Sending transaction"));
   } catch (std::system_error&) {

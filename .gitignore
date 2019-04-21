@@ -2,6 +2,7 @@
 **/build32
 **/build64
 **/cryptonote
+.vscode/
 
 ### mac
 # General

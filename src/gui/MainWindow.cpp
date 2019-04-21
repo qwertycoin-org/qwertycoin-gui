@@ -38,6 +38,7 @@
 #include "RestoreFromMnemonicSeedDialog.h"
 #include "GetBalanceProofDialog.h"
 #include "MainWindow.h"
+#include "MessagesModel.h"
 #include "NewPasswordDialog.h"
 #include "NodeAdapter.h"
 #include "PasswordDialog.h"
@@ -46,16 +47,17 @@
 #include "WalletEvents.h"
 #include "SendFrame.h"
 #include "InfoDialog.h"
-#include "ui_mainwindow.h"
 #include "MnemonicSeedDialog.h"
 #include "ConfirmSendDialog.h"
 #include "TranslatorManager.h"
+
+#include "ui_mainwindow.h"
 
 #ifdef Q_OS_MAC
 #include "macdockiconhandler.h"
 #endif
 
-#include "mnemonics/electrum-words.h"
+#include "Mnemonics/electrum-words.h"
 
 extern "C"
 {
@@ -130,6 +132,7 @@ void MainWindow::connectToSignals() {
   connect(m_ui->m_sendFrame, &SendFrame::uriOpenSignal, this, &MainWindow::onUriOpenSignal, Qt::QueuedConnection);
   connect(m_ui->m_noWalletFrame, &NoWalletFrame::createWalletClickedSignal, this, &MainWindow::createWallet, Qt::QueuedConnection);
   connect(m_ui->m_noWalletFrame, &NoWalletFrame::openWalletClickedSignal, this, &MainWindow::openWallet, Qt::QueuedConnection);
+  connect(m_ui->m_messagesFrame, &MessagesFrame::replyToSignal, this, &MainWindow::replyTo);
   connect(m_ui->m_addressBookFrame, &AddressBookFrame::payToSignal, this, &MainWindow::payTo);
   connect(m_connectionStateIconLabel, SIGNAL(clicked()), this, SLOT(showStatusInfo()));
 }
@@ -161,12 +164,16 @@ void MainWindow::initUi() {
   m_ui->m_receiveFrame->hide();
   m_ui->m_transactionsFrame->hide();
   m_ui->m_addressBookFrame->hide();
+  m_ui->m_messagesFrame->hide();
+  m_ui->m_sendMessageFrame->hide();
 
   m_tabActionGroup->addAction(m_ui->m_overviewAction);
   m_tabActionGroup->addAction(m_ui->m_sendAction);
   m_tabActionGroup->addAction(m_ui->m_receiveAction);
   m_tabActionGroup->addAction(m_ui->m_transactionsAction);
   m_tabActionGroup->addAction(m_ui->m_addressBookAction);
+  m_tabActionGroup->addAction(m_ui->m_messagesAction);
+  m_tabActionGroup->addAction(m_ui->m_sendMessageAction);
 
   m_ui->m_overviewAction->toggle();
   encryptedFlagChanged(false);
@@ -1002,6 +1009,8 @@ void MainWindow::walletClosed() {
   m_ui->m_sendFrame->hide();
   m_ui->m_transactionsFrame->hide();
   m_ui->m_addressBookFrame->hide();
+  m_ui->m_messagesFrame->hide();
+  m_ui->m_sendMessageFrame->hide();
   m_ui->m_noWalletFrame->show();
   m_encryptionStateIconLabel->hide();
   m_trackingModeIconLabel->hide();
@@ -1072,6 +1081,7 @@ void MainWindow::createTrayIconMenu()
     trayIconMenu->addAction(m_ui->m_receiveAction);
     trayIconMenu->addAction(m_ui->m_transactionsAction);
     trayIconMenu->addAction(m_ui->m_addressBookAction);
+    trayIconMenu->addAction(m_ui->m_messagesAction);
     trayIconMenu->addSeparator();
     trayIconMenu->addAction(m_ui->m_openWalletAction);
     trayIconMenu->addAction(m_ui->m_closeWalletAction);
@@ -1086,6 +1096,11 @@ void MainWindow::createTrayIconMenu()
 void MainWindow::payTo(const QModelIndex& _index) {
   m_ui->m_sendFrame->setAddress(_index.data(AddressBookModel::ROLE_ADDRESS).toString());
   m_ui->m_sendAction->trigger();
+}
+
+void MainWindow::replyTo(const QModelIndex& _index) {
+  m_ui->m_sendMessageFrame->setAddress(_index.data(MessagesModel::ROLE_HEADER_REPLY_TO).toString());
+  m_ui->m_sendMessageAction->trigger();
 }
 
 #ifdef Q_OS_WIN

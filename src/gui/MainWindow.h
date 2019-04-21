@@ -103,6 +103,7 @@ private:
   void updateRecentActionList();
   void updateUnmixableBalance(quint64 _balance);
   void payTo(const QModelIndex& _index);
+  void replyTo(const QModelIndex& _index);
 
   Q_SLOT void createWallet();
   Q_SLOT void createNonDeterministicWallet();
