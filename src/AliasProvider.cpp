@@ -28,9 +28,9 @@
 
 namespace WalletGui {
 
-Q_DECL_CONSTEXPR char ALIAS_OBJECT_NAME[] = "digitalname1";
+Q_DECL_CONSTEXPR char ALIAS_OBJECT_NAME[] = "qwertycoin";
 Q_DECL_CONSTEXPR char ALIAS_NAME_TAG[] = "name";
-Q_DECL_CONSTEXPR char ALIAS_ADDRESS_TAG[] = "xdn";
+Q_DECL_CONSTEXPR char ALIAS_ADDRESS_TAG[] = "qwc";
 
 AliasProvider::AliasProvider(QObject *parent) : QObject(parent), m_networkManager() {
 }

@@ -32,10 +32,6 @@ void ExportTrackingKeyDialog::walletOpened() {
 
   keys.spendSecretKey = boost::value_initialized<Crypto::SecretKey>();
 
-  // XDN paperwallet style key
-  // trackingWalletKeys = QString::fromStdString(Tools::Base58::encode_addr(CurrencyAdapter::instance().getAddressPrefix(),
-  //                     std::string(reinterpret_cast<char*>(&keys), sizeof(keys))));
-
   // Bytecoin GUI style .trackingkey. Lets use this style to  prevent confusing with import of private key / paperwallet
   trackingWalletKeys = QString::fromStdString(Common::podToHex(keys));
 

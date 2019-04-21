@@ -475,14 +475,6 @@ void MainWindow::importTrackingKey() {
 
     CryptoNote::AccountKeys keys;
 
-    //  XDN style tracking key import
-    //  uint64_t addressPrefix;
-    //  std::string data;
-
-    //  if (Tools::Base58::decode_addr(keyString.toStdString(), addressPrefix, data) && addressPrefix == CurrencyAdapter::instance().getAddressPrefix() &&
-    //    data.size() == sizeof(keys)) {
-    //    std::memcpy(&keys, data.data(), sizeof(keys));
-
     // To prevent confusing with import of private key / paperwallet lets use Bytecoin style tracking keys, they look different
     std::string public_spend_key_string = keyString.mid(0,64).toStdString();
     std::string public_view_key_string = keyString.mid(64,64).toStdString();
