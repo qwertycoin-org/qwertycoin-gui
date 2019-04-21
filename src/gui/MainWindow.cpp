@@ -119,7 +119,7 @@ void MainWindow::connectToSignals() {
   });
   connect(&WalletAdapter::instance(), &WalletAdapter::walletUnmixableBalanceUpdatedSignal, this, &MainWindow::updateUnmixableBalance,
     Qt::QueuedConnection);
-  connect(&WalletAdapter::instance(), &WalletAdapter::walletSendTransactionCompletedSignal, this, [this](CryptoNote::TransactionId _transactionId, int _error, const QString& _errorString) {
+  connect(&WalletAdapter::instance(), &WalletAdapter::walletSendTransactionCompletedSignal, this, [this](CryptoNote::TransactionId _transaction_id, int _error, const QString& _errorString) {
     if (_error == 0) {
       m_ui->m_transactionsAction->setChecked(true);
     }

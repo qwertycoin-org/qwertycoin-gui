@@ -19,43 +19,26 @@
 
 #pragma once
 
-#include <QFrame>
-
-#include <IWalletLegacy.h>
-
-namespace Ui {
-class SendMessageFrame;
-}
+#include <QObject>
+#include <QNetworkAccessManager>
 
 namespace WalletGui {
 
-class MessageAddressFrame;
-
-class SendMessageFrame : public QFrame {
+class AliasProvider : public QObject {
   Q_OBJECT
-  Q_DISABLE_COPY(SendMessageFrame)
 
 public:
-  SendMessageFrame(QWidget* _parent);
-  ~SendMessageFrame();
+  AliasProvider(QObject *parent);
+  ~AliasProvider();
 
-  void setAddress(const QString& _address);
+  void getAddresses(const QString& _urlString);
 
 private:
-  QScopedPointer<Ui::SendMessageFrame> m_ui;
-  QList<MessageAddressFrame*> m_addressFrames;
-  void sendMessageCompleted(CryptoNote::TransactionId _transaction_id, bool _error, const QString& _error_text);
-  void reset();
+  QNetworkAccessManager m_networkManager;
+  void readyRead();
 
-  QString extractAddress(const QString& _addressString) const;
-  void recalculateFeeValue();
-
-  Q_SLOT void addRecipientClicked();
-  Q_SLOT void messageTextChanged();
-  Q_SLOT void mixinValueChanged(int _value);
-  Q_SLOT void sendClicked();
-  Q_SLOT void ttlCheckStateChanged(int _state);
-  Q_SLOT void ttlValueChanged(int _ttlValue);
+Q_SIGNALS:
+  void aliasFoundSignal(const QString& _name, const QString& _address);
 };
 
 }

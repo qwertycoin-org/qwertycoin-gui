@@ -1,8 +1,23 @@
 // Copyright (c) 2011-2016 The Cryptonote developers
 // Copyright (c) 2015-2016 XDN developers
 // Copyright (c) 2016-2017 The Karbowanec developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+// Copyright (c) 2018-2019, The Qwertycoin developers
+//
+// This file is part of Qwertycoin.
+//
+// Qwertycoin is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Qwertycoin is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
+
 
 #pragma once
 
@@ -95,6 +110,8 @@ private:
   std::atomic<quint64> m_lastWalletTransactionId;
   QTimer m_newTransactionsNotificationTimer;
   QPushButton* m_closeButton;
+  std::atomic<CryptoNote::TransactionId> m_sentTransactionId;
+  std::atomic<CryptoNote::TransactionId> m_sentMessageId;
 
   WalletAdapter();
   ~WalletAdapter();
@@ -124,8 +141,13 @@ Q_SIGNALS:
   void walletActualBalanceUpdatedSignal(quint64 _actual_balance);
   void walletPendingBalanceUpdatedSignal(quint64 _pending_balance);
   void walletUnmixableBalanceUpdatedSignal(quint64 _dust_balance);
+  void walletActualDepositBalanceUpdatedSignal(quint64 _actualDepositBalance);
+  void walletPendingDepositBalanceUpdatedSignal(quint64 _pendingDepositBalance);
   void walletTransactionCreatedSignal(CryptoNote::TransactionId _transaction_id);
   void walletSendTransactionCompletedSignal(CryptoNote::TransactionId _transaction_id, int _error, const QString& _error_text);
+  void walletSendMessageCompletedSignal(CryptoNote::TransactionId _transaction_id, int _error, const QString& _error_text);
+  void walletCreateDepositCompletedSignal(CryptoNote::TransactionId _transaction_id, int _error, const QString& _error_text);
+  void walletWithdrawDepositCompletedSignal(CryptoNote::TransactionId _transaction_id, int _error, const QString& _error_text);
   void walletTransactionUpdatedSignal(CryptoNote::TransactionId _transaction_id);
   void walletStateChangedSignal(const QString &_state_text);
 

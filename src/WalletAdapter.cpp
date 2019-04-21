@@ -1,8 +1,23 @@
 // Copyright (c) 2011-2016 The Cryptonote developers
 // Copyright (c) 2015-2016 XDN developers
 // Copyright (c) 2016-2017 The Karbowanec developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+// Copyright (c) 2018-2019, The Qwertycoin developers
+//
+// This file is part of Qwertycoin.
+//
+// Qwertycoin is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Qwertycoin is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with Qwertycoin.  If not, see <http://www.gnu.org/licenses/>.
+
 
 #include <QCoreApplication>
 #include <QMessageBox>
@@ -444,7 +459,7 @@ void WalletAdapter::initCompleted(std::error_code _error) {
   Q_EMIT walletInitCompletedSignal(_error.value(), QString::fromStdString(_error.message()));
 }
 
-void WalletAdapter::onWalletInitCompleted(int _error, const QString& _errorText) {
+void WalletAdapter::onWalletInitCompleted(int _error, const QString& _error_text) {
   switch(_error) {
   case 0: {
     Q_EMIT walletActualBalanceUpdatedSignal(m_wallet->actualBalance());
@@ -516,30 +531,23 @@ void WalletAdapter::unmixableBalanceUpdated(uint64_t _dust_balance) {
   Q_EMIT walletUnmixableBalanceUpdatedSignal(_dust_balance);
 }
 
-void WalletAdapter::externalTransactionCreated(CryptoNote::TransactionId _transactionId) {
+void WalletAdapter::externalTransactionCreated(CryptoNote::TransactionId _transaction_id) {
   if (!m_isSynchronized) {
-    m_lastWalletTransactionId = _transactionId;
+    m_lastWalletTransactionId = _transaction_id;
   } else {
-    Q_EMIT walletTransactionCreatedSignal(_transactionId);
+    Q_EMIT walletTransactionCreatedSignal(_transaction_id);
   }
 }
 
-void WalletAdapter::sendTransactionCompleted(CryptoNote::TransactionId _transactionId, std::error_code _error) {
-  Q_ASSERT(_transactionId == m_sentTransactionId || _transactionId == m_sentMessageId ||
-    _transactionId == m_depositId || _transactionId == m_depositWithdrawalId);
+void WalletAdapter::sendTransactionCompleted(CryptoNote::TransactionId _transaction_id, std::error_code _error) {
+  Q_ASSERT(_transaction_id == m_sentTransactionId || _transaction_id == m_sentMessageId);
   unlock();
-  Q_EMIT walletSendTransactionCompletedSignal(_transactionId, _error.value(), QString::fromStdString(_error.message()));
-  if (_transactionId == m_sentTransactionId) {
+  Q_EMIT walletSendTransactionCompletedSignal(_transaction_id, _error.value(), QString::fromStdString(_error.message()));
+  if (_transaction_id == m_sentTransactionId) {
     m_sentTransactionId = CryptoNote::WALLET_LEGACY_INVALID_TRANSACTION_ID;
-  } else if (_transactionId == m_sentMessageId) {
-    Q_EMIT walletSendMessageCompletedSignal(_transactionId, _error.value(), QString::fromStdString(_error.message()));
+  } else if (_transaction_id == m_sentMessageId) {
+    Q_EMIT walletSendMessageCompletedSignal(_transaction_id, _error.value(), QString::fromStdString(_error.message()));
     m_sentMessageId = CryptoNote::WALLET_LEGACY_INVALID_TRANSACTION_ID;
-  } else if (_transactionId == m_depositId) {
-    Q_EMIT walletCreateDepositCompletedSignal(_transactionId, _error.value(), QString::fromStdString(_error.message()));
-    m_depositId = CryptoNote::WALLET_LEGACY_INVALID_TRANSACTION_ID;
-  } else if (_transactionId == m_depositWithdrawalId) {
-    Q_EMIT walletWithdrawDepositCompletedSignal(_transactionId, _error.value(), QString::fromStdString(_error.message()));
-    m_depositWithdrawalId = CryptoNote::WALLET_LEGACY_INVALID_TRANSACTION_ID;
   }
 
   Q_EMIT updateBlockStatusTextWithDelaySignal();
@@ -580,13 +588,13 @@ QString WalletAdapter::walletErrorMessage(int _error_code) {
   }
 }
 
-void WalletAdapter::onWalletSendTransactionCompleted(CryptoNote::TransactionId _transactionId, int _error, const QString& _errorText) {
+void WalletAdapter::onWalletSendTransactionCompleted(CryptoNote::TransactionId _transaction_id, int _error, const QString& _error_text) {
   if (_error) {
     return;
   }
 
   CryptoNote::WalletLegacyTransaction transaction;
-  if (!this->getTransaction(_transactionId, transaction)) {
+  if (!this->getTransaction(_transaction_id, transaction)) {
     return;
   }
 
@@ -594,13 +602,13 @@ void WalletAdapter::onWalletSendTransactionCompleted(CryptoNote::TransactionId _
     return;
   }
 
-  Q_EMIT walletTransactionCreatedSignal(_transactionId);
+  Q_EMIT walletTransactionCreatedSignal(_transaction_id);
 
   save(true, true);
 }
 
-void WalletAdapter::transactionUpdated(CryptoNote::TransactionId _transactionId) {
-  Q_EMIT walletTransactionUpdatedSignal(_transactionId);
+void WalletAdapter::transactionUpdated(CryptoNote::TransactionId _transaction_id) {
+  Q_EMIT walletTransactionUpdatedSignal(_transaction_id);
 }
 
 void WalletAdapter::lock() {

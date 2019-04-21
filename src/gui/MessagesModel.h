@@ -69,7 +69,7 @@ private:
   QVariant getDisplayRole(const QModelIndex& _index) const;
   QVariant getDecorationRole(const QModelIndex& _index) const;
   QVariant getAlignmentRole(const QModelIndex& _index) const;
-  QVariant getUserRole(const QModelIndex& _index, int _role, CryptoNote::TransactionId _transactionId, CryptoNote::WalletLegacyTransaction& _transaction,
+  QVariant getUserRole(const QModelIndex& _index, int _role, CryptoNote::TransactionId _transaction_id, CryptoNote::WalletLegacyTransaction& _transaction,
     const Message& _message) const;
 
   void reloadWalletTransactions();

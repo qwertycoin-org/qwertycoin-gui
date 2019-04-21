@@ -66,12 +66,12 @@ void SendMessageFrame::setAddress(const QString& _address) {
   m_ui->m_addReplyToCheck->setChecked(true);
 }
 
-void SendMessageFrame::sendMessageCompleted(CryptoNote::TransactionId _transactionId, bool _error, const QString& _errorText) {
-  Q_UNUSED(_transactionId);
+void SendMessageFrame::sendMessageCompleted(CryptoNote::TransactionId _transaction_id, bool _error, const QString& _error_text) {
+  Q_UNUSED(_transaction_id);
   if (_error) {
     QCoreApplication::postEvent(
       &MainWindow::instance(),
-      new ShowMessageEvent(_errorText, QtCriticalMsg));
+      new ShowMessageEvent(_error_text, QtCriticalMsg));
   } else {
     reset();
   }

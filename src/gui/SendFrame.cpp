@@ -400,12 +400,12 @@ void SendFrame::priorityValueChanged(int _value) {
   m_ui->m_feeSpin->setValue(send_fee);
 }
 
-void SendFrame::sendTransactionCompleted(CryptoNote::TransactionId _id, bool _error, const QString& _errorText) {
+void SendFrame::sendTransactionCompleted(CryptoNote::TransactionId _id, bool _error, const QString& _error_text) {
   Q_UNUSED(_id);
   if (_error) {
     QCoreApplication::postEvent(
       &MainWindow::instance(),
-      new ShowMessageEvent(_errorText, QtCriticalMsg));
+      new ShowMessageEvent(_error_text, QtCriticalMsg));
   } else {
     clearAllClicked();
   }

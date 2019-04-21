@@ -209,7 +209,7 @@ QVariant MessagesModel::getAlignmentRole(const QModelIndex& _index) const {
   return headerData(_index.column(), Qt::Horizontal, Qt::TextAlignmentRole);
 }
 
-QVariant MessagesModel::getUserRole(const QModelIndex& _index, int _role, CryptoNote::TransactionId _transactionId,
+QVariant MessagesModel::getUserRole(const QModelIndex& _index, int _role, CryptoNote::TransactionId _transaction_id,
   CryptoNote::WalletLegacyTransaction& _transaction, const Message& _message) const {
   switch(_role) {
   case ROLE_DATE:
@@ -268,33 +268,33 @@ void MessagesModel::reloadWalletTransactions() {
   }
 }
 
-void MessagesModel::appendTransaction(CryptoNote::TransactionId _transactionId, quint32& _insertedRowCount) {
+void MessagesModel::appendTransaction(CryptoNote::TransactionId _transaction_id, quint32& _insertedRowCount) {
   CryptoNote::WalletLegacyTransaction transaction;
-  if (!WalletAdapter::instance().getTransaction(_transactionId, transaction)) {
+  if (!WalletAdapter::instance().getTransaction(_transaction_id, transaction)) {
     return;
   }
 
-  m_transactionRow.insert(_transactionId, qMakePair(std::numeric_limits<quint32>::max(), std::numeric_limits<quint32>::max()));
+  m_transactionRow.insert(_transaction_id, qMakePair(std::numeric_limits<quint32>::max(), std::numeric_limits<quint32>::max()));
   if (transaction.messages.empty()) {
     return;
   }
 
-  m_transactionRow[_transactionId] = qMakePair(m_messages.size(), transaction.messages.size());
+  m_transactionRow[_transaction_id] = qMakePair(m_messages.size(), transaction.messages.size());
   for (quint32 i = 0; i < transaction.messages.size(); ++i) {
     Message message(QString::fromStdString(transaction.messages[i]));
-    m_messages.append(TransactionMessageId(_transactionId, std::move(message)));
+    m_messages.append(TransactionMessageId(_transaction_id, std::move(message)));
     ++_insertedRowCount;
   }
 }
 
-void MessagesModel::appendTransaction(CryptoNote::TransactionId _transactionId) {
-  if (m_transactionRow.contains(_transactionId)) {
+void MessagesModel::appendTransaction(CryptoNote::TransactionId _transaction_id) {
+  if (m_transactionRow.contains(_transaction_id)) {
     return;
   }
 
   quint32 oldRowCount = rowCount();
   quint32 insertedRowCount = 0;
-  for (quint64 transactionId = m_transactionRow.size(); transactionId <= _transactionId; ++transactionId) {
+  for (quint64 transactionId = m_transactionRow.size(); transactionId <= _transaction_id; ++transactionId) {
     appendTransaction(transactionId, insertedRowCount);
   }
 
