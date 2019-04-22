@@ -2,24 +2,54 @@
 #### Master Build Status
 [![Build Status](https://travis-ci.org/qwertycoin-org/qwertycoin-gui.svg?branch=master)](https://travis-ci.org/qwertycoin-org/qwertycoin-gui) [![Build status](https://ci.appveyor.com/api/projects/status/1g1cxw31kqep753n/branch/master?svg=true)](https://ci.appveyor.com/project/Qwertycoin/qwertycoin-gui/branch/master)
 
+
+
 #### Development Build Status
 [![Build Status](https://travis-ci.org/qwertycoin-org/qwertycoin-gui.svg?branch=dev)](https://travis-ci.org/qwertycoin-org/qwertycoin-gui) [![Build status](https://ci.appveyor.com/api/projects/status/1g1cxw31kqep753n/branch/dev?svg=true)](https://ci.appveyor.com/project/Qwertycoin/qwertycoin-gui/branch/dev)
 
-### Installing
 
+# Table of contents
+1. [Project Specs](#coinspecs)
+2. [How to Compile Qwertycoin](#howtocompile)
+    1. [Qwertycoin for Linux](#build-linux)
+    2. [Qwertycoin for Windows](#build-windows)
+    3. [Qwertycoin for macOS](#build-apple)
+3. [Downloads](#downloads)
+4. [Useful Links](#usefullinks)
+5. [Donate & Thanks](#donate)
+6. [Copyright / License](#copypasta)
+
+## Installing <a name="installing"></a>
 We offer binary images of the latest releases here: https://releases.qwertycoin.org
 
 If you would like to compile yourself, read on.
 
-### How To Compile
+### Coin Specs <a name="coinspecs"></a>
+<table>
+<tr><td>Ticker Symbol</td><td>QWC</td></tr>
+<tr><td>Algorithm</td><td>Cryptonight</td></tr>
+<tr><td>Type</td><td>Proof of Work (PoW)</td></tr>
+<tr><td>Block Time</td><td>120 Seconds</td></tr>
+<tr><td>Premine</td><td>0.0 %</td></tr>
+<tr><td>Decimals</td><td>8 Digits</td></tr>
+<tr><td>Block Reward</td><td>Decrease by each block</td></tr>
+<tr><td>Max Coin Supply </td><td>184,467,440,737 QWC</td></tr>
+<tr><td>P2P | RPC Port</td><td>8196 | 8197</td></tr>
+</table>
 
-#### Linux
+More information at [qwertycoin.org](https://qwertycoin.org/)
+
+# How To Compile <a name="howtocompile"></a>
+
+#### Linux  <a name="build-linux"></a>
 
 ##### Prerequisites
 
-- You will need the following packages: boost (1.64 or higher), QT Library (5.9.0 or higher) cmake (3.10 or higher), git, gcc (4.9 or higher), g++ (4.9 or higher), make, and python. Most of these should already be installed on your system.
-- For example on ubuntu: `sudo apt-get install build-essential python-dev gcc g++ git cmake libboost-all-dev qtbase5-dev`
-- After this you can build your Qwertycoin Zero Wallet.
+- You will need the following packages: build-essential, [cmake (3.10 or higher)](https://github.com/qwertycoin-org/qwertycoin/wiki/E01.-Install-Cmake-3.10) and git;
+- Most of these should already be installed on your system. For example on Ubuntu by running:
+```
+sudo apt-get install build-essential cmake git
+```
 
 ##### Building
 
@@ -34,7 +64,7 @@ cmake --build . --config Release
 ```
 - If all went well, it will complete successfully, and you will find all your binaries in the `./build/Release` directory.
 
-#### Windows 10
+#### Windows 10 <a name="build-windows"></a>
 
 ##### Prerequisites
 
@@ -57,7 +87,7 @@ cmake --build . --config Release
 - If all went well, it will complete successfully, and you will find all your binaries in the `.\build\Release` directory;
 - Additionally, a `.sln` file will have been created in the `build` directory. If you wish to open the project in Visual Studio with this, you can.
 
-#### Apple
+#### Apple macOS <a name="build-apple"></a>
 
 ##### Prerequisites
 
@@ -78,8 +108,14 @@ cmake --build . --config Release
 ```
 - If all went well, it will complete successfully, and you will find all your binaries in the `./build/Release` directory.
 
+#### Advanced options (for all platforms)
 
-## Donate
+* Parallel build: run `make -j<number of threads>` instead of `make`;
+* Debug build: run `make build-debug`;
+* Test suite: run `make test-release` to run tests in addition to building. Running `make test-debug` will do the same to the debug version;
+* Building with Clang: it may be possible to use Clang instead of GCC, but this may not work everywhere. To build, run `export CC=clang CXX=clang++` before running `make`.
+
+## Donate <a name="donate"></a>
 
 ```
 QWC: QWC1K6XEhCC1WsZzT9RRVpc1MLXXdHVKt2BUGSrsmkkXAvqh52sVnNc1pYmoF2TEXsAvZnyPaZu8MW3S8EWHNfAh7X2xa63P7Y
@@ -100,6 +136,48 @@ XMR: 47gmN4GMQ17Veur5YEpru7eCQc5A65DaWUThZa9z9bP6jNMYXPKAyjDcAW4RzNYbRChEwnKu1H3
 ETN: etnkJXJFqiH9FCt6Gq2HWHPeY92YFsmvKX7qaysvnV11M796Xmovo2nSu6EUCMnniqRqAhKX9AQp31GbG3M2DiVM3qRDSQ5Vwq
 ```
 
-#### Thanks
+### Downloads <a name="downloads"></a>
+| Operating System | Download                                 |
+| ---------------- | ---------------------------------------- |
+| Windows 32       | https://releases.qwertycoin.org/get/cli/latest/win32 |
+| Windows 64       | https://releases.qwertycoin.org/get/cli/latest/win64 |
+| macOS 10.8 & Later | https://releases.qwertycoin.org/get/cli/latest/macos |
+| Linux 32         | https://releases.qwertycoin.org/get/cli/latest/linux32 |
+| Linux 64         | https://releases.qwertycoin.org/get/cli/latest/linux64 |
+| OpenBSD 64       | https://releases.qwertycoin.org/get/cli/latest/openbsd64 |
+| FreeBSD 64       | https://releases.qwertycoin.org/get/cli/latest/freebsd64 |
+| Linux ARM 64     | https://releases.qwertycoin.org/get/cli/latest/arm64 |
+| Other platforms      | https://releases.qwertycoin.org |
+
+### Useful Links <a name="usefullinks"></a>
+<table>
+<tr><td>Website</td><td>https://qwertycoin.org</td></tr>
+<tr><td>Bitcointalk ANN</td><td>https://bitcointalk.org/index.php?topic=2881418.0</td></tr>
+<tr><td>Explorer</td><td>https://explorer.qwertycoin.org</td></tr>
+<tr><td>Pool Explorer</td><td>https://explorer.qwertycoin.org/#network</td></tr>
+<tr><td>Node Map</td><td>https://nodes.qwertycoin.org</td></tr>
+<tr><td>Wallets</td><td>https://releases.qwertycoin.org</td></tr>
+<tr><td>Web Wallet</td><td>https://myqwertycoin.com</td></tr>
+<tr><td>Masternode Setup</td><td>https://github.com/qwertycoin-org/qwertycoin/wiki</td></tr>
+<tr><td>Blockfolio</td><td>https://blockfolio.com/#get-app</td></tr>
+<tr><td>CoinGecko</td><td>https://www.coingecko.com/en/coins/qwertycoin</td></tr>
+<tr><td>Delta</td><td>https://delta.app</td></tr>
+<tr><td>Discord</td><td>https://qwertycoin.org/discord</td></tr>
+<tr><td>Twitter</td><td>https://twitter.com/Qwertycoin_QWC</td></tr>
+</table>
+
+#### Thanks <a name="thanks"></a>
 
 Cryptonote Developers, Bytecoin Developers, Monero Developers, Karbo Developers, Qwertycoin Community
+
+### Copypasta for license when editing files  <a name="copypasta"></a>
+
+Hi Qwertycoin contributor, thanks for forking and sending back Pull Requests. Extensive docs about contributing are in the works or elsewhere. For now this is the bit we need to get into all the files we touch. Please add it to the top of the files, see [lib/CryptoNoteConfig.h](https://github.com/qwertycoin-org/qwertycoin/blob/master/lib/CryptoNoteConfig.h) for an example.
+
+```
+// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2016-2018, The Karbowanec developers
+// Copyright (c) 2018-2019, The Qwertycoin Developers
+//
+// Please see the included LICENSE file for more information.
+```
