@@ -353,13 +353,14 @@ Crypto::SecretKey WalletAdapter::getTxKey(Crypto::Hash& txid) {
   return CryptoNote::NULL_SECRET_KEY;
 }
 
-void WalletAdapter::sendTransaction(const std::vector<CryptoNote::WalletLegacyTransfer>& _transfers, quint64 _fee, const QString& _paymentId, quint64 _mixin,
-    const QVector<CryptoNote::TransactionMessage>& _messages) {
+void WalletAdapter::sendTransaction(const QVector<CryptoNote::WalletLegacyTransfer>& _transfers, 
+                                    quint64 _fee, const QString& _paymentId, quint64 _mixin,
+                                    const QVector<CryptoNote::TransactionMessage>& _messages) {
   Q_CHECK_PTR(m_wallet);
+  const std::string& sender = "";
   try {
     lock();
-    m_sentTransactionId = m_wallet->sendTransaction(_transfers, _fee, NodeAdapter::instance().convertPaymentId(_paymentId), _mixin, 0,
-      _messages.toStdVector());
+    m_sentTransactionId = m_wallet->sendTransaction(_transfers.toStdVector(), _fee, NodeAdapter::instance().convertPaymentId(_paymentId), _mixin, 0, _messages.toStdVector(), 0, sender);
     Q_EMIT walletStateChangedSignal(tr("Sending transaction"));
   } catch (std::system_error&) {
     unlock();
@@ -367,11 +368,13 @@ void WalletAdapter::sendTransaction(const std::vector<CryptoNote::WalletLegacyTr
 }
 
 void WalletAdapter::sendMessage(const QVector<CryptoNote::WalletLegacyTransfer>& _transfers, quint64 _fee, quint64 _mixin,
-  const QVector<CryptoNote::TransactionMessage>& _messages, quint64 _ttl) {
+  const QVector<CryptoNote::TransactionMessage>& _messages, quint64 _ttl, QString sender) {
+  Q_EMIT walletStateChangedSignal(tr("Checking Wallet"));
+
   Q_CHECK_PTR(m_wallet);
   try {
     lock();
-    m_sentMessageId = m_wallet->sendTransaction(_transfers.toStdVector(), _fee, "", _mixin, 0, _messages.toStdVector(), _ttl);
+    m_sentMessageId = m_wallet->sendTransaction(_transfers.toStdVector(), _fee, "", _mixin, 0, _messages.toStdVector(), _ttl, sender.toStdString());
     Q_EMIT walletStateChangedSignal(tr("Sending messages"));
   } catch (std::system_error&) {
     unlock();

@@ -34,7 +34,7 @@ namespace WalletGui {
 
 Q_DECL_CONSTEXPR quint64 MESSAGE_AMOUNT = 100000;
 Q_DECL_CONSTEXPR quint64 MESSAGE_CHAR_PRICE = 1000000;
-Q_DECL_CONSTEXPR quint64 MINIMAL_MESSAGE_FEE = MESSAGE_CHAR_PRICE;
+Q_DECL_CONSTEXPR quint64 MINIMAL_MESSAGE_FEE = 100000000;
 Q_DECL_CONSTEXPR int DEFAULT_MESSAGE_MIXIN = 2;
 
 Q_DECL_CONSTEXPR quint32 MINUTE_SECONDS = 60;
@@ -151,14 +151,15 @@ void SendMessageFrame::sendClicked() {
   if (!WalletAdapter::instance().isOpen()) {
     return;
   }
-
   QVector<CryptoNote::WalletLegacyTransfer> transfers;
   QVector<CryptoNote::TransactionMessage> messages;
   QString messageString = m_ui->m_messageTextEdit->toPlainText();
+  QString messageSender = "";
   if (m_ui->m_addReplyToCheck->isChecked()) {
     MessageHeader header;
     header.append(qMakePair(QString(MessagesModel::HEADER_REPLY_TO_KEY), WalletAdapter::instance().getAddress()));
     messageString = Message::makeTextMessage(messageString, header);
+    messageSender = WalletAdapter::instance().getAddress();
   }
 
   transfers.reserve(m_addressFrames.size());
@@ -186,7 +187,7 @@ void SendMessageFrame::sendClicked() {
   }
 
   if (WalletAdapter::instance().isOpen()) {
-    WalletAdapter::instance().sendMessage(transfers, fee, m_ui->m_mixinSlider->value(), messages, ttl);
+    WalletAdapter::instance().sendMessage(transfers, fee, m_ui->m_mixinSlider->value(), messages, ttl, messageSender);
   }
 }
 

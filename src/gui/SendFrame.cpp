@@ -310,8 +310,7 @@ void SendFrame::parsePaymentRequest(QString _request) {
 
 void SendFrame::sendClicked() {
  ConfirmSendDialog dlg(&MainWindow::instance());
- QVector<CryptoNote::TransactionMessage> walletMessages;
-
+ 
     dlg.showPaymentDetails(total_amount);
     if (m_ui->donateCheckBox->isChecked()) {
       dlg.showConfirmDonation(total_amount*1/1000);
@@ -322,8 +321,8 @@ void SendFrame::sendClicked() {
       dlg.confirmNoPaymentId();
     }
     if (dlg.exec() == QDialog::Accepted) {
-
-      std::vector<CryptoNote::WalletLegacyTransfer> walletTransfers;
+      QVector<CryptoNote::TransactionMessage> walletMessages;
+      QVector<CryptoNote::WalletLegacyTransfer> walletTransfers;
       Q_FOREACH (TransferFrame * transfer, m_transfers) {
         QString address = transfer->getAddress();
         if (!CurrencyAdapter::instance().validateAddress(address)) {
@@ -367,7 +366,7 @@ void SendFrame::sendClicked() {
       priorityValueChanged(m_ui->m_prioritySlider->value());
       quint64 fee = CurrencyAdapter::instance().parseAmount(m_ui->m_feeSpin->cleanText());
 
-	  if (fee < NodeAdapter::instance().getMinimalFee()) {
+	    if (fee < NodeAdapter::instance().getMinimalFee()) {
         QCoreApplication::postEvent(&MainWindow::instance(), new ShowMessageEvent(tr("Incorrect fee value"), QtCriticalMsg));
         return;
       }

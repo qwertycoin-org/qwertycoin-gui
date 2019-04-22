@@ -66,14 +66,14 @@ public:
   size_t getUnlockedOutputsCount();
   bool isOpen() const;
   void sendTransaction(
-    const std::vector<CryptoNote::WalletLegacyTransfer>& _transfers, quint64 _fee,
+    const QVector<CryptoNote::WalletLegacyTransfer>& _transfers, quint64 _fee,
     const QString& _payment_id, quint64 _mixin,
-    const QVector<CryptoNote::TransactionMessage>& _messages
+    const QVector<CryptoNote::TransactionMessage>& _messages = QVector<CryptoNote::TransactionMessage>()
   );
 
   void sendMessage(
     const QVector<CryptoNote::WalletLegacyTransfer>& _transfers, quint64 _fee, quint64 _mixin,
-    const QVector<CryptoNote::TransactionMessage>& _messages, quint64 _ttl
+    const QVector<CryptoNote::TransactionMessage>& _messages, quint64 _ttl, QString sender
   );
 
   void sweepDust(const std::vector<CryptoNote::WalletLegacyTransfer>& _transfers, quint64 _fee, const QString& _payment_id, quint64 _mixin);
