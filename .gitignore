@@ -1,7 +1,21 @@
-**/build
-**/build32
-**/build64
-**/cryptonote
+**/bui*
+
+.DS_Store
+/build
+/build32
+/build64
+/tags
+.idea
+.ycm_extra_conf.py
+.ycm_extra_conf.pyc
+Release
+Debug
+src/CMakeCache.txt
+src/CMakeFiles/
+src/Makefile
+src/build/
+src/cmake_install.cmake
+.codelite/
 
 ### mac
 # General
@@ -72,3 +86,6 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+.vscode
+.vs

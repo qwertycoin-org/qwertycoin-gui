@@ -1,9 +1,8 @@
-
 #pragma once
 
 namespace WalletGui {
 
-const char WALLET_CURRENCY_DISPLAY_NAME[] = "@PROJECT_CURRENCY_DISPLAY_NAME@";
+const char WALLET_CURRENCY_DISPLAY_NAME[] = "@PROJECT_DISPLAY_NAME@";
 const char WALLET_CURRENCY_TICKER[] = "@PROJECT_CURRENCY_TICKER@";
 
 }

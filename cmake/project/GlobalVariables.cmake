@@ -1,8 +1,12 @@
-# Detect OS
+# Detect OS targeted by the build
+message(STATUS "CMAKE_HOST_SYSTEM_NAME: ${CMAKE_HOST_SYSTEM_NAME}") # system hosting the build
+message(STATUS "CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME}") # system targeted by the build
+message(STATUS "CMAKE_SYSTEM_VERSION: ${CMAKE_SYSTEM_VERSION}")
 if(UNIX)
     if(${CMAKE_SYSTEM_NAME} MATCHES "Android")
         set(PROJECT_OS_NAME "android")
         set(PROJECT_OS_ANDROID ON)
+        set(ANDROID TRUE)
     elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         set(PROJECT_OS_NAME "linux")
         set(PROJECT_OS_LINUX ON)
@@ -23,5 +27,5 @@ endif()
 if (PROJECT_OS_UNKNOWN)
     message(WARNING "Unable to detect OS!")
 else()
-    message(STATUS "Detected OS: ${PROJECT_OS_NAME}")
+    message(STATUS "Detect OS targeted by the build: ${PROJECT_OS_NAME}")
 endif()

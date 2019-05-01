@@ -16,6 +16,7 @@
 #include "CommandLineParser.h"
 #include "CurrencyAdapter.h"
 #include "Settings.h"
+#include "version.h"
 
 namespace WalletGui {
 
@@ -206,7 +207,7 @@ bool Settings::isTrackingMode() const {
 }
 
 QString Settings::getVersion() const {
-  return VERSION;
+  return PROJECT_VERSION;
 }
 
 QString Settings::getCurrentTheme() const {

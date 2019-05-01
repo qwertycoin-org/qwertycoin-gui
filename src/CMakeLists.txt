@@ -174,7 +174,7 @@ if(APPLE)
     list(APPEND TARGET_SRC "${CMAKE_CURRENT_LIST_DIR}/gui/macdockiconhandler.h")
     list(APPEND TARGET_SRC "${CMAKE_CURRENT_LIST_DIR}/gui/macdockiconhandler.mm")
 elseif(WIN32)
-    list(APPEND TARGET_SRC "${CMAKE_CURRENT_LIST_DIR}/cryptonotewallet.rc")
+    list(APPEND TARGET_SRC "${CMAKE_CURRENT_LIST_DIR}/qwertycoinwallet.rc")
 endif()
 
 # Include directories
@@ -191,7 +191,7 @@ set(TARGET_INCLUDE_DIRS
     "${CMAKE_CURRENT_BINARY_DIR}"
 )
 
-# Linked libraries
+## Linked libraries
 set(TARGET_LINK_LIBS
     PRIVATE
     qrencode::qrencode
@@ -224,25 +224,28 @@ if(APPLE)
 
     list(APPEND TARGET_LINK_LIBS Qt5::PrintSupport)
 elseif(WIN32)
-    list(APPEND TARGET_LINK_LIBS Imm32 Iphlpapi Winmm)
+    list(APPEND TARGET_LINK_LIBS Imm32 Iphlpapi Winmm UxTheme d3d9 dxguid Rpcrt4 Wtsapi32 WSock32 ws2_32 Dwmapi)
 endif()
 
 # Compile definitions
 set(TARGET_COMPILE_DEFS
     PRIVATE
-    -DVERSION="${PROJECT_VERSION}"
+    -DCN_VERSION="${PROJECT_VERSION}"
+    -DCN_REVISION="${PROJECT_GIT_COMMIT_ID}"
+    -DGIT_REVISION="${PROJECT_GIT_COMMIT_ID}"
+    -DUSE_LITE_WALLET
 )
 if(WIN32)
     list(APPEND TARGET_COMPILE_DEFS -D_CRT_SECURE_NO_WARNINGS -D_WIN32_WINNT=0x0600 -DSTATICLIB)
 endif()
 
-# Generate CryptoNoteWalletConfig.h header
+# Generate version.h header
 configure_file(
-    "${CMAKE_CURRENT_LIST_DIR}/CryptoNoteWalletConfig.h.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/CryptoNoteWalletConfig.h"
+    "${CMAKE_CURRENT_LIST_DIR}/version.h.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/version.h"
     @ONLY
 )
-message(STATUS "CryptoNoteWalletConfig.h: ${CMAKE_CURRENT_BINARY_DIR}/CryptoNoteWalletConfig.h")
+message(STATUS "version.h: ${CMAKE_CURRENT_BINARY_DIR}/version.h")
 
 add_executable(${TARGET_NAME} WIN32 MACOSX_BUNDLE ${TARGET_SRC})
 add_executable(${TARGET_NAME_ALIAS} ALIAS ${TARGET_NAME})

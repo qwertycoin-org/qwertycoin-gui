@@ -1,12 +1,12 @@
 ![image](https://cdn.qwertycoin.org/images/press/other/qwc-github-3.png)
 #### Master Build Status
-[![Build Status](https://travis-ci.org/qwertycoin-org/qwertycoin-gui.svg?branch=master)](https://travis-ci.org/qwertycoin-org/qwertycoin-gui) [![Build status](https://ci.appveyor.com/api/projects/status/1g1cxw31kqep753n/branch/master?svg=true)](https://ci.appveyor.com/project/Qwertycoin/qwertycoin-gui/branch/master)
+[![Build Status](https://travis-ci.org/qwertycoin-org/qwertycoin-gui.svg?branch=master)](https://travis-ci.org/qwertycoin-org/qwertycoin-gui)
+[![Build status](https://ci.appveyor.com/api/projects/status/udpsj8mf5x7s1rt6/branch/master?svg=true)](https://ci.appveyor.com/project/Qwertycoin/qwertycoin-gui/branch/master) [![codecov](https://codecov.io/gh/qwertycoin-org/qwertycoin-gui/branch/master/graph/badge.svg)](https://codecov.io/gh/qwertycoin-org/qwertycoin-gui)
 
 
 
 #### Development Build Status
-[![Build Status](https://travis-ci.org/qwertycoin-org/qwertycoin-gui.svg?branch=dev)](https://travis-ci.org/qwertycoin-org/qwertycoin-gui) [![Build status](https://ci.appveyor.com/api/projects/status/1g1cxw31kqep753n/branch/dev?svg=true)](https://ci.appveyor.com/project/Qwertycoin/qwertycoin-gui/branch/dev)
-
+[![Build Status](https://travis-ci.org/qwertycoin-org/qwertycoin-gui.svg?branch=dev)](https://travis-ci.org/qwertycoin-org/qwertycoin-gui) [![Build status](https://ci.appveyor.com/api/projects/status/udpsj8mf5x7s1rt6/branch/dev?svg=true)](https://ci.appveyor.com/project/Qwertycoin/qwertycoin-gui/branch/dev)
 
 # Table of contents
 1. [Project Specs](#coinspecs)
@@ -48,7 +48,7 @@ More information at [qwertycoin.org](https://qwertycoin.org/)
 - You will need the following packages: build-essential, [cmake (3.10 or higher)](https://github.com/qwertycoin-org/qwertycoin/wiki/E01.-Install-Cmake-3.10) and git;
 - Most of these should already be installed on your system. For example on Ubuntu by running:
 ```
-sudo apt-get install build-essential cmake git
+sudo apt-get install build-essential python-dev gcc g++ git cmake libboost-all-dev qtbase5-dev
 ```
 
 ##### Building
@@ -59,7 +59,7 @@ git clone --recurse-submodules https://github.com/qwertycoin-org/qwertycoin-gui
 cd ./qwertycoin-gui
 mkdir ./build
 cd ./build
-cmake ..
+cmake -DBUILD_ALL:BOOL=TRUE ..
 cmake --build . --config Release
 ```
 - If all went well, it will complete successfully, and you will find all your binaries in the `./build/Release` directory.
@@ -77,14 +77,14 @@ cmake --build . --config Release
 - From the start menu, open "x64 Native Tools Command Prompt for vs2017";
 - And the run the following commands:
 ```
-git clone https://github.com/qwertycoin-org/qwertycoin-gui
+git clone --recurse-submodules https://github.com/qwertycoin-org/qwertycoin-gui
 cd qwertycoin-gui
 md build
 cd build
-cmake -G "Visual Studio 15 2017 Win64" ..
+cmake -G "Visual Studio 15 2017 Win64" -DBUILD_ALL:BOOL=TRUE ..
 cmake --build . --config Release
 ```
-- If all went well, it will complete successfully, and you will find all your binaries in the `.\build\Release` directory;
+- If all went well, it will complete successfully, and you will find all your binaries in the `.\build\src\Release` directory;
 - Additionally, a `.sln` file will have been created in the `build` directory. If you wish to open the project in Visual Studio with this, you can.
 
 #### Apple macOS <a name="build-apple"></a>
@@ -99,21 +99,14 @@ cmake --build . --config Release
 
 - After installing dependencies run simple script:
 ```
-git clone https://github.com/qwertycoin-org/qwertycoin-gui
+git clone --recurse-submodules https://github.com/qwertycoin-org/qwertycoin-gui
 cd ./qwertycoin-gui
 mkdir ./build
 cd ./build
-cmake ..
+cmake -DBUILD_ALL:BOOL=TRUE ..
 cmake --build . --config Release
 ```
 - If all went well, it will complete successfully, and you will find all your binaries in the `./build/Release` directory.
-
-#### Advanced options (for all platforms)
-
-* Parallel build: run `make -j<number of threads>` instead of `make`;
-* Debug build: run `make build-debug`;
-* Test suite: run `make test-release` to run tests in addition to building. Running `make test-debug` will do the same to the debug version;
-* Building with Clang: it may be possible to use Clang instead of GCC, but this may not work everywhere. To build, run `export CC=clang CXX=clang++` before running `make`.
 
 ## Donate <a name="donate"></a>
 
@@ -139,14 +132,11 @@ ETN: etnkJXJFqiH9FCt6Gq2HWHPeY92YFsmvKX7qaysvnV11M796Xmovo2nSu6EUCMnniqRqAhKX9AQ
 ### Downloads <a name="downloads"></a>
 | Operating System | Download                                 |
 | ---------------- | ---------------------------------------- |
-| Windows 32       | https://releases.qwertycoin.org/get/cli/latest/win32 |
-| Windows 64       | https://releases.qwertycoin.org/get/cli/latest/win64 |
-| macOS 10.8 & Later | https://releases.qwertycoin.org/get/cli/latest/macos |
-| Linux 32         | https://releases.qwertycoin.org/get/cli/latest/linux32 |
-| Linux 64         | https://releases.qwertycoin.org/get/cli/latest/linux64 |
-| OpenBSD 64       | https://releases.qwertycoin.org/get/cli/latest/openbsd64 |
-| FreeBSD 64       | https://releases.qwertycoin.org/get/cli/latest/freebsd64 |
-| Linux ARM 64     | https://releases.qwertycoin.org/get/cli/latest/arm64 |
+| Windows 32       | https://releases.qwertycoin.org/get/gui/latest/win32 |
+| Windows 64       | https://releases.qwertycoin.org/get/gui/latest/win64 |
+| macOS 10.8 & Later | https://releases.qwertycoin.org/get/gui/latest/macos |
+| Linux 64         | https://releases.qwertycoin.org/get/gui/latest/linux64 |
+| Linux ARM 64     | https://releases.qwertycoin.org/get/gui/latest/arm64 |
 | Other platforms      | https://releases.qwertycoin.org |
 
 ### Useful Links <a name="usefullinks"></a>
