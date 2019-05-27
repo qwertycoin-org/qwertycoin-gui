@@ -15,7 +15,7 @@
 #include <atomic>
 #include <fstream>
 
-#include <IWalletLegacy.h>
+#include <WalletLegacy/IWalletLegacy.h>
 #include <ITransfersContainer.h>
 
 namespace WalletGui {
