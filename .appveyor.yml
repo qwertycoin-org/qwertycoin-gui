@@ -9,7 +9,7 @@ environment:
     global:
         BOOST_ROOT: "C:/Libraries/boost_1_69_0"
         BOOST_LIBRARYDIR: "C:/Libraries/boost_1_69_0/lib64-msvc-14.1"
-        Qt5_DIR: "C:/Qt/5.12.1/msvc2017_64/lib/cmake/Qt5"
+        Qt5_DIR: "C:/Qt/5.12/msvc2017_64/lib/cmake/Qt5"
     matrix:
         - Purpose: "WindowsDebugBuild"
           QWC_GENERATOR_NAME: "Visual Studio 15 2017 Win64"
