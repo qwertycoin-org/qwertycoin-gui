@@ -25,10 +25,10 @@ ExternalProject_Add(qrencode
     CMAKE_ARGS ${qrencode_CMAKE_ARGS}
 
     # CONFIGURE_COMMAND (use default)
-    # BUILD_COMMAND (use default)
+    BUILD_COMMAND ${CMAKE_COMMAND} --build <BINARY_DIR> --config Release
     BUILD_ALWAYS FALSE
     TEST_COMMAND ""
-    # INSTALL_COMMAND (use default)
+    INSTALL_COMMAND ${CMAKE_COMMAND} --build <BINARY_DIR> --config Release --target install
 )
 
 ExternalProject_Get_property(qrencode INSTALL_DIR)
@@ -38,7 +38,7 @@ set(qrencode_INCLUDE_DIRS
 set(qrencode_LIB
     "${INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}qrencode${CMAKE_STATIC_LIBRARY_SUFFIX}"
 )
-mark_as_advanced(qrencode_INCLUDE_DIRS qrencode_INCLUDE_LIB)
+mark_as_advanced(qrencode_INCLUDE_DIRS qrencode_LIB)
 
 if(NOT EXISTS "${INSTALL_DIR}/include")
     file(MAKE_DIRECTORY "${INSTALL_DIR}/include")

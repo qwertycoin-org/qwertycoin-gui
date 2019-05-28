@@ -9,7 +9,7 @@ if(CMAKE_TOOLCHAIN_FILE)
 endif()
 
 if(NOT WIN32)
-    list(INSERT Qwertycoin_CMAKE_ARGS 0 -DCMAKE_BUILD_TYPE=Release)
+    list(INSERT Qwertycoin_CMAKE_ARGS 0 -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
 endif()
 
 ExternalProject_Add(Qwertycoin
@@ -24,7 +24,7 @@ ExternalProject_Add(Qwertycoin
     CMAKE_ARGS ${Qwertycoin_CMAKE_ARGS}
 
     # CONFIGURE_COMMAND (use default)
-    BUILD_COMMAND ${CMAKE_COMMAND} --build . --config Release --target QwertycoinFramework
+    BUILD_COMMAND ${CMAKE_COMMAND} --build . --config ${CMAKE_BUILD_TYPE} --target QwertycoinFramework
     BUILD_ALWAYS FALSE
     TEST_COMMAND ""
     INSTALL_COMMAND ""
@@ -77,17 +77,24 @@ set(QwertycoinFramework_LIBS
 mark_as_advanced(QwertycoinFramework_INCLUDE_DIRS QwertycoinFramework_LIBS)
 
 foreach(LIB ${QwertycoinFramework_LIBS})
-    set(${LIB}_filename "${CMAKE_STATIC_LIBRARY_PREFIX}QwertycoinFramework_${LIB}${CMAKE_STATIC_LIBRARY_SUFFIX}")
+    set(LIB_IMPORTED_LOCATION_KEY "RELEASE")
+    set(LIB_SUFFIX "")
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(LIB_IMPORTED_LOCATION_KEY "DEBUG")
+        set(LIB_SUFFIX "d")
+    endif()
+
+    set(${LIB}_filename "${CMAKE_STATIC_LIBRARY_PREFIX}QwertycoinFramework_${LIB}${LIB_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}")
     if(WIN32)
-        set(${LIB}_library "${BINARY_DIR}/lib/Release/${${LIB}_filename}")
+        set(${LIB}_library "${BINARY_DIR}/lib/${CMAKE_BUILD_TYPE}/${${LIB}_filename}")
     else()
         set(${LIB}_library "${BINARY_DIR}/lib/${${LIB}_filename}")
     endif()
 
     add_library(QwertycoinFramework::${LIB} UNKNOWN IMPORTED GLOBAL)
     set_target_properties(QwertycoinFramework::${LIB} PROPERTIES
-        IMPORTED_CONFIGURATIONS Release
-        IMPORTED_LOCATION_RELEASE ${${LIB}_library}
+        IMPORTED_CONFIGURATIONS ${CMAKE_BUILD_TYPE}
+        IMPORTED_LOCATION_${LIB_IMPORTED_LOCATION_KEY} ${${LIB}_library}
     )
     add_dependencies(QwertycoinFramework::${LIB} Qwertycoin)
 endforeach()

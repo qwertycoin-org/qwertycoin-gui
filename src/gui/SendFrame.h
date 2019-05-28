@@ -8,8 +8,8 @@
 
 #include <QFrame>
 
-#include <IWallet.h>
-#include <IWalletLegacy.h>
+#include <Wallet/IWallet.h>
+#include <WalletLegacy/IWalletLegacy.h>
 #include "SendGlassFrame.h"
 
 namespace Ui {

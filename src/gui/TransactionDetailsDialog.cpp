@@ -7,7 +7,7 @@
 #include "CurrencyAdapter.h"
 #include "TransactionDetailsDialog.h"
 #include "TransactionsModel.h"
-#include <IWalletLegacy.h>
+#include <WalletLegacy/IWalletLegacy.h>
 #include "WalletAdapter.h"
 #include "Common/StringTools.h"
 #include "CryptoNoteCore/CryptoNoteBasic.h"

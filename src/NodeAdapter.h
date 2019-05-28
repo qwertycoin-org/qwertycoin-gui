@@ -23,7 +23,7 @@
 #include <QThread>
 
 #include <INode.h>
-#include <IWalletLegacy.h>
+#include <WalletLegacy/IWalletLegacy.h>
 #include "CryptoNoteWrapper.h"
 
 namespace CryptoNote {
