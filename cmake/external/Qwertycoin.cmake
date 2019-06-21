@@ -38,6 +38,7 @@ set(QwertycoinFramework_INCLUDE_DIRS
     "${SOURCE_DIR}/lib"
     "${BINARY_DIR}/lib"
     "${BINARY_DIR}/_ExternalProjects/Install/sparsehash/include"
+    "${SOURCE_DIR}/src" # Temporary hack-ish solution for <config/*> includes.
 )
 if(MSVC)
     list(APPEND QwertycoinFramework_INCLUDE_DIRS "${SOURCE_DIR}/lib/Platform/Windows")
