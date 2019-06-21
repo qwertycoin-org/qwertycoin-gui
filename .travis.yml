@@ -24,7 +24,7 @@ matrix:
               - CTEST_REGEXP="Tests$"
         - name: "macOS, Debug"
           os: osx
-          osx_image: xcode10.1
+          osx_image: xcode10.2
           env:
               - CMAKE_GENERATOR_NAME="Unix Makefiles"
               - CMAKE_BUILD_TYPE="Debug"
@@ -33,7 +33,7 @@ matrix:
               - CTEST_REGEXP="Tests$"
         - name: "macOS, Release"
           os: osx
-          osx_image: xcode10.1
+          osx_image: xcode10.2
           env:
               - CMAKE_GENERATOR_NAME="Unix Makefiles"
               - CMAKE_BUILD_TYPE="Release"
