@@ -386,13 +386,19 @@ void MainWindow::createNonDeterministicWallet() {
 }
 
 void MainWindow::openWallet() {
-  QString filePath = QFileDialog::getOpenFileName(this, tr("Open .wallet/.keys file"),
+  QString walletDirectory = "";
+  QString lastwalletDir = QFileInfo(Settings::instance().getWalletFile()).absolutePath();
+  if (!lastwalletDir.isEmpty()) {
+    walletDirectory = lastwalletDir;
+  } else {
 #ifdef Q_OS_WIN
-    //QApplication::applicationDirPath(),
-      QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation),
+    walletDirectory = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
 #else
-    QDir::homePath(),
+    walletDirectory = QDir::homePath();
 #endif
+  }
+  QString filePath = QFileDialog::getOpenFileName(this, tr("Open .wallet/.keys file"),
+    walletDirectory,
     tr("Wallet (*.wallet *.keys)"));
 
   if (!filePath.isEmpty()) {
@@ -947,7 +953,7 @@ void MainWindow::walletSynchronized(int _error, const QString& _error_text) {
 void MainWindow::walletOpened(bool _error, const QString& _error_text) {
   if (!_error) {
     m_ui->m_noWalletFrame->hide();
-	m_ui->accountToolBar->show();
+  m_ui->accountToolBar->show();
     m_ui->m_closeWalletAction->setEnabled(true);
     m_ui->m_exportTrackingKeyAction->setEnabled(true);
     m_encryptionStateIconLabel->show();
