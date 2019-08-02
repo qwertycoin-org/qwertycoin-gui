@@ -46,7 +46,7 @@ deploy:
     description: "Qwertycoin GUI release"
     provider: GitHub
     auth_token:
-        secure: "2+Ji3AkIi/6n3bNzeQNvr7ZKetnvNC/K5czk1iDU5OQHiozVan1ksMw3Nk1GTssO"
+        secure: "4VgHg760VN6gCaRp6++fnkyxTe/p4vZ8DCNry0YDRhI6O4Pml9+29kfBv2WIjROA"
     artifact: /qwertycoin-gui-.*\.exe/
     draft: true
     prerelease: true
