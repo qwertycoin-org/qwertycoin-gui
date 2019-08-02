@@ -10,8 +10,7 @@ matrix:
               - CMAKE_GENERATOR_NAME="Unix Makefiles"
               - CMAKE_BUILD_TYPE="Debug"
               - CMAKE_TOOLCHAIN_FILE_NAME=gcc-cxx14-c11.cmake
-              - Qt5_DIR="/usr/lib/x86_64-linux-gnu/cmake/Qt5"
-              - CTEST_REGEXP="Tests$"
+              - Qt5_DIR="/opt/qt512/lib/cmake/Qt5"
         - name: "Linux, Release"
           os: linux
           dist: xenial
@@ -20,8 +19,7 @@ matrix:
               - CMAKE_GENERATOR_NAME="Unix Makefiles"
               - CMAKE_BUILD_TYPE="Release"
               - CMAKE_TOOLCHAIN_FILE_NAME=gcc-cxx14-c11.cmake
-              - Qt5_DIR="/usr/lib/x86_64-linux-gnu/cmake/Qt5"
-              - CTEST_REGEXP="Tests$"
+              - Qt5_DIR="/opt/qt512/lib/cmake/Qt5"
         - name: "macOS, Debug"
           os: osx
           osx_image: xcode10.2
@@ -30,7 +28,6 @@ matrix:
               - CMAKE_BUILD_TYPE="Debug"
               - CMAKE_TOOLCHAIN_FILE_NAME=clang-cxx14.cmake
               - Qt5_DIR="/usr/local/opt/qt/lib/cmake/Qt5"
-              - CTEST_REGEXP="Tests$"
         - name: "macOS, Release"
           os: osx
           osx_image: xcode10.2
@@ -39,11 +36,6 @@ matrix:
               - CMAKE_BUILD_TYPE="Release"
               - CMAKE_TOOLCHAIN_FILE_NAME=clang-cxx14.cmake
               - Qt5_DIR="/usr/local/opt/qt/lib/cmake/Qt5"
-              - CTEST_REGEXP="Tests$"
-
-env:
-    global:
-        - CTEST_LOG_REGEXP="=== EVENT \#\|SwappedVector\|\[\([a-zA-Z]\+\)\(\/[a-zA-Z0-9]\+\)\?\]"
 
 addons:
     apt: # Linux
@@ -51,18 +43,19 @@ addons:
             - build-essential
             - cmake
             - git
-            - qtbase5-dev
+            - libgl1-mesa-dev
+            - qt512-meta-full
             - unzip
             - wget
-            - lcov
+            - rpm
         sources:
             - ubuntu-toolchain-r-test
+            - sourceline: "ppa:beineri/opt-qt-5.12.3-xenial"
     homebrew: # macOS
         packages:
             - cmake
             - git
             - qt5
-            - lcov
 
 cache:
     directories:
@@ -77,18 +70,17 @@ script:
         -DBUILD_ALL:BOOL=TRUE
         ..
     - cmake --build . --config $CMAKE_BUILD_TYPE -- -j 2
-    - ctest -C $CMAKE_BUILD_TYPE -V -j 2 -R "$CTEST_REGEXP" | grep --line-buffered -i -v "$CTEST_LOG_REGEXP"
     - cpack -C $CMAKE_BUILD_TYPE
 
-after_success:
-    - |
-        if [ "$CMAKE_BUILD_TYPE" = "Release" ]; then
-            echo "Code-coverage is only available for debug builds. Skipping..."
-        else
-            COVERAGE_FILE="$TRAVIS_BUILD_DIR/build/coverage.info"
-            echo "coverage.info: $COVERAGE_FILE"
-            lcov --capture --directory . --output-file $COVERAGE_FILE
-            lcov --remove $COVERAGE_FILE "/Applications/Xcode*" "/usr/*" "*/boost/*" "*/_ExternalProjects/*" --output-file $COVERAGE_FILE
-            lcov --list $COVERAGE_FILE
-            bash <(curl -s https://codecov.io/bash) -f $COVERAGE_FILE || echo "Upload to codecov.io FAILED"
-        fi
+deploy:
+    provider: releases # GitHub Releases
+    api_key:
+        secure: "st8VQ60nphaWVJJqamvLp3aLxhaP3B9cEcL5g/6grQxZvSBingu07o849cMa1TcXk9moLXgJlxqI5TkOkIubQ+NRnjCVKdiA8om242BwBzoMtgrpNWxh66pHIhIUR1V61mVhkKFrVN4/z2UGV8syt6E7O1W/kbWeBJW13Z4IZDgZhxW1LnN/OKFsPu7+zYhfZ1cYLfpQSiVQovH1R3p2WkeNHv4ZaCd0+yV6Dm8SaQNjzLT/6j/xOmflTllSdzKa+2viVL0sBT07uuwzaL+6dNN6/EWI2q88WHL8z9EgkTOFgB58IfkOrcGFP6mM67k9uvqVf11Sykn28WuF7Q4YHZPVdFt9hYXS4WnKLEB7SoO7t9OH6xrlRoMmZr2lg4JYxE+25WpcFZ/RGGXR+owntWTaouanUcSS/ESm59iqkBZalEnsNX1GbHBiaxQLsJiG/ZO70XMA3wS88CtMXs8he9Rc5uGvLdyFJJU3Q3PewTizqkzny3NBXCoz/GkhiGf1g8MDjHUXh3CtM/mzdBj+4gbMaivSRH2PEo8BiqDe7h0pKSIcWZ8Np+LppbQuMHPzD2yumbQnV20iNfAMrlozuWgj20N5lqK8bglO+2jKoDaQBBctxjeXORiBHH9UaDrCvpSwdmEHRoK7qnQWi5bOxfce7EdatJ6CuQ/PQ1jqahw="
+    file: dist/qwertycoin-gui-* # path is relative to the current working directory, not to $TRAVIS_BUILD_DIR
+    file_glob: true
+    draft: true
+    on:
+        branch: master
+        tags: true
+        condition: $CMAKE_BUILD_TYPE = "Release"
+    skip_cleanup: true
