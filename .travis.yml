@@ -10,7 +10,7 @@ matrix:
               - CMAKE_GENERATOR_NAME="Unix Makefiles"
               - CMAKE_BUILD_TYPE="Debug"
               - CMAKE_TOOLCHAIN_FILE_NAME=gcc-cxx14-c11.cmake
-              - Qt5_DIR="/usr/lib/x86_64-linux-gnu/cmake/Qt5"
+              - Qt5_DIR="/opt/qt512/lib/cmake/Qt5"
         - name: "Linux, Release"
           os: linux
           dist: xenial
@@ -19,7 +19,7 @@ matrix:
               - CMAKE_GENERATOR_NAME="Unix Makefiles"
               - CMAKE_BUILD_TYPE="Release"
               - CMAKE_TOOLCHAIN_FILE_NAME=gcc-cxx14-c11.cmake
-              - Qt5_DIR="/usr/lib/x86_64-linux-gnu/cmake/Qt5"
+              - Qt5_DIR="/opt/qt512/lib/cmake/Qt5"
         - name: "macOS, Debug"
           os: osx
           osx_image: xcode10.2
