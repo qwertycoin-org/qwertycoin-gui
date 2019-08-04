@@ -2,10 +2,10 @@ language: cpp
 
 matrix:
     include:
-        - name: "Linux, Debug"
-          os: linux
-          dist: xenial
-          sudo: required
+#        - name: "Linux, Debug"
+#          os: linux
+#          dist: xenial
+#          sudo: required
 #          env:
 #              - CMAKE_GENERATOR_NAME="Unix Makefiles"
 #              - CMAKE_BUILD_TYPE="Debug"
@@ -20,10 +20,10 @@ matrix:
               - CMAKE_BUILD_TYPE="Release"
               - CMAKE_TOOLCHAIN_FILE_NAME=gcc-cxx14-c11.cmake
               - Qt5_DIR="/opt/qt512/lib/cmake/Qt5"
-        - name: "macOS, Debug"
-          os: osx
-          osx_image: xcode10.2
-          env:
+#        - name: "macOS, Debug"
+#          os: osx
+#          osx_image: xcode10.2
+#          env:
 #              - CMAKE_GENERATOR_NAME="Unix Makefiles"
 #              - CMAKE_BUILD_TYPE="Debug"
 #              - CMAKE_TOOLCHAIN_FILE_NAME=clang-cxx14.cmake
