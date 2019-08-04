@@ -6,11 +6,11 @@ matrix:
           os: linux
           dist: xenial
           sudo: required
-          env:
-              - CMAKE_GENERATOR_NAME="Unix Makefiles"
-              - CMAKE_BUILD_TYPE="Debug"
-              - CMAKE_TOOLCHAIN_FILE_NAME=gcc-cxx14-c11.cmake
-              - Qt5_DIR="/opt/qt512/lib/cmake/Qt5"
+#          env:
+#              - CMAKE_GENERATOR_NAME="Unix Makefiles"
+#              - CMAKE_BUILD_TYPE="Debug"
+#              - CMAKE_TOOLCHAIN_FILE_NAME=gcc-cxx14-c11.cmake
+#              - Qt5_DIR="/opt/qt512/lib/cmake/Qt5"
         - name: "Linux, Release"
           os: linux
           dist: xenial
@@ -24,10 +24,10 @@ matrix:
           os: osx
           osx_image: xcode10.2
           env:
-              - CMAKE_GENERATOR_NAME="Unix Makefiles"
-              - CMAKE_BUILD_TYPE="Debug"
-              - CMAKE_TOOLCHAIN_FILE_NAME=clang-cxx14.cmake
-              - Qt5_DIR="/usr/local/opt/qt/lib/cmake/Qt5"
+#              - CMAKE_GENERATOR_NAME="Unix Makefiles"
+#              - CMAKE_BUILD_TYPE="Debug"
+#              - CMAKE_TOOLCHAIN_FILE_NAME=clang-cxx14.cmake
+#              - Qt5_DIR="/usr/local/opt/qt/lib/cmake/Qt5"
         - name: "macOS, Release"
           os: osx
           osx_image: xcode10.2
