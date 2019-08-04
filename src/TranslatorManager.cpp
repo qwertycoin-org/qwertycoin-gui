@@ -18,12 +18,12 @@ TranslatorManager::TranslatorManager()
 
 #if defined(_MSC_VER)
   m_langPath = QApplication::applicationDirPath();
-  m_langPath.append("/languages");
+  m_langPath.append("/translations");
 #elif defined(Q_OS_MAC)
   m_langPath = QApplication::applicationDirPath();
-  m_langPath = m_langPath + "/../Resources/languages/";
+  m_langPath = m_langPath + "/../Resources/translations/";
 #else
-  m_langPath = "/opt/karbo/languages";
+  m_langPath = "/opt/karbo/translations";
 #endif
 
     QDir dir(m_langPath);
