@@ -108,7 +108,6 @@ void OptimizationManager::checkOptimization() {
 
 void OptimizationManager::optimize() {
   if (!Settings::instance().isTrackingMode() && WalletAdapter::instance().isOpen() && m_isSynchronized) {
-    size_t fusionReadyCount = WalletAdapter::instance().estimateFusion(CurrencyAdapter::instance().getMinimumFee());
     const size_t MAX_FUSION_OUTPUT_COUNT = 4;
     const quint64 mixin = Settings::instance().getOptimizationMixin();
     size_t estimatedFusionInputsCount = CurrencyAdapter::instance().getCurrency().getApproximateMaximumInputCount(CurrencyAdapter::instance().getCurrency().fusionTxMaxSize(), MAX_FUSION_OUTPUT_COUNT, mixin);
