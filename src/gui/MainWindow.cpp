@@ -623,7 +623,7 @@ void MainWindow::createLanguageMenu(void)
   for (int i = 0; i < fileNames.size(); ++i) {
     QString locale;
     locale = fileNames[i];
-    QMessageBox::warning(this, tr("Locale"), tr(locale), QMessageBox::Ok);
+    QMessageBox::warning(this, tr("Locale"), tr("Language: %1").arg(locale), QMessageBox::Ok);
     locale.truncate(locale.lastIndexOf('.'));
     QString lang = QLocale(locale).nativeLanguageName();
     QAction *action = new QAction(lang, this);
