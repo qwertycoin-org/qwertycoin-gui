@@ -619,10 +619,11 @@ void MainWindow::createLanguageMenu(void)
   m_langPath = "/opt/karbo/translations";
 #endif
   QDir dir(m_langPath);
-  QStringList fileNames = dir.entryList(QStringList("qt_??.qm"));
+  QStringList fileNames = dir.entryList(QStringList("??.qm"));
   for (int i = 0; i < fileNames.size(); ++i) {
     QString locale;
     locale = fileNames[i];
+    QMessageBox::warning(this, tr("Locale"), tr(locale), QMessageBox::Ok);
     locale.truncate(locale.lastIndexOf('.'));
     QString lang = QLocale(locale).nativeLanguageName();
     QAction *action = new QAction(lang, this);
