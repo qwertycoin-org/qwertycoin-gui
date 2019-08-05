@@ -1,8 +1,7 @@
 ![image](https://cdn.qwertycoin.org/images/press/other/qwc-github-3.png)
 #### Master Build Status
 [![Build Status](https://travis-ci.org/qwertycoin-org/qwertycoin-gui.svg?branch=master)](https://travis-ci.org/qwertycoin-org/qwertycoin-gui)
-[![Build status](https://ci.appveyor.com/api/projects/status/udpsj8mf5x7s1rt6/branch/master?svg=true)](https://ci.appveyor.com/project/Qwertycoin/qwertycoin-gui/branch/master) [![codecov](https://codecov.io/gh/qwertycoin-org/qwertycoin-gui/branch/master/graph/badge.svg)](https://codecov.io/gh/qwertycoin-org/qwertycoin-gui)
-
+[![Build status](https://ci.appveyor.com/api/projects/status/udpsj8mf5x7s1rt6/branch/master?svg=true)](https://ci.appveyor.com/project/Qwertycoin/qwertycoin-gui/branch/master)
 
 
 #### Development Build Status
@@ -135,8 +134,8 @@ ETN: etnkJXJFqiH9FCt6Gq2HWHPeY92YFsmvKX7qaysvnV11M796Xmovo2nSu6EUCMnniqRqAhKX9AQ
 | Windows 32       | https://releases.qwertycoin.org/get/gui/latest/win32 |
 | Windows 64       | https://releases.qwertycoin.org/get/gui/latest/win64 |
 | macOS 10.8 & Later | https://releases.qwertycoin.org/get/gui/latest/macos |
-| Linux 64         | https://releases.qwertycoin.org/get/gui/latest/linux64 |
-| Linux ARM 64     | https://releases.qwertycoin.org/get/gui/latest/arm64 |
+| Linux DEB         | https://releases.qwertycoin.org/get/gui/latest/linux/deb |
+| Linux RPM     | https://releases.qwertycoin.org/get/gui/latest/linux/rpm |
 | Other platforms      | https://releases.qwertycoin.org |
 
 ### Useful Links <a name="usefullinks"></a>
@@ -158,15 +157,13 @@ ETN: etnkJXJFqiH9FCt6Gq2HWHPeY92YFsmvKX7qaysvnV11M796Xmovo2nSu6EUCMnniqRqAhKX9AQ
 
 #### Thanks <a name="thanks"></a>
 
-Cryptonote Developers, Bytecoin Developers, Monero Developers, Karbo Developers, Qwertycoin Community
+Cryptonote Developers, Bytecoin Developers, Monero Developers, Karbo Developers, The Qwertycoin Community
 
 ### Copypasta for license when editing files  <a name="copypasta"></a>
 
-Hi Qwertycoin contributor, thanks for forking and sending back Pull Requests. Extensive docs about contributing are in the works or elsewhere. For now this is the bit we need to get into all the files we touch. Please add it to the top of the files, see [lib/CryptoNoteConfig.h](https://github.com/qwertycoin-org/qwertycoin/blob/master/lib/CryptoNoteConfig.h) for an example.
+Hi Qwertycoin contributor, thanks for forking and sending back Pull Requests. Extensive docs about contributing are in the works or elsewhere. For now this is the bit we need to get into all the files we touch. Please add it to the top of the files, see [src/config/CryptoNoteConfig.h](https://github.com/qwertycoin-org/qwertycoin/blob/master/src/config/CryptoNoteConfig.h) for an example.
 
 ```
-// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
-// Copyright (c) 2016-2018, The Karbowanec developers
 // Copyright (c) 2018-2019, The Qwertycoin Developers
 //
 // Please see the included LICENSE file for more information.
