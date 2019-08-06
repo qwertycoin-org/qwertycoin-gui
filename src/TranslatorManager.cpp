@@ -44,7 +44,7 @@ TranslatorManager::TranslatorManager()
             }
         }
     }
-    QStringList resourcesQt = dir.entryList(QStringList("*.qm"));
+    QStringList resourcesQt = dir.entryList(QStringList("??.qm"));
     for (int j = 0; j < resourcesQt.size(); j++)
     {
         QString locale = resourcesQt[j];
