@@ -170,24 +170,6 @@ set(TARGET_SRC
     ${TARGET_UI}
 )
 
-set(TARGET_TRANSLATIONS
-    "${CMAKE_CURRENT_LIST_DIR}/languages/ar.ts"
-    "${CMAKE_CURRENT_LIST_DIR}/languages/be.ts"
-    "${CMAKE_CURRENT_LIST_DIR}/languages/de.ts"
-    "${CMAKE_CURRENT_LIST_DIR}/languages/en.ts"
-    "${CMAKE_CURRENT_LIST_DIR}/languages/es.ts"
-    "${CMAKE_CURRENT_LIST_DIR}/languages/fa.ts"
-    "${CMAKE_CURRENT_LIST_DIR}/languages/fr.ts"
-    "${CMAKE_CURRENT_LIST_DIR}/languages/hi.ts"
-    "${CMAKE_CURRENT_LIST_DIR}/languages/it.ts"
-    "${CMAKE_CURRENT_LIST_DIR}/languages/ja.ts"
-    "${CMAKE_CURRENT_LIST_DIR}/languages/ko.ts"
-    "${CMAKE_CURRENT_LIST_DIR}/languages/pl.ts"
-    "${CMAKE_CURRENT_LIST_DIR}/languages/pt.ts"
-    "${CMAKE_CURRENT_LIST_DIR}/languages/ru.ts"
-    "${CMAKE_CURRENT_LIST_DIR}/languages/uk.ts"
-    "${CMAKE_CURRENT_LIST_DIR}/languages/zh.ts"
-)
 if(APPLE)
     list(APPEND TARGET_SRC "${CMAKE_CURRENT_LIST_DIR}/gui/MainWindow.mm")
     list(APPEND TARGET_SRC "${CMAKE_CURRENT_LIST_DIR}/gui/macdockiconhandler.h")
@@ -410,6 +392,8 @@ endif()
 
 # translation stuff
 set_directory_properties(PROPERTIES CLEAN_NO_CUSTOM 1)
+
+file(GLOB TARGET_TRANSLATIONS ${CMAKE_CURRENT_LIST_DIR/languages/*.ts})
 
 qt5_create_translation(TRANSLATION_MESSAGES ${FILES_TO_TRANSLATE} ${TARGET_TRANSLATIONS})
 qt5_add_translation(TRANSLATION_QM ${TARGET_TRANSLATIONS})
