@@ -411,7 +411,7 @@ endif()
 # translation stuff
 set_directory_properties(PROPERTIES CLEAN_NO_CUSTOM 1)
 
-qt5_create_translation(TRANSLATION_MESSAGES ${FILES_TO_TRANSLATE} ${TRANSLATION_FILES})
+qt5_create_translation(TRANSLATION_MESSAGES ${FILES_TO_TRANSLATE} ${TARGET_TRANSLATIONS})
 qt5_add_translation(TRANSLATION_QM ${TARGET_TRANSLATIONS})
 add_custom_target(translations_update DEPENDS ${TRANSLATION_MESSAGES})
 add_custom_target(translations DEPENDS ${TRANSLATION_QM})
