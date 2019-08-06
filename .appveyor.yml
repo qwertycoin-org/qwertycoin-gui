@@ -51,5 +51,5 @@ deploy:
     draft: true
     prerelease: true
     on:
-        APPVEYOR_REPO_TAG: true
+        APPVEYOR_REPO_TAG: false
         QWC_BUILD_TYPE: "Release"
