@@ -393,7 +393,7 @@ endif()
 # translation stuff
 set_directory_properties(PROPERTIES CLEAN_NO_CUSTOM 1)
 
-file(GLOB TARGET_TRANSLATIONS ${CMAKE_CURRENT_LIST_DIR/languages/*.ts})
+file(GLOB TARGET_TRANSLATIONS ${CMAKE_CURRENT_LIST_DIR/languages}/*.ts)
 
 qt5_create_translation(TRANSLATION_MESSAGES ${FILES_TO_TRANSLATE} ${TARGET_TRANSLATIONS})
 qt5_add_translation(TRANSLATION_QM ${TARGET_TRANSLATIONS})
