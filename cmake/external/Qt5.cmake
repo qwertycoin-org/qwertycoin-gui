@@ -5,7 +5,7 @@ set(CMAKE_AUTOMOC ON) # Instruct CMake to run moc automatically when needed
 set(CMAKE_AUTOUIC OFF) # Create code from a list of Qt designer ui files
 set(CMAKE_AUTORCC ON) # Automatically handle Qt resource files
 
-set(Qt5_COMPONENTS Core Gui Network Widgets)
+set(Qt5_COMPONENTS Core Gui LinguistTools Network Widgets)
 if (APPLE)
     list(APPEND Qt5_COMPONENTS PrintSupport)
 endif ()
