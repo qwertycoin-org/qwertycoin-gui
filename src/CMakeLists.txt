@@ -169,6 +169,25 @@ set(TARGET_SRC
     "${CMAKE_CURRENT_LIST_DIR}/gui/WalletEvents.h"
     ${TARGET_UI}
 )
+
+set(TARGET_TRANSLATIONS
+    "${CMAKE_CURRENT_LIST_DIR}/languages/ar.ts"
+    "${CMAKE_CURRENT_LIST_DIR}/languages/be.ts"
+    "${CMAKE_CURRENT_LIST_DIR}/languages/de.ts"
+    "${CMAKE_CURRENT_LIST_DIR}/languages/en.ts"
+    "${CMAKE_CURRENT_LIST_DIR}/languages/es.ts"
+    "${CMAKE_CURRENT_LIST_DIR}/languages/fa.ts"
+    "${CMAKE_CURRENT_LIST_DIR}/languages/fr.ts"
+    "${CMAKE_CURRENT_LIST_DIR}/languages/hi.ts"
+    "${CMAKE_CURRENT_LIST_DIR}/languages/it.ts"
+    "${CMAKE_CURRENT_LIST_DIR}/languages/ja.ts"
+    "${CMAKE_CURRENT_LIST_DIR}/languages/ko.ts"
+    "${CMAKE_CURRENT_LIST_DIR}/languages/pl.ts"
+    "${CMAKE_CURRENT_LIST_DIR}/languages/pt.ts"
+    "${CMAKE_CURRENT_LIST_DIR}/languages/ru.ts"
+    "${CMAKE_CURRENT_LIST_DIR}/languages/uk.ts"
+    "${CMAKE_CURRENT_LIST_DIR}/languages/zh.ts"
+)
 if(APPLE)
     list(APPEND TARGET_SRC "${CMAKE_CURRENT_LIST_DIR}/gui/MainWindow.mm")
     list(APPEND TARGET_SRC "${CMAKE_CURRENT_LIST_DIR}/gui/macdockiconhandler.h")
@@ -360,7 +379,7 @@ elseif(PROJECT_OS_WINDOWS) # Windows
             JOIN " " WINDEPLOYQT_COMMANDS
             COMMAND "\"${CMAKE_COMMAND}\"" -E remove_directory "\"${WINDEPLOYQT_TMP_DIR}\""
             COMMAND "\"${CMAKE_COMMAND}\"" -E make_directory "\"${WINDEPLOYQT_TMP_DIR}\""
-            COMMAND "\"${WINDEPLOYQT_EXE}\"" --dir "\"${WINDEPLOYQT_TMP_DIR}\"" "\"${WINDEPLOYQT_TARGET}\""
+            COMMAND "\"${WINDEPLOYQT_EXE}\"" --no-translations --dir "\"${WINDEPLOYQT_TMP_DIR}\"" "\"${WINDEPLOYQT_TARGET}\""
         )
 
         # execute windeployqt in a tmp directory
@@ -387,4 +406,18 @@ elseif(PROJECT_OS_WINDOWS) # Windows
     )
 else() # unknown
     message(WARNING "Can't detect platform. Installation targets are not configured!")
+endif()
+
+# translation stuff
+set_directory_properties(PROPERTIES CLEAN_NO_CUSTOM 1)
+
+qt5_create_translation(TRANSLATION_MESSAGES ${FILES_TO_TRANSLATE} ${TRANSLATION_FILES})
+qt5_add_translation(TRANSLATION_QM ${TARGET_TRANSLATIONS})
+add_custom_target(translations_update DEPENDS ${TRANSLATION_MESSAGES})
+add_custom_target(translations DEPENDS ${TRANSLATION_QM})
+
+if(APPLE AND UNIX) ## OSX
+	install(FILES ${TRANSLATION_QM} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_DISPLAY_NAME}.app/Contents/Resources/translations")
+else()
+	install(FILES ${TRANSLATION_QM} DESTINATION translations)
 endif()

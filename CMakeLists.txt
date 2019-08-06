@@ -73,7 +73,7 @@ if(GIT_FOUND)
     endif()
 endif()
 
-set(PROJECT_DISPLAY_NAME "Qwertycoin")
+set(PROJECT_DISPLAY_NAME "Qwertycoin-GUI")
 set(PROJECT_SHORT_NAME "qwcg")
 set(PROJECT_CURRENCY_TICKER "QWC")
 set(PROJECT_NAME "qwertycoin-gui")
