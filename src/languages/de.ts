@@ -2170,7 +2170,7 @@ Bist du sicher?</translation>
         <source>You will be able to send %1
 when the wallet is synchronized</source>
         <translation>Sie können  %1 senden
-wenn die Brieftasche die Synchronisation beendet</translation>
+wenn die Brieftasche synchron ist</translation>
     </message>
 </context>
 <context>
