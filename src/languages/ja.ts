@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ja" sourcelanguage="en">
+<TS version="2.1" language="ja" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -239,12 +239,12 @@
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;strong&gt;%1 QWC&lt;/strong&gt;&lt;を送信してよろしいですか?/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../gui/ui/confirmsenddialog.ui" line="75"/>
+        <location filename="../gui/ui/confirmsenddialog.ui" line="85"/>
         <source>Yes</source>
         <translation>はい</translation>
     </message>
     <message>
-        <location filename="../gui/ui/confirmsenddialog.ui" line="86"/>
+        <location filename="../gui/ui/confirmsenddialog.ui" line="96"/>
         <source>Cancel</source>
         <translation>キャンセル</translation>
     </message>
@@ -318,8 +318,12 @@
     </message>
     <message>
         <location filename="../gui/ui/connectionsettingsdialog.ui" line="251"/>
+        <source>Wallet will connect to remote node running in local or global network. Please select node or specify IP address or domain name and port. In this mode wallet sends 0.25% fee from each transaction to the node, but no more than 100 QWC.</source>
+        <translation type="unfinished">ウォレットは、ローカルまたはグローバルネットワークで実行されているリモートノードに接続されます。ノードを選択するか、IPアドレス、ドメイン名、ポートを指定してください。このモードでは、ウォレットはトランザクション毎に0.25%の手数料をそのノードに送付しますが、最大でも1QWCです。 {0.25%?} {100 ?}</translation>
+    </message>
+    <message>
         <source>Wallet will connect to remote node running in local or global network. Please select node or specify IP address or domain name and port. In this mode wallet sends 0.25% fee from each transaction to the node, but no more than 1 QWC.</source>
-        <translation>ウォレットは、ローカルまたはグローバルネットワークで実行されているリモートノードに接続されます。ノードを選択するか、IPアドレス、ドメイン名、ポートを指定してください。このモードでは、ウォレットはトランザクション毎に0.25%の手数料をそのノードに送付しますが、最大でも1QWCです。</translation>
+        <translation type="vanished">ウォレットは、ローカルまたはグローバルネットワークで実行されているリモートノードに接続されます。ノードを選択するか、IPアドレス、ドメイン名、ポートを指定してください。このモードでは、ウォレットはトランザクション毎に0.25%の手数料をそのノードに送付しますが、最大でも1QWCです。</translation>
     </message>
 </context>
 <context>
@@ -694,7 +698,7 @@ Please wait...</source>
     </message>
     <message>
         <source>Mining</source>
-        <translation>マイニング</translation>
+        <translation type="vanished">マイニング</translation>
     </message>
     <message>
         <location filename="../gui/ui/mainwindow.ui" line="522"/>
@@ -769,7 +773,7 @@ Please wait...</source>
     </message>
     <message>
         <source>Start pool mining automatically</source>
-        <translation>自動プールマイニング開始</translation>
+        <translation type="vanished">自動プールマイニング開始</translation>
     </message>
     <message>
         <location filename="../gui/ui/mainwindow.ui" line="601"/>
@@ -781,47 +785,47 @@ Please wait...</source>
     <name>MiningFrame</name>
     <message>
         <source>Pool mining</source>
-        <translation>プールマイニング</translation>
+        <translation type="vanished">プールマイニング</translation>
     </message>
     <message>
         <source>Add pool</source>
-        <translation>プール追加</translation>
+        <translation type="vanished">プール追加</translation>
     </message>
     <message>
         <source>Select pool</source>
-        <translation>プール選択</translation>
+        <translation type="vanished">プール選択</translation>
     </message>
     <message>
         <source>Start mining</source>
-        <translation>マイニング開始</translation>
+        <translation type="vanished">マイニング開始</translation>
     </message>
     <message>
         <source>Stop mining</source>
-        <translation>マイニング停止</translation>
+        <translation type="vanished">マイニング停止</translation>
     </message>
     <message>
         <source>Stopped</source>
-        <translation>停止</translation>
+        <translation type="vanished">停止</translation>
     </message>
     <message>
         <source>Mining status:</source>
-        <translation>マイニング 状態:</translation>
+        <translation type="vanished">マイニング 状態:</translation>
     </message>
     <message>
         <source>Remove pool</source>
-        <translation>プール消去</translation>
+        <translation type="vanished">プール消去</translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation>設定</translation>
+        <translation type="vanished">設定</translation>
     </message>
     <message>
         <source>CPU cores</source>
-        <translation>CPUのコア</translation>
+        <translation type="vanished">CPUのコア</translation>
     </message>
     <message>
         <source>Solo mining</source>
-        <translation>ソロマイニング</translation>
+        <translation type="vanished">ソロマイニング</translation>
     </message>
 </context>
 <context>
@@ -940,19 +944,19 @@ Please wait...</source>
     <name>NewPoolDialog</name>
     <message>
         <source>New pool</source>
-        <translation>新プール</translation>
+        <translation type="vanished">新プール</translation>
     </message>
     <message>
         <source>Host:</source>
-        <translation>ホスト:</translation>
+        <translation type="vanished">ホスト:</translation>
     </message>
     <message>
         <source>Port:</source>
-        <translation>ポート:</translation>
+        <translation type="vanished">ポート:</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>キャンセル</translation>
+        <translation type="vanished">キャンセル</translation>
     </message>
 </context>
 <context>
@@ -1163,7 +1167,7 @@ Please wait...</source>
     <name>PrivateKeysDialog</name>
     <message>
         <source>Private Key</source>
-        <translation>プライベートキー</translation>
+        <translation type="vanished">プライベートキー</translation>
     </message>
     <message>
         <location filename="../gui/ui/privatekeysdialog.ui" line="26"/>
@@ -1194,7 +1198,7 @@ Please wait...</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="665"/>
+        <location filename="../gui/MainWindow.cpp" line="672"/>
         <location filename="../main.cpp" line="70"/>
         <source>Help</source>
         <translation>ヘルプ</translation>
@@ -1343,20 +1347,19 @@ Do you want to go to download page?</source>
     </message>
     <message>
         <source>Anonymity level:</source>
-        <translation>匿名性レベル:</translation>
+        <translation type="vanished">匿名性レベル:</translation>
     </message>
     <message>
-        <location filename="../gui/ui/sendframe.ui" line="167"/>
         <source>Donate 0.1% to development fund:</source>
-        <translation>開発資金へ0.1%寄付:</translation>
+        <translation type="vanished">開発資金へ0.1%寄付:</translation>
     </message>
     <message>
         <source>Fee:</source>
-        <translation>手数料:</translation>
+        <translation type="vanished">手数料:</translation>
     </message>
     <message>
         <source>PaymentID:</source>
-        <translation>ペイメントID:</translation>
+        <translation type="vanished">ペイメントID:</translation>
     </message>
     <message>
         <location filename="../gui/ui/sendframe.ui" line="127"/>
@@ -1376,6 +1379,11 @@ Do you want to go to download page?</source>
     <message>
         <location filename="../gui/ui/sendframe.ui" line="160"/>
         <source>Anonymity:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/ui/sendframe.ui" line="167"/>
+        <source>Donate 0.1% to foundation fund:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1425,7 +1433,7 @@ Do you want to go to download page?</source>
     </message>
     <message>
         <source>Remote node mode</source>
-        <translation>リモートノードモード</translation>
+        <translation type="vanished">リモートノードモード</translation>
     </message>
     <message>
         <location filename="../gui/ui/sendframe.ui" line="507"/>
@@ -1661,7 +1669,7 @@ Do you want to go to download page?</source>
 <context>
     <name>WalletGui::AboutDialog</name>
     <message>
-        <location filename="../gui/AboutDialog.cpp" line="15"/>
+        <location filename="../gui/AboutDialog.cpp" line="16"/>
         <source>About %1 Wallet</source>
         <translation>%1 ウォレットについて</translation>
     </message>
@@ -1669,7 +1677,7 @@ Do you want to go to download page?</source>
 <context>
     <name>WalletGui::AccountFrame</name>
     <message>
-        <location filename="../gui/AccountFrame.cpp" line="40"/>
+        <location filename="../gui/AccountFrame.cpp" line="41"/>
         <source>Copied to clipboard</source>
         <translation>クリップボードにコピーされた</translation>
     </message>
@@ -1677,58 +1685,58 @@ Do you want to go to download page?</source>
 <context>
     <name>WalletGui::AddressBookFrame</name>
     <message>
-        <location filename="../gui/AddressBookFrame.cpp" line="34"/>
+        <location filename="../gui/AddressBookFrame.cpp" line="35"/>
         <source>&amp;Pay to</source>
         <translation>ペイメント先</translation>
     </message>
     <message>
-        <location filename="../gui/AddressBookFrame.cpp" line="35"/>
+        <location filename="../gui/AddressBookFrame.cpp" line="36"/>
         <source>Copy &amp;label</source>
         <translation>ラベルをコピー</translation>
     </message>
     <message>
-        <location filename="../gui/AddressBookFrame.cpp" line="36"/>
+        <location filename="../gui/AddressBookFrame.cpp" line="37"/>
         <source>Copy &amp;address</source>
         <translation>アドレスをコピー</translation>
     </message>
     <message>
-        <location filename="../gui/AddressBookFrame.cpp" line="37"/>
+        <location filename="../gui/AddressBookFrame.cpp" line="38"/>
         <source>Copy Payment &amp;ID</source>
         <translation>ペイメント&amp;IDをコピー</translation>
     </message>
     <message>
-        <location filename="../gui/AddressBookFrame.cpp" line="38"/>
+        <location filename="../gui/AddressBookFrame.cpp" line="39"/>
         <source>&amp;Edit</source>
         <translation>編集</translation>
     </message>
     <message>
-        <location filename="../gui/AddressBookFrame.cpp" line="39"/>
+        <location filename="../gui/AddressBookFrame.cpp" line="40"/>
         <source>&amp;Delete</source>
         <translation>削除</translation>
     </message>
     <message>
-        <location filename="../gui/AddressBookFrame.cpp" line="59"/>
-        <location filename="../gui/AddressBookFrame.cpp" line="82"/>
-        <location filename="../gui/AddressBookFrame.cpp" line="117"/>
+        <location filename="../gui/AddressBookFrame.cpp" line="60"/>
+        <location filename="../gui/AddressBookFrame.cpp" line="83"/>
+        <location filename="../gui/AddressBookFrame.cpp" line="118"/>
         <source>Invalid address</source>
         <translation>無効なアドレス</translation>
     </message>
     <message>
-        <location filename="../gui/AddressBookFrame.cpp" line="64"/>
-        <location filename="../gui/AddressBookFrame.cpp" line="87"/>
-        <location filename="../gui/AddressBookFrame.cpp" line="122"/>
+        <location filename="../gui/AddressBookFrame.cpp" line="65"/>
+        <location filename="../gui/AddressBookFrame.cpp" line="88"/>
+        <location filename="../gui/AddressBookFrame.cpp" line="123"/>
         <source>Invalid payment ID</source>
         <translation>無効なペイメントID</translation>
     </message>
     <message>
-        <location filename="../gui/AddressBookFrame.cpp" line="71"/>
-        <location filename="../gui/AddressBookFrame.cpp" line="94"/>
-        <location filename="../gui/AddressBookFrame.cpp" line="129"/>
+        <location filename="../gui/AddressBookFrame.cpp" line="72"/>
+        <location filename="../gui/AddressBookFrame.cpp" line="95"/>
+        <location filename="../gui/AddressBookFrame.cpp" line="130"/>
         <source>Contact with such label already exists.</source>
         <translation>同じラベルの連絡先が既に存在します。</translation>
     </message>
     <message>
-        <location filename="../gui/AddressBookFrame.cpp" line="108"/>
+        <location filename="../gui/AddressBookFrame.cpp" line="109"/>
         <source>Edit contact</source>
         <translation>連絡先編集</translation>
     </message>
@@ -1846,11 +1854,21 @@ Do you want to go to download page?</source>
     </message>
     <message>
         <location filename="../CommandLineParser.cpp" line="30"/>
+        <source>Rollback to height</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CommandLineParser.cpp" line="30"/>
+        <source>height</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../CommandLineParser.cpp" line="31"/>
         <source>Run application in minimized mode</source>
         <translation>最小化モードでアプリケーションを実行</translation>
     </message>
     <message>
-        <location filename="../CommandLineParser.cpp" line="31"/>
+        <location filename="../CommandLineParser.cpp" line="32"/>
         <source>Qwertycoin wallet</source>
         <translation>カルボウォレット</translation>
     </message>
@@ -1858,30 +1876,35 @@ Do you want to go to download page?</source>
 <context>
     <name>WalletGui::ConfirmSendDialog</name>
     <message>
-        <location filename="../gui/ConfirmSendDialog.cpp" line="20"/>
+        <location filename="../gui/ConfirmSendDialog.cpp" line="21"/>
         <source>Confirm sending %1 QWC</source>
         <translation>%1 QWCの送信を確認</translation>
     </message>
     <message>
-        <location filename="../gui/ConfirmSendDialog.cpp" line="25"/>
+        <location filename="../gui/ConfirmSendDialog.cpp" line="27"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Payment ID: %1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>ペイメントID: %1</translation>
     </message>
     <message>
-        <location filename="../gui/ConfirmSendDialog.cpp" line="29"/>
+        <location filename="../gui/ConfirmSendDialog.cpp" line="31"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Are you sure you want to send &lt;strong&gt;without Payment ID&lt;/strong&gt;?&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>支払いIDなしで送信してもよろしいでしょうか？</translation>
+    </message>
+    <message>
+        <location filename="../gui/ConfirmSendDialog.cpp" line="35"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Are you sure you want donate &lt;strong&gt;%1 QWC&lt;/strong&gt;?&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>WalletGui::ExportTrackingKeyDialog</name>
     <message>
-        <location filename="../gui/ExportTrackingKeyDialog.cpp" line="55"/>
+        <location filename="../gui/ExportTrackingKeyDialog.cpp" line="56"/>
         <source>Save tracking key to...</source>
         <translation>トラッキングキーを...保存</translation>
     </message>
     <message>
-        <location filename="../gui/ExportTrackingKeyDialog.cpp" line="55"/>
+        <location filename="../gui/ExportTrackingKeyDialog.cpp" line="56"/>
         <source>Tracking key (*.trackingkey)</source>
         <translation>トラッキングキー (*.trackingkey)</translation>
     </message>
@@ -1889,7 +1912,7 @@ Do you want to go to download page?</source>
 <context>
     <name>WalletGui::GetBalanceProofDialog</name>
     <message>
-        <location filename="../gui/GetBalanceProofDialog.cpp" line="57"/>
+        <location filename="../gui/GetBalanceProofDialog.cpp" line="62"/>
         <source>Save as</source>
         <translation>ファイル保存</translation>
     </message>
@@ -1897,12 +1920,12 @@ Do you want to go to download page?</source>
 <context>
     <name>WalletGui::ImportKeyDialog</name>
     <message>
-        <location filename="../gui/ImportKeyDialog.cpp" line="33"/>
+        <location filename="../gui/ImportKeyDialog.cpp" line="34"/>
         <source>Wallet file</source>
         <translation>ウォレットファイル</translation>
     </message>
     <message>
-        <location filename="../gui/ImportKeyDialog.cpp" line="40"/>
+        <location filename="../gui/ImportKeyDialog.cpp" line="41"/>
         <source>Wallets (*.wallet)</source>
         <translation>ウォレット (*.wallet)</translation>
     </message>
@@ -1910,12 +1933,12 @@ Do you want to go to download page?</source>
 <context>
     <name>WalletGui::ImportTrackingKeyDialog</name>
     <message>
-        <location filename="../gui/ImportTrackingKeyDialog.cpp" line="33"/>
+        <location filename="../gui/ImportTrackingKeyDialog.cpp" line="34"/>
         <source>Tracking wallet file</source>
         <translation>トラッキングウォレットファイル</translation>
     </message>
     <message>
-        <location filename="../gui/ImportTrackingKeyDialog.cpp" line="40"/>
+        <location filename="../gui/ImportTrackingKeyDialog.cpp" line="41"/>
         <source>Tracking wallets (*.wallet)</source>
         <translation>トラッキングウォレット (*.wallet)</translation>
     </message>
@@ -1923,26 +1946,26 @@ Do you want to go to download page?</source>
 <context>
     <name>WalletGui::InfoDialog</name>
     <message>
-        <location filename="../gui/InfoDialog.cpp" line="31"/>
+        <location filename="../gui/InfoDialog.cpp" line="32"/>
         <source>%1 (Outgoing: %2, Incoming: %3)</source>
         <translation>%1 (アウトゴーイング: %2, インカミング: %3)</translation>
     </message>
     <message>
-        <location filename="../gui/InfoDialog.cpp" line="35"/>
+        <location filename="../gui/InfoDialog.cpp" line="36"/>
         <source>White: %1, Grey: %2</source>
         <translation>ホワイト: %1, グレー: %2</translation>
     </message>
     <message>
-        <location filename="../gui/InfoDialog.cpp" line="39"/>
+        <location filename="../gui/InfoDialog.cpp" line="40"/>
         <source>Known: %1, Local: %2</source>
         <translation>既知: %1, ローカル: %2</translation>
     </message>
     <message>
-        <location filename="../gui/InfoDialog.cpp" line="42"/>
-        <location filename="../gui/InfoDialog.cpp" line="45"/>
-        <location filename="../gui/InfoDialog.cpp" line="48"/>
-        <location filename="../gui/InfoDialog.cpp" line="51"/>
-        <location filename="../gui/InfoDialog.cpp" line="54"/>
+        <location filename="../gui/InfoDialog.cpp" line="43"/>
+        <location filename="../gui/InfoDialog.cpp" line="46"/>
+        <location filename="../gui/InfoDialog.cpp" line="49"/>
+        <location filename="../gui/InfoDialog.cpp" line="52"/>
+        <location filename="../gui/InfoDialog.cpp" line="55"/>
         <source>%1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1951,7 +1974,7 @@ Do you want to go to download page?</source>
     <name>WalletGui::MainWindow</name>
     <message>
         <location filename="../gui/MainWindow.cpp" line="138"/>
-        <location filename="../gui/MainWindow.cpp" line="1041"/>
+        <location filename="../gui/MainWindow.cpp" line="1058"/>
         <source>Qwertycoin Wallet %1</source>
         <translation>カルボウォレット %1</translation>
     </message>
@@ -1989,202 +2012,212 @@ Do you want to go to download page?</source>
     <message>
         <location filename="../gui/MainWindow.cpp" line="338"/>
         <location filename="../gui/MainWindow.cpp" line="367"/>
-        <location filename="../gui/MainWindow.cpp" line="720"/>
+        <location filename="../gui/MainWindow.cpp" line="727"/>
         <source>Wallets (*.wallet)</source>
         <translation>ウォレット (*.wallet)</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="389"/>
+        <location filename="../gui/MainWindow.cpp" line="400"/>
         <source>Open .wallet/.keys file</source>
         <translation>.wallet/.keysファイルを開く</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="396"/>
+        <location filename="../gui/MainWindow.cpp" line="402"/>
         <source>Wallet (*.wallet *.keys)</source>
         <translation>ウォレット (*.wallet *.keys)</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="401"/>
+        <location filename="../gui/MainWindow.cpp" line="407"/>
         <source>Wrong wallet file extension</source>
         <translation>ウォレットファイルの拡張子が間違っています</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="402"/>
+        <location filename="../gui/MainWindow.cpp" line="408"/>
         <source>Wrong wallet file extension, wallet file should have &quot;.wallet&quot;, &quot;.keys&quot; or &quot;.trackingwallet&quot; extension.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="454"/>
+        <location filename="../gui/MainWindow.cpp" line="460"/>
         <source>Wallet keys are not valid</source>
         <translation>ウォレットキーは無効です</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="454"/>
+        <location filename="../gui/MainWindow.cpp" line="460"/>
         <source>The private keys you entered are not valid.</source>
         <translation>あなたが入力したプライベートキーは無効です。</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="468"/>
+        <location filename="../gui/MainWindow.cpp" line="474"/>
         <source>Tracking key is not valid</source>
         <translation>トラッキングキーは無効です</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="468"/>
+        <location filename="../gui/MainWindow.cpp" line="474"/>
         <source>The tracking key you entered is not valid.</source>
         <translation>あなたが入力したトラッキングキーは無効です。</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="499"/>
-        <location filename="../gui/MainWindow.cpp" line="503"/>
-        <location filename="../gui/MainWindow.cpp" line="507"/>
-        <location filename="../gui/MainWindow.cpp" line="511"/>
+        <location filename="../gui/MainWindow.cpp" line="505"/>
+        <location filename="../gui/MainWindow.cpp" line="509"/>
+        <location filename="../gui/MainWindow.cpp" line="513"/>
+        <location filename="../gui/MainWindow.cpp" line="517"/>
         <source>Key is not valid</source>
         <translation>キーは無効です</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="499"/>
+        <location filename="../gui/MainWindow.cpp" line="505"/>
         <source>The public spend key you entered is not valid.</source>
         <translation>あなたが入力したパブリックスペンドキーは無効です。</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="503"/>
+        <location filename="../gui/MainWindow.cpp" line="509"/>
         <source>The public view key you entered is not valid.</source>
         <translation>あなたが入力したパブリックビューキーは無効です。</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="507"/>
+        <location filename="../gui/MainWindow.cpp" line="513"/>
         <source>The private spend key you entered is not valid.</source>
         <translation>あなたが入力したプライベートスペンドキーは無効です。</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="511"/>
+        <location filename="../gui/MainWindow.cpp" line="517"/>
         <source>The private view key you entered is not valid.</source>
         <translation>あなたが入力したプライベートビューキーは無効です。</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="573"/>
+        <location filename="../gui/MainWindow.cpp" line="580"/>
         <source>Mnemonic seed is not correct</source>
         <translation>ニーモニックシードが正しくありません。</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="573"/>
+        <location filename="../gui/MainWindow.cpp" line="580"/>
         <source>There must be an error in mnemonic seed. Make sure you entered it correctly.</source>
         <translation>ニーモニックシードにエラーがあります。正しく入力したか確認してください。</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="656"/>
+        <location filename="../gui/MainWindow.cpp" line="663"/>
         <source>Language changed to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="657"/>
+        <location filename="../gui/MainWindow.cpp" line="664"/>
         <source>Language was changed</source>
         <translation>言語は変更されました。</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="658"/>
+        <location filename="../gui/MainWindow.cpp" line="665"/>
         <source>Language changed to %1. The change will take effect after restarting the wallet.</source>
         <translation>ウォレットの再起動後に言語が変更されます。</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="668"/>
+        <location filename="../gui/MainWindow.cpp" line="675"/>
         <source>More info can be found at www.qwertycoin.org in Documentation section</source>
         <translation>詳細情報はwww.qwertycoin.orgのDocumentationセクションにあります。</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="693"/>
+        <location filename="../gui/MainWindow.cpp" line="700"/>
         <source>Connection settings changed</source>
         <translation>接続設定は変更されました</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="693"/>
+        <location filename="../gui/MainWindow.cpp" line="700"/>
         <source>Connection mode will be changed after restarting the wallet.</source>
         <translation>ウォレットの再起動後に接続モードが変更されます。</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="713"/>
+        <location filename="../gui/MainWindow.cpp" line="720"/>
         <source>Backup wallet to...</source>
         <translation>...へウォレットをバックアップ</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="733"/>
+        <location filename="../gui/MainWindow.cpp" line="740"/>
         <source>Warning</source>
         <translation>警告</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="733"/>
+        <location filename="../gui/MainWindow.cpp" line="740"/>
         <source>Your wallet will be reset and restored from blockchain.
 Are you sure?</source>
         <translation>ウォレットがリセットされ、ブロックチェーンから復元されます。本当に実行してもよろしいでしょうか？</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="894"/>
+        <location filename="../gui/MainWindow.cpp" line="901"/>
         <source>Wallet error</source>
         <translation>ウォレットエラー</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="897"/>
+        <location filename="../gui/MainWindow.cpp" line="904"/>
         <source>Wallet</source>
         <translation>ウォレット</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="918"/>
+        <location filename="../gui/MainWindow.cpp" line="925"/>
         <source>Encrypted</source>
         <translation>暗号化</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="918"/>
+        <location filename="../gui/MainWindow.cpp" line="925"/>
         <source>Not encrypted</source>
         <translation>暗号化されていない</translation>
     </message>
     <message numerus="yes">
-        <location filename="../gui/MainWindow.cpp" line="926"/>
+        <location filename="../gui/MainWindow.cpp" line="933"/>
         <source>%n active connection(s)</source>
         <translation>
             <numerusform>%n アクティブコネクション</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="931"/>
+        <location filename="../gui/MainWindow.cpp" line="938"/>
         <source>Synchronization in progress</source>
         <translation>同期化進行中</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="938"/>
+        <location filename="../gui/MainWindow.cpp" line="946"/>
         <source>Not synchronized</source>
         <translation>同期化されていない</translation>
     </message>
     <message>
-        <location filename="../gui/MainWindow.cpp" line="938"/>
+        <location filename="../gui/MainWindow.cpp" line="946"/>
         <source>Synchronized</source>
         <translation>同期化</translation>
+    </message>
+    <message>
+        <location filename="../gui/MainWindow.cpp" line="979"/>
+        <source>%1 - Qwertycoin Wallet %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../gui/MainWindow.cpp" line="1026"/>
+        <source>Qwertycoin Wallet %2</source>
+        <translation type="unfinished">カルボウォレット %2</translation>
     </message>
 </context>
 <context>
     <name>WalletGui::MiningFrame</name>
     <message>
         <source>Mining in pool. Hashrate: %1 H/s</source>
-        <translation>マイニングインプール. ハッシュレート: %1 H/s</translation>
+        <translation type="vanished">マイニングインプール. ハッシュレート: %1 H/s</translation>
     </message>
     <message>
         <source>Mining solo. Hashrate: %1 H/s</source>
-        <translation>マイニングソロ. ハッシュレート: %1 H/s</translation>
+        <translation type="vanished">マイニングソロ. ハッシュレート: %1 H/s</translation>
     </message>
     <message>
         <source>Error: %1</source>
-        <translation>エラー: %1</translation>
+        <translation type="vanished">エラー: %1</translation>
     </message>
     <message>
         <source>Starting...</source>
-        <translation>開始...</translation>
+        <translation type="vanished">開始...</translation>
     </message>
     <message>
         <source>Stopped</source>
-        <translation>停止</translation>
+        <translation type="vanished">停止</translation>
     </message>
     <message>
         <source>Starting solo minining...</source>
-        <translation>ソロマイング開始中...</translation>
+        <translation type="vanished">ソロマイング開始中...</translation>
     </message>
 </context>
 <context>
@@ -2285,7 +2318,7 @@ Are you sure?</source>
     <name>WalletGui::PoolModel</name>
     <message>
         <source>Pool URL</source>
-        <translation>プールURL</translation>
+        <translation type="vanished">プールURL</translation>
     </message>
 </context>
 <context>
@@ -2317,12 +2350,12 @@ Are you sure?</source>
 <context>
     <name>WalletGui::RestoreFromMnemonicSeedDialog</name>
     <message>
-        <location filename="../gui/RestoreFromMnemonicSeedDialog.cpp" line="31"/>
+        <location filename="../gui/RestoreFromMnemonicSeedDialog.cpp" line="32"/>
         <source>Wallet file</source>
         <translation>ウォレットファイル</translation>
     </message>
     <message>
-        <location filename="../gui/RestoreFromMnemonicSeedDialog.cpp" line="38"/>
+        <location filename="../gui/RestoreFromMnemonicSeedDialog.cpp" line="39"/>
         <source>Wallets (*.wallet)</source>
         <translation>ウォレット (*.wallet)</translation>
     </message>
@@ -2330,63 +2363,63 @@ Are you sure?</source>
 <context>
     <name>WalletGui::SendFrame</name>
     <message>
-        <location filename="../gui/SendFrame.cpp" line="59"/>
+        <location filename="../gui/SendFrame.cpp" line="73"/>
         <source>Low</source>
         <translation>低い</translation>
     </message>
     <message>
-        <location filename="../gui/SendFrame.cpp" line="60"/>
+        <location filename="../gui/SendFrame.cpp" line="74"/>
         <source>Normal</source>
         <translation>正常</translation>
     </message>
     <message>
-        <location filename="../gui/SendFrame.cpp" line="61"/>
+        <location filename="../gui/SendFrame.cpp" line="75"/>
         <source>High</source>
         <translation>高い</translation>
     </message>
     <message>
-        <location filename="../gui/SendFrame.cpp" line="62"/>
+        <location filename="../gui/SendFrame.cpp" line="76"/>
         <source>Highest</source>
         <translation>最高</translation>
     </message>
     <message>
-        <location filename="../gui/SendFrame.cpp" line="225"/>
+        <location filename="../gui/SendFrame.cpp" line="239"/>
         <source>Node fee: %1 %2</source>
         <translation>ノードの手数料: %1 %2</translation>
     </message>
     <message>
-        <location filename="../gui/SendFrame.cpp" line="258"/>
+        <location filename="../gui/SendFrame.cpp" line="272"/>
         <source>Payment request should start with qwertycoin:</source>
         <translation>ペイメントリクエストはkarbowanecで始めなくてなならない</translation>
     </message>
     <message>
-        <location filename="../gui/SendFrame.cpp" line="272"/>
-        <location filename="../gui/SendFrame.cpp" line="313"/>
+        <location filename="../gui/SendFrame.cpp" line="286"/>
+        <location filename="../gui/SendFrame.cpp" line="330"/>
         <source>Invalid recipient address</source>
         <translation>無効な受領者アドレス</translation>
     </message>
     <message>
-        <location filename="../gui/SendFrame.cpp" line="352"/>
+        <location filename="../gui/SendFrame.cpp" line="369"/>
         <source>Incorrect fee value</source>
         <translation>正しくない手数料の値</translation>
     </message>
     <message>
-        <location filename="../gui/SendFrame.cpp" line="361"/>
+        <location filename="../gui/SendFrame.cpp" line="378"/>
         <source>Insufficient balance</source>
         <translation>残高不足</translation>
     </message>
     <message>
-        <location filename="../gui/SendFrame.cpp" line="361"/>
+        <location filename="../gui/SendFrame.cpp" line="378"/>
         <source>Available balance is insufficient to send this transaction. Have you excluded a fee?</source>
         <translation>このトランザクションを送信するための利用可能残高が不足しています。手数料を除外しましたか？</translation>
     </message>
     <message>
-        <location filename="../gui/SendFrame.cpp" line="368"/>
+        <location filename="../gui/SendFrame.cpp" line="385"/>
         <source>Invalid payment ID</source>
         <translation>無効なペイメントID</translation>
     </message>
     <message>
-        <location filename="../gui/SendFrame.cpp" line="435"/>
+        <location filename="../gui/SendFrame.cpp" line="452"/>
         <source>You have unmixable dust on balance. Use menu &apos;Wallet -&gt; Sweep unmixable&apos; first.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2470,8 +2503,8 @@ when the wallet is synchronized</source>
         </translation>
     </message>
     <message>
-        <location filename="../gui/TransactionDetailsDialog.cpp" line="72"/>
         <location filename="../gui/TransactionDetailsDialog.cpp" line="73"/>
+        <location filename="../gui/TransactionDetailsDialog.cpp" line="74"/>
         <source>(n/a)</source>
         <translation type="unfinished"></translation>
     </message>
