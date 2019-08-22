@@ -11,11 +11,11 @@ environment:
         BOOST_LIBRARYDIR: "C:/Libraries/boost_1_70_0/lib64-msvc-14.1"
         Qt5_DIR: "C:/Qt/5.12/msvc2017_64/lib/cmake/Qt5"
     matrix:
-#        - Purpose: "WindowsDebugBuild"
-#          QWC_GENERATOR_NAME: "Visual Studio 15 2017 Win64"
-#          QWC_BUILD_TYPE: "Debug"
-#          QWC_TOOLCHAIN_FILE_NAME: "cmake/polly/vs-15-2017-win64.cmake"
-#          QWC_TESTS_REGEXP: "NONE"
+        - Purpose: "WindowsDebugBuild"
+          QWC_GENERATOR_NAME: "Visual Studio 15 2017 Win64"
+          QWC_BUILD_TYPE: "Debug"
+          QWC_TOOLCHAIN_FILE_NAME: "cmake/polly/vs-15-2017-win64.cmake"
+          QWC_TESTS_REGEXP: "NONE"
         - Purpose: "WindowsReleaseBuild"
           QWC_GENERATOR_NAME: "Visual Studio 15 2017 Win64"
           QWC_BUILD_TYPE: "Release"
@@ -46,10 +46,10 @@ deploy:
     description: "Qwertycoin GUI release"
     provider: GitHub
     auth_token:
-        secure: "4VgHg760VN6gCaRp6++fnkyxTe/p4vZ8DCNry0YDRhI6O4Pml9+29kfBv2WIjROA"
+        secure: "2+Ji3AkIi/6n3bNzeQNvr7ZKetnvNC/K5czk1iDU5OQHiozVan1ksMw3Nk1GTssO"
     artifact: /qwertycoin-gui-.*\.exe/
     draft: true
     prerelease: true
     on:
-        APPVEYOR_REPO_TAG: false
+        APPVEYOR_REPO_TAG: true
         QWC_BUILD_TYPE: "Release"
