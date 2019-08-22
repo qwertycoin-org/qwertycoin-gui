@@ -161,7 +161,7 @@ Cryptonote Developers, Bytecoin Developers, Monero Developers, Karbo Developers,
 
 ### Copypasta for license when editing files  <a name="copypasta"></a>
 
-Hi Qwertycoin contributor, thanks for forking and sending back Pull Requests. Extensive docs about contributing are in the works or elsewhere. For now this is the bit we need to get into all the files we touch. Please add it to the top of the files, see [src/config/CryptoNoteConfig.h](https://github.com/qwertycoin-org/qwertycoin/blob/master/src/config/CryptoNoteConfig.h) for an example.
+Hi Qwertycoin contributor, thanks for forking and sending back Pull Requests. Extensive docs about contributing are in the works or elsewhere. For now this is the bit we need to get into all the files we touch. Please add it to the top of the files, see [lib/Global/CryptoNoteConfig.h](https://github.com/qwertycoin-org/qwertycoin/blob/master/lib/Global/CryptoNoteConfig.h) for an example.
 
 ```
 // Copyright (c) 2018-2019, The Qwertycoin Developers

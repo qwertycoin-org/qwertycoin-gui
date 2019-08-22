@@ -18,6 +18,8 @@
 #include "AddressBookModel.h"
 #include "WalletAdapter.h"
 
+using namespace Qwertycoin;
+
 namespace WalletGui {
 
 namespace {
@@ -408,7 +410,7 @@ QVariant TransactionsModel::getUserRole(const QModelIndex& _index, int _role, Cr
   case ROLE_SECRET_KEY: {
     if (_transaction.secretKey) {
       Crypto::SecretKey txkey = _transaction.secretKey.get();
-      if (txkey != CryptoNote::NULL_SECRET_KEY) {
+      if (txkey != NULL_SECRET_KEY) {
         return QByteArray(reinterpret_cast<char*>(&txkey), sizeof(txkey));
       }
     }

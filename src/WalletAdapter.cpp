@@ -18,6 +18,7 @@
 #include <Common/Util.h>
 #include <Wallet/WalletErrors.h>
 #include <Wallet/LegacyKeysImporter.h>
+#include <Global/Constants.h>
 #include "CryptoNoteCore/CryptoNoteBasic.h"
 
 #include "NodeAdapter.h"
@@ -31,6 +32,8 @@ extern "C"
 #include "crypto/keccak.h"
 #include "crypto/crypto-ops.h"
 }
+
+using namespace Qwertycoin;
 
 namespace WalletGui {
 
@@ -335,7 +338,7 @@ Crypto::SecretKey WalletAdapter::getTxKey(Crypto::Hash& txid) {
   } catch (std::system_error&) {
   }
 
-  return CryptoNote::NULL_SECRET_KEY;
+  return NULL_SECRET_KEY;
 }
 
 void WalletAdapter::sendTransaction(const std::vector<CryptoNote::WalletLegacyTransfer>& _transfers, quint64 _fee, const QString& _paymentId, quint64 _mixin) {

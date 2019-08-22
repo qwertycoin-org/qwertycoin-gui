@@ -4,7 +4,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <Common/Util.h>
-#include <config/CryptoNoteConfig.h>
+#include <Global/CryptoNoteConfig.h>
 
 #include "CommandLineParser.h"
 
