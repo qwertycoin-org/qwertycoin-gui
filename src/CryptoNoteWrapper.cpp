@@ -5,7 +5,6 @@
 
 #include <limits>
 #include "CryptoNoteWrapper.h"
-#include "config/Checkpoints.h"
 #include "CryptoNoteCore/CryptoNoteBasicImpl.h"
 #include "CryptoNoteCore/CryptoNoteFormatUtils.h"
 #include "CryptoNoteCore/Currency.h"
@@ -25,6 +24,7 @@
 #include "System/Dispatcher.h"
 #include "CurrencyAdapter.h"
 #include "Settings.h"
+#include <Global/Checkpoints.h>
 #include <QDebug>
 
 namespace WalletGui {

@@ -18,12 +18,12 @@ TranslatorManager::TranslatorManager()
 
 #if defined(_MSC_VER)
   m_langPath = QApplication::applicationDirPath();
-  m_langPath.append("/languages");
+  m_langPath.append("/translations");
 #elif defined(Q_OS_MAC)
   m_langPath = QApplication::applicationDirPath();
-  m_langPath = m_langPath + "/../Resources/languages/";
+  m_langPath = m_langPath + "/../Resources/translations/";
 #else
-  m_langPath = "/opt/karbo/languages";
+  m_langPath = "/opt/karbo/translations";
 #endif
 
     QDir dir(m_langPath);
@@ -44,7 +44,7 @@ TranslatorManager::TranslatorManager()
             }
         }
     }
-    QStringList resourcesQt = dir.entryList(QStringList("qt_??.qm"));
+    QStringList resourcesQt = dir.entryList(QStringList("??.qm"));
     for (int j = 0; j < resourcesQt.size(); j++)
     {
         QString locale = resourcesQt[j];

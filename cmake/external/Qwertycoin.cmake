@@ -38,7 +38,6 @@ set(QwertycoinFramework_INCLUDE_DIRS
     "${SOURCE_DIR}/lib"
     "${BINARY_DIR}/lib"
     "${BINARY_DIR}/_ExternalProjects/Install/sparsehash/include"
-    "${SOURCE_DIR}/src" # Temporary hack-ish solution for <config/*> includes.
 )
 if(MSVC)
     list(APPEND QwertycoinFramework_INCLUDE_DIRS "${SOURCE_DIR}/lib/Platform/Windows")
@@ -60,6 +59,7 @@ set(QwertycoinFramework_LIBS
     Crypto
     CryptoNoteCore
     CryptoNoteProtocol
+    Global
     Http
     InProcessNode
     JsonRpcServer
@@ -104,6 +104,7 @@ endforeach()
 target_link_libraries(QwertycoinFramework::Common INTERFACE
     Threads::Threads
     QwertycoinFramework::Crypto
+    QwertycoinFramework::Global
 )
 if(UNIX AND NOT ANDROID)
     target_link_libraries(QwertycoinFramework::Common INTERFACE -lresolv)
@@ -116,17 +117,25 @@ target_link_libraries(QwertycoinFramework::CryptoNoteCore INTERFACE
     QwertycoinFramework::BlockchainExplorer
     QwertycoinFramework::Common
     QwertycoinFramework::Crypto
+    QwertycoinFramework::Global
     QwertycoinFramework::Logging
     QwertycoinFramework::Serialization
+)
+
+# QwertycoinFramework::Global
+target_link_libraries(QwertycoinFramework::Global INTERFACE 
+    QwertycoinFramework::Global
 )
 
 # QwertycoinFramework::InProcessNode
 target_link_libraries(QwertycoinFramework::InProcessNode INTERFACE
     QwertycoinFramework::BlockchainExplorer
+    QwertycoinFramework::Global
 )
 
 # QwertycoinFramework::NodeRpcProxy
 target_link_libraries(QwertycoinFramework::NodeRpcProxy INTERFACE
+    QwertycoinFramework::Global
     QwertycoinFramework::System
 )
 
@@ -134,6 +143,7 @@ target_link_libraries(QwertycoinFramework::NodeRpcProxy INTERFACE
 target_link_libraries(QwertycoinFramework::P2p INTERFACE
     MiniUPnP::miniupnpc
     QwertycoinFramework::CryptoNoteProtocol
+    QwertycoinFramework::Global
 )
 
 if(WIN32 AND MSVC)
@@ -152,6 +162,7 @@ target_link_libraries(QwertycoinFramework::PaymentGate INTERFACE
 target_link_libraries(QwertycoinFramework::Rpc INTERFACE
     QwertycoinFramework::BlockchainExplorer
     QwertycoinFramework::CryptoNoteCore
+    QwertycoinFramework::Global
     QwertycoinFramework::P2p
     QwertycoinFramework::PaymentGate
     QwertycoinFramework::Serialization
@@ -172,6 +183,7 @@ endif()
 # QwertycoinFramework::Transfers
 target_link_libraries(QwertycoinFramework::Transfers INTERFACE
     QwertycoinFramework::CryptoNoteCore
+    QwertycoinFramework::Global
 )
 
 # QwertycoinFramework::Wallet
