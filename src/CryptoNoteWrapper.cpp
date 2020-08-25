@@ -539,7 +539,7 @@ public:
   }
 
   uint64_t getDifficulty() {
-    return m_core.getNextBlockDifficulty();
+    return m_core.getNextBlockDifficulty(getLastKnownBlockHeight() ? time(nullptr) : 0);
   }
 
   uint64_t getTxCount() {

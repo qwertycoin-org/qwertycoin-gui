@@ -1,0 +1,269 @@
+name: Build check
+
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '*'            # We don't want this to run on release
+  pull_request:
+
+jobs:
+  build-windows:
+    name: Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@master
+        with:
+          fetch-depth: 0
+
+      - name: Setup MSBuild.exe
+        uses: warrenbuckley/Setup-MSBuild@v1
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2
+        with:
+          version: '5.12.2'
+          host: 'windows'
+          target: 'desktop'
+          modules: 'qttools5'
+          install-deps: 'true'
+
+      - name: Install NSIS
+        uses: joncloud/makensis-action@v1
+        with:
+          just-include: true
+
+      - name: Build
+        shell: powershell
+        id: build
+        env:
+          BOOST_ROOT: ${{ env.BOOST_ROOT }}
+          GIT_REDIRECT_STDERR: '2>&1'
+          VCINSTALLDIR: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\'
+        run: |
+          $build_folder = "build"
+          $qwc_ver = git describe --tags --abbrev=0
+          $release_name = "Qwertycoin-wallet-win64-${qwc_ver}"
+          $release_folder = "Release"
+          echo "$release_name"
+          set CMAKE_PREFIX_PATH="$($qt5_cmake)"
+          $qt5_cmake = "${{ env.Qt5_Dir }}/lib/cmake" -replace '[/]', '\\'
+          mkdir "$build_folder"
+          cd "$build_folder"
+          Start-Process cmake -ArgumentList "-DBOOST_ROOT=""$env:BOOST_ROOT_1_69_0"" -G ""Visual Studio 16 2019"" -A x64",".." -NoNewWindow -Wait
+          Start-Process msbuild -ArgumentList "Qwertycoin-GUI.sln","/p:Configuration=Release" -NoNewWindow -Wait
+          $build_path = "./$build_folder"
+          mkdir "$release_folder/$release_name"
+          mkdir "$release_folder/$release_name/languages"
+          cp languages/*.qm "$release_folder/$release_name/languages/"
+          cd "$release_folder"
+          cp Qwertycoin-GUI.exe "$release_name/"
+          cp "../../COPYING" "$release_name/LICENSE.txt"
+          windeployqt --release Qwertycoin-GUI.exe --dir "$release_name/"
+          Compress-Archive -Path "$release_name/" -DestinationPath "$release_name.zip"
+          $sha256a = (Get-FileHash "$release_name.zip").Hash
+          $asset_path_archive = "./$build_folder/$release_folder/$release_name.zip"
+          echo "::set-output name=sha256a::${sha256a}"
+          echo "::set-output name=release_name_archive::${release_name}.zip"
+          echo "::set-output name=asset_path_archive::${asset_path_archive}"
+          cd ../
+          makensis WindowsInstall.nsi
+          cd "$release_folder"
+          Compress-Archive -Path "Qwertycoin-GUI-Setup.exe" -DestinationPath "$release_name-install.zip"
+          $sha256i = (Get-FileHash "$release_name-install.zip").Hash
+          $asset_path_install = "./$build_folder/$release_folder/$release_name-install.zip"
+          echo "::set-output name=sha256i::${sha256i}"
+          echo "::set-output name=release_name_install::${release_name}-install.zip"
+          echo "::set-output name=asset_path_install::${asset_path_install}"
+          echo "::set-output name=qwc_ver::${qwc_ver}"
+
+      - name: Create Archive Artifact
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          path: ${{ steps.build.outputs.asset_path_archive }}
+          name: ${{ steps.build.outputs.release_name_archive }}
+          body: |
+            **${{ steps.build.outputs.release_name_archive }}**
+            ${{ steps.build.outputs.sha256a }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Installer Artifact
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          path: ${{ steps.build.outputs.asset_path_install }}
+          name: ${{ steps.build.outputs.release_name_install }}
+          body: |
+            **${{ steps.build.outputs.release_name_install }}**
+            ${{ steps.build.outputs.sha256i }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-macos:
+    name: macOS
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@master
+        with:
+          fetch-depth: 0
+
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@1.0
+        with:
+          xcode-version: '10'
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2
+        with:
+          version: '5.12.2'
+          modules: 'qttools5'
+          install-deps: 'true'
+
+      - name: Find Tag
+        id: tagger
+        uses: jimschubert/query-tag-action@v1
+        with:
+          include: 'v*'
+          exclude: '*-rc*'
+          commit-ish: 'HEAD~'
+          skip-unshallow: 'true'
+
+      - name: Build
+        id: build
+        run: |
+          build_folder="build/release"
+          qwc_ver="${{steps.tagger.outputs.tag}}"
+          release_name="Qwertycoin-wallet-macOS-$qwc_ver"
+          app_name="Qwertycoin-GUI.app"
+          lang_folder="/Contents/Resources/languages"
+          brew install gcc boost
+          brew link boost --force
+          mkdir -p "$build_folder"
+          cd "$build_folder"
+          cmake -DCMAKE_C_FLAGS="-mmacosx-version-min=10.12" -DCMAKE_CXX_FLAGS="-mmacosx-version-min=10.12" -D CMAKE_BUILD_TYPE=Release ../..
+          make
+          mkdir "$app_name$lang_folder"
+          cp languages/*.qm "$app_name$lang_folder"
+          macdeployqt "$app_name"
+          cpack
+          mv *.dmg "$release_name".dmg
+          sha256=$(shasum -a 256 "$release_name".dmg | awk '{ print toupper($1) }')
+          asset_path="./$build_folder/$release_name.dmg"
+          echo "::set-output name=sha256::${sha256}"
+          echo "::set-output name=release_name::${release_name}.zip"
+          echo "::set-output name=asset_path::${asset_path}"
+          echo "::set-output name=qwc_ver::${qwc_ver}"
+
+      - name: Create Artifact
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          path: ${{ steps.build.outputs.asset_path }}
+          name: ${{ steps.build.outputs.release_name }}
+          body: |
+            **${{ steps.build.outputs.release_name }}**
+            ${{ steps.build.outputs.sha256 }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-ubuntu20:
+    name: Ubuntu 20.04
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@master
+        with:
+          fetch-depth: 0
+
+      - name: Find Tag
+        id: tagger
+        uses: jimschubert/query-tag-action@v1
+        with:
+          include: 'v*'
+          exclude: '*-rc*'
+          commit-ish: 'HEAD~'
+          skip-unshallow: 'true'
+
+      - name: Build
+        id: build
+        run: |
+          sudo apt update -y
+          sudo apt install -y qt5-default qttools5-dev qttools5-dev-tools libboost-all-dev
+          build_folder="build/release"
+          qwc_ver="${{ steps.build.outputs.qwc_ver }}"
+          release_name=Qwertycoin-wallet-ubuntu-20.04-"qwc_ver"
+          app_name="Qwertycoin-GUI"
+          mkdir -p "$build_folder"
+          cd "$build_folder"
+          cmake -D ARCH=default -D CMAKE_BUILD_TYPE=Release -D CMAKE_POSITION_INDEPENDENT_CODE:BOOL=true -D BOOST_IGNORE_SYSTEM_PATHS_DEFAULT=ON -D BOOST_ROOT=/usr ../..
+          make
+          cpack
+          tar -czf "$release_name".tar.gz *.deb
+          sha256=$(shasum -a 256 "$release_name".tar.gz | awk '{print toupper($1)}')
+          asset_path="./$build_folder/$release_name".tar.gz
+          echo "::set-output name=sha256::${sha256}"
+          echo "::set-output name=release_name::${release_name}.tar.gz"
+          echo "::set-output name=asset_path::${asset_path}"
+          echo "::set-output name=qwc_ver::${qwc_ver}"
+
+      - name: Create Artifact
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          path: ${{ steps.build.outputs.asset_path }}
+          name: ${{ steps.build.outputs.release_name }}
+          body: |
+            **${{ steps.build.outputs.release_name }}**
+            ${{ steps.build.outputs.sha256 }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-ubuntu18:
+    name: Ubuntu 18.04
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@master
+        with:
+          fetch-depth: 0
+
+      - name: Find Tag
+        id: tagger
+        uses: jimschubert/query-tag-action@v1
+        with:
+          include: 'v*'
+          exclude: '*-rc*'
+          commit-ish: 'HEAD~'
+          skip-unshallow: 'true'
+
+      - name: Build
+        id: build
+        run: |
+          sudo apt-get purge '*boost*'
+          sudo apt update -y
+          sudo apt install -y qt5-default qttools5-dev qttools5-dev-tools libboost1.62-all-dev
+          build_folder="build/release"
+          qwc_ver="${{ steps.build.outputs.qwc_ver }}"
+          release_name=Qwertycoin-wallet-ubuntu-18.04-"qwc_ver"
+          app_name="Qwertycoin-GUI"
+          mkdir -p "$build_folder"
+          cd "$build_folder"
+          cmake -D ARCH=default -D CMAKE_BUILD_TYPE=Release -D CMAKE_POSITION_INDEPENDENT_CODE:BOOL=true -D BOOST_IGNORE_SYSTEM_PATHS_DEFAULT=ON -D BOOST_ROOT=/usr ../..
+          make
+          cpack
+          tar -czf "$release_name".tar.gz *.deb
+          sha256=$(shasum -a 256 "$release_name".tar.gz | awk '{print toupper($1)}')
+          asset_path="./$build_folder/$release_name".tar.gz
+          echo "::set-output name=sha256::${sha256}"
+          echo "::set-output name=release_name::${release_name}.tar.gz"
+          echo "::set-output name=asset_path::${asset_path}"
+          echo "::set-output name=qwc_ver::${qwc_ver}"
+
+      - name: Create Artifact
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          path: ${{ steps.build.outputs.asset_path }}
+          name: ${{ steps.build.outputs.release_name }}
+          body: |
+            **${{ steps.build.outputs.release_name }}**
+            ${{ steps.build.outputs.sha256 }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
