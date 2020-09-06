@@ -56,10 +56,10 @@ jobs:
           $build_path = "./$build_folder"
           mkdir "$release_folder/$release_name"
           mkdir "$release_folder/$release_name/languages"
-          cp languages/*.qm "$release_folder/$release_name/languages/"
+          cp "../../src/languages/*.qm" "$release_folder/$release_name/languages/"
           cd "$release_folder"
           cp Qwertycoin-GUI.exe "$release_name/"
-          cp "../../COPYING" "$release_name/LICENSE.txt"
+          cp "../../LICENSE.txt" "$release_name/LICENSE.txt"
           windeployqt --release Qwertycoin-GUI.exe --dir "$release_name/"
           Compress-Archive -Path "$release_name/" -DestinationPath "$release_name.zip"
           $sha256a = (Get-FileHash "$release_name.zip").Hash
