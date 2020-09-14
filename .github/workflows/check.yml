@@ -56,7 +56,7 @@ jobs:
           $build_path = "./$build_folder"
           mkdir "$release_folder/$release_name"
           mkdir "$release_folder/$release_name/languages"
-          cp "../../src/languages/*.qm" "$release_folder/$release_name/languages/"
+          cp languages/*.qm "$release_folder/$release_name/languages/"
           cd "$release_folder"
           cp Qwertycoin-GUI.exe "$release_name/"
           cp "../../LICENSE.txt" "$release_name/LICENSE.txt"
@@ -187,7 +187,7 @@ jobs:
         id: build
         run: |
           sudo apt update -y
-          sudo apt install -y qt5-default qttools5-dev qttools5-dev-tools libboost-all-dev
+          sudo apt install -y build-essential libgl1-mesa-dev qt5-default qttools5-dev qttools5-dev-tools libboost-all-dev
           build_folder="build/release"
           qwc_ver="${{ steps.build.outputs.qwc_ver }}"
           release_name=Qwertycoin-wallet-ubuntu-20.04-"qwc_ver"
@@ -238,7 +238,7 @@ jobs:
         run: |
           sudo apt-get purge '*boost*'
           sudo apt update -y
-          sudo apt install -y qt5-default qttools5-dev qttools5-dev-tools libboost1.62-all-dev
+          sudo apt install -y build-essential python-dev gcc g++ qtbase5-dev qt5-default qttools5-dev qttools5-dev-tools libboost1.62-all-dev
           build_folder="build/release"
           qwc_ver="${{ steps.build.outputs.qwc_ver }}"
           release_name=Qwertycoin-wallet-ubuntu-18.04-"qwc_ver"
