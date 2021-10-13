@@ -102,7 +102,16 @@ void Settings::load() {
   }
 
   QStringList defaultNodesList;
-  defaultNodesList << "node-00.qwertycoin.org:8197" << "node-01.qwertycoin.org:8197" << "node-02.qwertycoin.org:8197"  << "node-03.qwertycoin.org:8197"  << "node-04.qwertycoin.org:8197"  << "node-05.qwertycoin.org:8197";
+  defaultNodesList << "node-00.qwertycoin.org:8197"
+                   << "node-01.qwertycoin.org:8197"
+                   << "node-02.qwertycoin.org:8197"
+                   << "node-03.qwertycoin.org:8197"
+                   << "node-04.qwertycoin.org:8197"
+                   << "node-05.qwertycoin.org:8197"
+                   << "node-06.qwertycoin.org:8197"
+                   << "node-07.qwertycoin.org:8197"
+                   << "node-08.qwertycoin.org:8197"
+                   << "node-09.qwertycoin.org:8197";
   if (!m_settings.contains(OPTION_RPCNODES)) {
     setRpcNodesList(QStringList() << defaultNodesList);
   } else {
