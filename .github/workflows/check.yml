@@ -52,15 +52,15 @@ jobs:
           mkdir "$build_folder"
           cd "$build_folder"
           Start-Process cmake -ArgumentList "-DBOOST_ROOT=""$env:BOOST_ROOT_1_69_0"" -G ""Visual Studio 16 2019"" -A x64",".." -NoNewWindow -Wait
-          Start-Process msbuild -ArgumentList "Qwertycoin.sln","/p:Configuration=Release" -NoNewWindow -Wait
+          Start-Process msbuild -ArgumentList "Qwertycoin-GUI.sln","/p:Configuration=Release" -NoNewWindow -Wait
           $build_path = "./$build_folder"
           mkdir "$release_folder/$release_name"
           mkdir "$release_folder/$release_name/languages"
           cp "../../src/languages/*.qm" "$release_folder/$release_name/languages/"
           cd "$release_folder"
-          cp Qwertycoin.exe "$release_name/"
+          cp Qwertycoin-GUI.exe "$release_name/"
           cp "../../LICENSE.txt" "$release_name/LICENSE.txt"
-          windeployqt --release Qwertycoin.exe --dir "$release_name/"
+          windeployqt --release Qwertycoin-GUI.exe --dir "$release_name/"
           Compress-Archive -Path "$release_name/" -DestinationPath "$release_name.zip"
           $sha256a = (Get-FileHash "$release_name.zip").Hash
           $asset_path_archive = "./$build_folder/$release_folder/$release_name.zip"
@@ -70,7 +70,7 @@ jobs:
           cd ../
           makensis WindowsInstall.nsi
           cd "$release_folder"
-          Compress-Archive -Path "Qwertycoin-Setup.exe" -DestinationPath "$release_name-install.zip"
+          Compress-Archive -Path "Qwertycoin-GUI-Setup.exe" -DestinationPath "$release_name-install.zip"
           $sha256i = (Get-FileHash "$release_name-install.zip").Hash
           $asset_path_install = "./$build_folder/$release_folder/$release_name-install.zip"
           echo "::set-output name=sha256i::${sha256i}"
@@ -135,7 +135,7 @@ jobs:
           build_folder="build/release"
           qwc_ver="${{steps.tagger.outputs.tag}}"
           release_name="Qwertycoin-wallet-macOS-$qwc_ver"
-          app_name="Qwertycoin.app"
+          app_name="Qwertycoin-GUI.app"
           lang_folder="/Contents/Resources/languages"
           brew install gcc boost
           brew link boost --force
@@ -191,7 +191,7 @@ jobs:
           build_folder="build/release"
           qwc_ver="${{ steps.build.outputs.qwc_ver }}"
           release_name=Qwertycoin-wallet-ubuntu-20.04-"qwc_ver"
-          app_name="Qwertycoin"
+          app_name="Qwertycoin-GUI"
           mkdir -p "$build_folder"
           cd "$build_folder"
           cmake -D ARCH=default -D CMAKE_BUILD_TYPE=Release -D CMAKE_POSITION_INDEPENDENT_CODE:BOOL=true -D BOOST_IGNORE_SYSTEM_PATHS_DEFAULT=ON -D BOOST_ROOT=/usr ../..
@@ -242,7 +242,7 @@ jobs:
           build_folder="build/release"
           qwc_ver="${{ steps.build.outputs.qwc_ver }}"
           release_name=Qwertycoin-wallet-ubuntu-18.04-"qwc_ver"
-          app_name="Qwertycoin"
+          app_name="Qwertycoin-GUI"
           mkdir -p "$build_folder"
           cd "$build_folder"
           cmake -D ARCH=default -D CMAKE_BUILD_TYPE=Release -D CMAKE_POSITION_INDEPENDENT_CODE:BOOL=true -D BOOST_IGNORE_SYSTEM_PATHS_DEFAULT=ON -D BOOST_ROOT=/usr ../..
