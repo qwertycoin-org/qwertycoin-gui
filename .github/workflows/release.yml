@@ -64,8 +64,6 @@ jobs:
           cd "$build_folder"
           $qwc_ver = "${{ steps.build.outputs.qwc_ver }}"
           mkdir "$release_folder/$release_name"
-          mkdir "$release_folder/$release_name/languages"
-          cp "../../src/languages/*.qm" "$release_folder/$release_name/languages/"
           cd "$release_folder"
           cp Qwertycoin-GUI.exe "$release_name/"
           cp "../../LICENSE.txt" "$release_name/LICENSE.txt"

@@ -55,8 +55,6 @@ jobs:
           Start-Process msbuild -ArgumentList "Qwertycoin-GUI.sln","/p:Configuration=Release" -NoNewWindow -Wait
           $build_path = "./$build_folder"
           mkdir "$release_folder/$release_name"
-          mkdir "$release_folder/$release_name/languages"
-          cp "../../src/languages/*.qm" "$release_folder/$release_name/languages/"
           cd "$release_folder"
           cp Qwertycoin-GUI.exe "$release_name/"
           cp "../../LICENSE.txt" "$release_name/LICENSE.txt"
