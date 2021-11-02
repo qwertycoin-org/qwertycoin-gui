@@ -1,3 +1,5 @@
+include(CPack)
+
 set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
 set(CPACK_PACKAGE_VENDOR "${PROJECT_VENDOR_NAME}")
 set(CPACK_PACKAGE_DIRECTORY "${PROJECT_BINARY_DIR}/dist")
@@ -49,5 +51,3 @@ elseif(PROJECT_OS_WINDOWS) # Windows
 else() # unknown
     message(WARNING "Can't detect platform. Package settings are not initialized!")
 endif()
-
-include(CPack)

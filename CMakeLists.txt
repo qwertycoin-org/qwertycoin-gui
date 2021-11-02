@@ -93,7 +93,9 @@ endif()
 include(project/CompilerSettings)
 include(project/GlobalOptions)
 include(project/GlobalVariables)
-
+if(BUILD_WITH_PACKAGE)
+    include(project/CPackConfig)
+endif()
 # External dependencies
 set_directory_properties(PROPERTIES EP_BASE "${CMAKE_CURRENT_BINARY_DIR}/_ExternalProjects")
 include(ExternalProject)
@@ -106,7 +108,3 @@ include(external/codecov)
 include(external/Threads)
 
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/src")
-
-if(BUILD_WITH_PACKAGE)
-    include(project/CPackConfig)
-endif()
