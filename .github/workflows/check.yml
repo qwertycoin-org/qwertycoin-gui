@@ -195,6 +195,7 @@ jobs:
           cmake -D ARCH=default -D CMAKE_BUILD_TYPE=Release -D BUILD_ALL:BOOL=TRUE -D CMAKE_POSITION_INDEPENDENT_CODE:BOOL=true -D BOOST_IGNORE_SYSTEM_PATHS_DEFAULT=ON -D BOOST_ROOT=/usr ../..
           make
           cpack
+          ls -al
           tar -czf "$release_name".tar.gz *.deb
           sha256=$(shasum -a 256 "$release_name".tar.gz | awk '{print toupper($1)}')
           asset_path="./$build_folder/$release_name".tar.gz
@@ -246,6 +247,7 @@ jobs:
           cmake -D ARCH=default -D CMAKE_BUILD_TYPE=Release -D BUILD_ALL:BOOL=TRUE -D CMAKE_POSITION_INDEPENDENT_CODE:BOOL=true -D BOOST_IGNORE_SYSTEM_PATHS_DEFAULT=ON -D BOOST_ROOT=/usr ../..
           make
           cpack
+          ls -al
           tar -czf "$release_name".tar.gz *.deb
           sha256=$(shasum -a 256 "$release_name".tar.gz | awk '{print toupper($1)}')
           asset_path="./$build_folder/$release_name".tar.gz
