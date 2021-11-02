@@ -51,7 +51,7 @@ jobs:
           $qt5_cmake = "${{ env.Qt5_Dir }}/lib/cmake" -replace '[/]', '\\'
           mkdir "$build_folder"
           cd "$build_folder"
-          Start-Process cmake -ArgumentList "-DBOOST_ROOT=""$env:BOOST_ROOT_1_69_0"" -G ""Visual Studio 16 2019"" -A x64",".." -NoNewWindow -Wait
+          Start-Process cmake -ArgumentList "-DBOOST_ROOT=""$env:BOOST_ROOT_1_69_0"" -G ""Visual Studio 16 2019"" -DBUILD_ALL:BOOL=""TRUE"" -A x64",".." -NoNewWindow -Wait
           Start-Process msbuild -ArgumentList "Qwertycoin-GUI.sln","/p:Configuration=Release" -NoNewWindow -Wait
           $build_path = "./$build_folder"
           mkdir "$release_folder/$release_name"
@@ -141,7 +141,7 @@ jobs:
           brew link boost --force
           mkdir -p "$build_folder"
           cd "$build_folder"
-          cmake -DCMAKE_C_FLAGS="-mmacosx-version-min=10.12" -DCMAKE_CXX_FLAGS="-mmacosx-version-min=10.12" -D CMAKE_BUILD_TYPE=Release ../..
+          cmake -DCMAKE_C_FLAGS="-mmacosx-version-min=10.12" -DBUILD_ALL:BOOL=TRUE -DCMAKE_CXX_FLAGS="-mmacosx-version-min=10.12" -D CMAKE_BUILD_TYPE=Release ../..
           make
           mkdir "$app_name$lang_folder"
           cp languages/*.qm "$app_name$lang_folder"
@@ -194,7 +194,7 @@ jobs:
           app_name="Qwertycoin-GUI"
           mkdir -p "$build_folder"
           cd "$build_folder"
-          cmake -D ARCH=default -D CMAKE_BUILD_TYPE=Release -D CMAKE_POSITION_INDEPENDENT_CODE:BOOL=true -D BOOST_IGNORE_SYSTEM_PATHS_DEFAULT=ON -D BOOST_ROOT=/usr ../..
+          cmake -D ARCH=default -D CMAKE_BUILD_TYPE=Release -D BUILD_ALL:BOOL=TRUE -D CMAKE_POSITION_INDEPENDENT_CODE:BOOL=true -D BOOST_IGNORE_SYSTEM_PATHS_DEFAULT=ON -D BOOST_ROOT=/usr ../..
           make
           cpack
           tar -czf "$release_name".tar.gz *.deb
@@ -245,7 +245,7 @@ jobs:
           app_name="Qwertycoin-GUI"
           mkdir -p "$build_folder"
           cd "$build_folder"
-          cmake -D ARCH=default -D CMAKE_BUILD_TYPE=Release -D CMAKE_POSITION_INDEPENDENT_CODE:BOOL=true -D BOOST_IGNORE_SYSTEM_PATHS_DEFAULT=ON -D BOOST_ROOT=/usr ../..
+          cmake -D ARCH=default -D CMAKE_BUILD_TYPE=Release -D BUILD_ALL:BOOL=TRUE -D CMAKE_POSITION_INDEPENDENT_CODE:BOOL=true -D BOOST_IGNORE_SYSTEM_PATHS_DEFAULT=ON -D BOOST_ROOT=/usr ../..
           make
           cpack
           tar -czf "$release_name".tar.gz *.deb
