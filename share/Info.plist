@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>LSMinimumSystemVersion</key>
+  <string>10.10.0</string>
+
+  <key>NSPrincipalClass</key>
+  <string>NSApplication</string>
+
+  <key>CFBundleIconFile</key>
+  <string>appicon.icns</string>
+
+  <key>CFBundlePackageType</key>
+  <string>APPL</string>
+
+  <key>CFBundleSignature</key>
+  <string>????</string>
+
+  <key>CFBundleExecutable</key>
+  <string>qwertycoin-gui</string>
+
+  <key>CFBundleName</key>
+  <string>Qwertycoin GUI</string>
+
+  <key>NSHumanReadableCopyright</key>
+  <string>Copyright © 2014-2024 The Monero Project; Copyright © 2026 The Qwertycoin Project</string>
+
+  <key>CFBundleIdentifier</key>
+  <string>org.qwertycoin.qwertycoin-gui</string>
+
+  <key>CFBundleVersion</key>
+  <string>@VERSION_LONG@</string>
+
+  <key>CFBundleShortVersionString</key>
+  <string>@VERSION@</string>
+
+  <key>NSSupportsAutomaticGraphicsSwitching</key>
+  <true/>
+
+  <key>CFBundleURLTypes</key>
+  <array>
+    <dict>
+      <key>CFBundleURLName</key>
+      <string>qwertycoin Handler</string>
+      <key>CFBundleURLSchemes</key>
+      <array>
+        <string>qwertycoin</string>
+      </array>
+    </dict>
+  </array>
+</dict>
+</plist>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+    <id>org.qwertycoin.QwertycoinGUI</id>
+    <metadata_license>CC0-1.0</metadata_license>
+    <project_license>BSD-3-Clause</project_license>
+    <content_rating type="oars-1.1"/>
+    <developer_name>The Qwertycoin Project</developer_name>
+    <categories>
+        <category>Network</category>
+        <category>Qt</category>
+        <category>Finance</category>
+        <category>Office</category>
+    </categories>
+    <name>Qwertycoin GUI</name>
+    <summary>Desktop wallet for Qwertycoin v2</summary>
+
+    <description>
+        <p>Qwertycoin GUI is a desktop wallet for Qwertycoin v2, derived from the
+            Monero GUI and wired to the Qwertycoin v2 core.</p>
+
+        <p>Privacy: Qwertycoin v2 uses a CryptoNote-derived system to allow you to send
+            and receive funds without your transactions being easily revealed on the
+            blockchain (the ledger of transactions that everyone has). This ensures that
+            your purchases, receipts, and all transfers remain absolutely private by
+            default.</p>
+
+        <p>Security: Using the power of a distributed peer-to-peer consensus network,
+            every transaction on the network is cryptographically secured. Individual
+            wallets have a 25 word mnemonic seed that is only displayed once, and can be
+            written down to backup the wallet. Wallet files are encrypted with a passphrase
+            to ensure they are useless if stolen.</p>
+
+        <p>This first Qwertycoin port keeps the Monero GUI license and attribution
+            while replacing the embedded core, network defaults, URI scheme, ticker,
+            application identity and primary branding.</p>
+    </description>
+
+    <launchable type="desktop-id">org.qwertycoin.QwertycoinGUI.desktop</launchable>
+
+    <screenshots>
+        <screenshot type="default">
+            <caption>A screenshot of the Qwertycoin GUI wallet</caption>
+            <image>https://qwertycoin.org/assets/social-card.png</image>
+        </screenshot>
+    </screenshots>
+
+    <url type="homepage">https://qwertycoin.org</url>
+    <url type="bugtracker">https://github.com/qwertycoin-org/qwertycoin-gui/issues</url>
+
+    <releases>
+        <release version="0.18.5.2-qwc-port.1" date="2026-09-04"/>
+    </releases>
+
+    <custom>
+      <value key="upstream::source">https://github.com/monero-project/monero-gui/tree/v0.18.5.2</value>
+    </custom>
+</component>
