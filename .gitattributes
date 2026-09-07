@@ -1,2 +1,9 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Preserve upstream Qt translation source strings. Some source IDs include
+# intentional trailing spaces which must not be rewritten during import.
+translations/*.ts whitespace=-trailing-space
+
+# Preserve upstream Windows-compatible CRLF files without treating CR as
+# trailing whitespace in reviews.
+installers/windows/** text eol=crlf whitespace=cr-at-eol
+*.bat text eol=crlf whitespace=cr-at-eol
+fonts/LICENSE.txt text eol=crlf whitespace=cr-at-eol

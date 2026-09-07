@@ -1,92 +1,42 @@
-**/bui*
+*.user
+*.user.*
+translations/*.qm
+build
+version.js
+# IOS stuff below
+moc_*
+*.o
+*.mak
+*.build
+*.xcodeproj
+monero-wallet-gui_plugin_import.cpp
+monero-wallet-gui_qml_plugin_import.cpp
+*.qmlc
+*.jsc
+qml_qmlcache.qrc
 
-.DS_Store
-/build
-/build32
-/build64
-/cmake-build-debug
-/tags
-.idea
-.ycm_extra_conf.py
-.ycm_extra_conf.pyc
-Release
-Debug
-src/CMakeCache.txt
-src/CMakeFiles/
-src/Makefile
-src/build/
-src/cmake_install.cmake
-.codelite/
-
-### mac
-# General
+### macOS metadata ###
 .DS_Store
 .AppleDouble
 .LSOverride
-
-# Icon must end with two \r
-Icon
-
-
-# Thumbnails
 ._*
 
-# Files that might appear in the root of a volume
-.DocumentRevisions-V100
-.fseventsd
-.Spotlight-V100
-.TemporaryItems
-.Trashes
-.VolumeIcon.icns
-.com.apple.timemachine.donotpresent
+### Vim ###
+# Swap
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
 
-# Directories potentially created on remote AFP share
-.AppleDB
-.AppleDesktop
-Network Trash Folder
-Temporary Items
-.apdisk
+# Session
+Session.vim
 
-
-### linux
+# Temporary
+.netrwhist
 *~
-
-# temporary files which can be created if a process still has a handle open of a deleted file
-.fuse_hidden*
-
-# KDE directory preferences
-.directory
-
-# Linux trash folder which might appear on any partition or disk
-.Trash-*
-
-# .nfs files are created when an open file is removed but is still being accessed
-.nfs*
-
-
-### win
-# Windows thumbnail cache files
-Thumbs.db
-ehthumbs.db
-ehthumbs_vista.db
-
-# Dump file
-*.stackdump
-
-# Folder config file
-[Dd]esktop.ini
-
-# Recycle Bin used on file shares
-$RECYCLE.BIN/
-
-# Windows Installer files
-*.cab
-*.msi
-*.msm
-*.msp
-
-# Windows shortcuts
-*.lnk
-
-.vscode
-.vs
+*.autosave
+# Auto-generated tag files
+tags
+# Persistent undo
+[._]*.un~

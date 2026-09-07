@@ -1,0 +1,69 @@
+name: qwc/gui-port-smoke
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  port-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Validate metadata
+        run: |
+          python3 - <<'PY'
+          import plistlib
+          import xml.etree.ElementTree as ET
+
+          with open("share/Info.plist", "rb") as handle:
+              plistlib.load(handle)
+          ET.parse("share/org.qwertycoin.QwertycoinGUI.metainfo.xml")
+          PY
+
+      - name: Validate YAML
+        run: |
+          python3 - <<'PY'
+          import pathlib
+
+          text = pathlib.Path("share/org.qwertycoin.QwertycoinGUI.yaml").read_text()
+          assert "app-id: org.qwertycoin.QwertycoinGUI" in text
+          assert "command: qwertycoin-gui" in text
+          assert "\t" not in text
+          PY
+
+      - name: Validate QWC porting markers
+        run: |
+          test -f README.monero-upstream.md
+          test -f docs/PORTING_STATUS.md
+          test -f images/qwertycoin-logo.png
+          test -f images/qwertycoin-icon-192.png
+          grep -q 'project(qwertycoin-gui)' CMakeLists.txt
+          grep -q 'add_executable(qwertycoin-gui' src/CMakeLists.txt
+          grep -q 'qwertycoind' src/daemon/DaemonManager.cpp
+          grep -q 'qwertycoin:' main.qml
+          grep -q '8197' main.qml
+          grep -q 'QWC' pages/Transfer.qml
+          grep -q 'QWC' pages/Receive.qml
+
+      - name: Guard against user-facing upstream defaults
+        run: |
+          ! grep -RInE 'monerod|monero-wallet-gui|xmrusd|xmreur|monero_wallet:|getmonero|\.bitmonero|~/Monero|xmr-gui' \
+              README.md main.qml components pages wizard src share \
+              --exclude='template.pdf'
+
+      - name: Check submodule declaration
+        run: |
+          grep -q 'path = monero' .gitmodules
+          grep -q 'qwertycoin-org/qwertycoin.git' .gitmodules
+          git ls-tree HEAD monero | grep -q '1c4c1bf10c387887a42243dc690a65abb6c6e786'
+
+      - name: Validate release automation
+        run: |
+          test -x tools/smoke/restore_from_seed.sh
+          test -x tools/release/package_artifacts.sh
+          grep -q 'macos-26' .github/workflows-disabled/release.yml
+          grep -q 'windows-2025' .github/workflows-disabled/release.yml
+          grep -q 'ubuntu-24.04' .github/workflows-disabled/release.yml

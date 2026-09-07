@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Qwertycoin GUI
+GenericName=Cryptocurrency wallet
+Comment=Qwertycoin GUI
+Exec=qwertycoin-gui
+Type=Application
+Terminal=false
+Categories=Network;Qt;Finance;Office;
+Icon=org.qwertycoin.QwertycoinGUI
+StartupNotify=true

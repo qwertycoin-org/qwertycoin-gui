@@ -1,0 +1,239 @@
+FROM ubuntu:20.04
+
+ARG THREADS=1
+ARG ANDROID_NDK_REVISION=23c
+ARG ANDROID_NDK_HASH=e5053c126a47e84726d9f7173a04686a71f9a67a
+ARG ANDROID_SDK_REVISION=7302050_latest
+ARG ANDROID_SDK_HASH=7a00faadc0864f78edd8f4908a629a46d622375cbe2e5814e82934aebecdb622
+ARG QT_VERSION=v5.15.19-lts-lgpl
+
+WORKDIR /opt/android
+ENV WORKDIR=/opt/android
+
+ENV ANDROID_NATIVE_API_LEVEL=31
+ENV ANDROID_API=android-${ANDROID_NATIVE_API_LEVEL}
+ENV ANDROID_CLANG=aarch64-linux-android${ANDROID_NATIVE_API_LEVEL}-clang
+ENV ANDROID_CLANGPP=aarch64-linux-android${ANDROID_NATIVE_API_LEVEL}-clang++
+ENV ANDROID_NDK_ROOT=${WORKDIR}/android-ndk-r${ANDROID_NDK_REVISION}
+ENV ANDROID_SDK_ROOT=${WORKDIR}/cmdline-tools
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+ENV PATH=${JAVA_HOME}/bin:${PATH}
+ENV PREFIX=${WORKDIR}/prefix
+ENV TOOLCHAIN_DIR=${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/linux-x86_64
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update \
+    && apt-get install -y ant automake build-essential ca-certificates-java file gettext git libc6 libncurses5 \
+    libssl-dev libstdc++6 libtinfo5 libtool libz1 ninja-build openjdk-11-jdk-headless openjdk-11-jre-headless pkg-config python3 \
+    unzip wget
+
+RUN PACKAGE_NAME=commandlinetools-linux-${ANDROID_SDK_REVISION}.zip \
+    && wget -q https://dl.google.com/android/repository/${PACKAGE_NAME} \
+    && echo "${ANDROID_SDK_HASH}  ${PACKAGE_NAME}" | sha256sum -c \
+    && unzip -q ${PACKAGE_NAME} \
+    && rm -f ${PACKAGE_NAME}
+
+RUN PACKAGE_NAME=android-ndk-r${ANDROID_NDK_REVISION}-linux.zip \
+    && wget -q https://dl.google.com/android/repository/${PACKAGE_NAME} \
+    && echo "${ANDROID_NDK_HASH}  ${PACKAGE_NAME}" | sha1sum -c \
+    && unzip -q ${PACKAGE_NAME} \
+    && rm -f ${PACKAGE_NAME}
+
+RUN echo y | ${ANDROID_SDK_ROOT}/bin/sdkmanager --sdk_root=${ANDROID_SDK_ROOT} "build-tools;28.0.3" "platforms;${ANDROID_API}" "tools" > /dev/null
+
+ENV HOST_PATH=${PATH}
+ENV PATH=${TOOLCHAIN_DIR}/aarch64-linux-android/bin:${TOOLCHAIN_DIR}/bin:${PATH}
+
+ARG ZLIB_VERSION=1.3.1
+ARG ZLIB_HASH=9a93b2b7dfdac77ceba5a558a580e74667dd6fede4585b91eefb60f03b72df23
+RUN wget -q https://github.com/madler/zlib/releases/download/v${ZLIB_VERSION}/zlib-${ZLIB_VERSION}.tar.gz \
+    && echo "${ZLIB_HASH}  zlib-${ZLIB_VERSION}.tar.gz" | sha256sum -c \
+    && tar -xzf zlib-${ZLIB_VERSION}.tar.gz \
+    && rm zlib-${ZLIB_VERSION}.tar.gz \
+    && cd zlib-${ZLIB_VERSION} \
+    && CC=${ANDROID_CLANG} CXX=${ANDROID_CLANGPP} ./configure --prefix=${PREFIX} --static \
+    && make -j${THREADS} \
+    && make -j${THREADS} install \
+    && rm -rf $(pwd)
+
+RUN git clone https://code.qt.io/qt/qt5.git -b ${QT_VERSION} --depth 1 \
+    && cd qt5 \
+    && git reset --hard dc2ac680fa9d0ef7b0d9520859593d13951bedea \
+    && perl init-repository --module-subset=default,-qtwebengine \
+    && PATH=${HOST_PATH} ./configure -v -developer-build -release \
+    -xplatform android-clang \
+    -android-ndk-platform ${ANDROID_API} \
+    -android-ndk ${ANDROID_NDK_ROOT} \
+    -android-sdk ${ANDROID_SDK_ROOT} \
+    -android-ndk-host linux-x86_64 \
+    -no-dbus \
+    -opengl es2 \
+    -no-use-gold-linker \
+    -no-sql-mysql \
+    -opensource -confirm-license \
+    -android-arch arm64-v8a \
+    -prefix ${PREFIX} \
+    -nomake tools -nomake tests -nomake examples \
+    -skip qtwebengine \
+    -skip qtserialport \
+    -skip qtconnectivity \
+    -skip qttranslations \
+    -skip qtpurchasing \
+    -skip qtgamepad -skip qtscript -skip qtdoc \
+    -no-warnings-are-errors \
+    && PATH=${HOST_PATH} make -j${THREADS} \
+    && PATH=${HOST_PATH} make -j${THREADS} install \
+    && cd qttools/src/linguist/lrelease \
+    && ../../../../qtbase/bin/qmake \
+    && PATH=${HOST_PATH} make -j${THREADS} install \
+    && cd ../../../.. \
+    && rm -rf $(pwd)
+
+ARG ICONV_VERSION=1.16
+ARG ICONV_HASH=e6a1b1b589654277ee790cce3734f07876ac4ccfaecbee8afa0b649cf529cc04
+RUN wget -q https://ftp.gnu.org/pub/gnu/libiconv/libiconv-${ICONV_VERSION}.tar.gz \
+    && echo "${ICONV_HASH}  libiconv-${ICONV_VERSION}.tar.gz" | sha256sum -c \
+    && tar -xzf libiconv-${ICONV_VERSION}.tar.gz \
+    && rm -f libiconv-${ICONV_VERSION}.tar.gz \
+    && cd libiconv-${ICONV_VERSION} \
+    && CC=${ANDROID_CLANG} CXX=${ANDROID_CLANGPP} ./configure --build=x86_64-linux-gnu --host=aarch64 --prefix=${PREFIX} --disable-rpath \
+    && make -j${THREADS} \
+    && make -j${THREADS} install
+
+ARG BOOST_VERSION=1_85_0
+ARG BOOST_VERSION_DOT=1.85.0
+ARG BOOST_HASH=7009fe1faa1697476bdc7027703a2badb84e849b7b0baad5086b087b971f8617
+RUN wget -q https://archives.boost.io/release/${BOOST_VERSION_DOT}/source/boost_${BOOST_VERSION}.tar.bz2 \
+    && echo "${BOOST_HASH}  boost_${BOOST_VERSION}.tar.bz2" | sha256sum -c \
+    && tar -xf boost_${BOOST_VERSION}.tar.bz2 \
+    && rm -f boost_${BOOST_VERSION}.tar.bz2 \
+    && cd boost_${BOOST_VERSION} \
+    && PATH=${HOST_PATH} ./bootstrap.sh --prefix=${PREFIX} \
+    && printf "using clang : arm : ${ANDROID_CLANGPP} :\n<cxxflags>\"-fPIC\"\n<cflags>\"-fPIC\" ;" > user.jam \
+    && PATH=${TOOLCHAIN_DIR}/bin:${HOST_PATH} ./b2 --build-type=minimal link=static runtime-link=static \
+    --with-chrono --with-date_time --with-filesystem --with-program_options --with-regex --with-serialization \
+    --with-system --with-thread --with-locale --build-dir=android --stagedir=android toolset=clang-arm threading=multi \
+    threadapi=pthread target-os=android -sICONV_PATH=${PREFIX} --user-config=user.jam architecture=arm address-model=64 \
+    install -j${THREADS} \
+    && rm -rf $(pwd)
+
+ARG OPENSSL_VERSION=1.1.1w
+ARG OPENSSL_HASH=cf3098950cb4d853ad95c0841f1f9c6d3dc102dccfcacd521d93925208b76ac8
+RUN wget -q https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz \
+    && echo "${OPENSSL_HASH}  openssl-${OPENSSL_VERSION}.tar.gz" | sha256sum -c \
+    && tar -xzf openssl-${OPENSSL_VERSION}.tar.gz \
+    && rm openssl-${OPENSSL_VERSION}.tar.gz \
+    && cd openssl-${OPENSSL_VERSION} \
+    && ANDROID_NDK_HOME=${ANDROID_NDK_ROOT} ./Configure CC=${ANDROID_CLANG} CXX=${ANDROID_CLANGPP} \
+    android-arm64 no-shared --static \
+    --with-zlib-include=${PREFIX}/include --with-zlib-lib=${PREFIX}/lib \
+    --prefix=${PREFIX} --openssldir=${PREFIX} \
+    && sed -i 's/CNF_EX_LIBS=-ldl -pthread//g;s/BIN_CFLAGS=-pie $(CNF_CFLAGS) $(CFLAGS)//g' Makefile \
+    && ANDROID_NDK_HOME=${ANDROID_NDK_ROOT} make -j${THREADS} \
+    && make -j${THREADS} install \
+    && rm -rf $(pwd)
+
+ARG EXPAT_VERSION=2.6.4
+ARG EXPAT_HASH=8dc480b796163d4436e6f1352e71800a774f73dbae213f1860b60607d2a83ada
+RUN wget https://github.com/libexpat/libexpat/releases/download/R_2_6_4/expat-${EXPAT_VERSION}.tar.bz2 && \
+    echo "${EXPAT_HASH}  expat-${EXPAT_VERSION}.tar.bz2" | sha256sum -c && \
+    tar -xf expat-${EXPAT_VERSION}.tar.bz2 && \
+    rm expat-${EXPAT_VERSION}.tar.bz2 && \
+    cd expat-${EXPAT_VERSION} && \
+    CC=${ANDROID_CLANG} CXX=${ANDROID_CLANGPP} ./configure --enable-static --disable-shared --prefix=${PREFIX} --host=aarch64-linux-android && \
+    make -j$THREADS && \
+    make -j$THREADS install && \
+    rm -rf $(pwd)
+
+ARG UNBOUND_VERSION=1.22.0
+ARG UNBOUND_HASH=c5dd1bdef5d5685b2cedb749158dd152c52d44f65529a34ac15cd88d4b1b3d43
+RUN wget https://www.nlnetlabs.nl/downloads/unbound/unbound-${UNBOUND_VERSION}.tar.gz && \
+    echo "${UNBOUND_HASH}  unbound-${UNBOUND_VERSION}.tar.gz" | sha256sum -c && \
+    tar -xzf unbound-${UNBOUND_VERSION}.tar.gz && \
+    rm unbound-${UNBOUND_VERSION}.tar.gz && \
+    cd unbound-${UNBOUND_VERSION} && \
+    CC=${ANDROID_CLANG} CXX=${ANDROID_CLANGPP} ./configure --disable-shared --enable-static --without-pyunbound --with-libexpat=${PREFIX} --with-ssl=${PREFIX} --with-libevent=no --without-pythonmodule --disable-flto --with-pthreads --with-libunbound-only --host=aarch64-linux-android --with-pic --prefix=${PREFIX} && \
+    make -j$THREADS && \
+    make -j$THREADS install && \
+    rm -rf $(pwd)
+
+ARG ZMQ_VERSION=v4.3.5
+ARG ZMQ_HASH=622fc6dde99ee172ebaa9c8628d85a7a1995a21d
+RUN git clone https://github.com/zeromq/libzmq.git -b ${ZMQ_VERSION} --depth 1 \
+    && cd libzmq \
+    && git checkout ${ZMQ_HASH} \
+    && ./autogen.sh \
+    && CC=${ANDROID_CLANG} CXX=${ANDROID_CLANGPP} ./configure --prefix=${PREFIX} --host=aarch64-linux-android \
+    --enable-static --disable-shared \
+    && make -j${THREADS} \
+    && make -j${THREADS} install \
+    && rm -rf $(pwd)
+
+ARG SODIUM_VERSION=1.0.20-RELEASE
+ARG SODIUM_HASH=9511c982fb1d046470a8b42aa36556cdb7da15de
+RUN set -ex \
+    && git clone https://github.com/jedisct1/libsodium.git -b ${SODIUM_VERSION} --depth 1 \
+    && cd libsodium \
+    && test `git rev-parse HEAD` = ${SODIUM_HASH} || exit 1 \
+    && ./autogen.sh \
+    && CC=${ANDROID_CLANG} CXX=${ANDROID_CLANGPP} ./configure --prefix=${PREFIX} --host=aarch64-linux-android --enable-static --disable-shared \
+    && make -j${THREADS} install \
+    && rm -rf $(pwd)
+
+RUN git clone -b libgpg-error-1.41 --depth 1 https://github.com/gpg/libgpg-error \
+    && cd libgpg-error \
+    && git reset --hard 98032624ae89a67ee6fe3b1db5d95032e681d163 \
+    && ./autogen.sh \
+    && CC=${ANDROID_CLANG} CXX=${ANDROID_CLANGPP} ./configure --host=aarch64-linux-android --prefix=${PREFIX} --disable-rpath --disable-shared --enable-static --disable-doc --disable-tests \
+    && PATH=${TOOLCHAIN_DIR}/bin:${HOST_PATH} make -j${THREADS} \
+    && make -j${THREADS} install \
+    && rm -rf $(pwd)
+
+RUN git clone -b libgcrypt-1.10.1 --depth 1 https://github.com/gpg/libgcrypt \
+    && cd libgcrypt \
+    && git reset --hard ae0e567820c37f9640440b3cff77d7c185aa6742 \
+    && ./autogen.sh \
+    && CC=${ANDROID_CLANG} CXX=${ANDROID_CLANGPP} ./configure --host=aarch64-linux-android --prefix=${PREFIX} --with-gpg-error-prefix=${PREFIX} --disable-shared --enable-static --disable-doc --disable-tests \
+    && PATH=${TOOLCHAIN_DIR}/bin:${HOST_PATH} make -j${THREADS} \
+    && make -j${THREADS} install \
+    && rm -rf $(pwd)
+
+RUN git clone -b v3.31.4 --depth 1 https://github.com/Kitware/CMake \
+    && cd CMake \
+    && git reset --hard 569b821a138a4d3f7f4cc42c0cf5ae5e68d56f96 \
+    && PATH=${HOST_PATH} ./bootstrap \
+    && PATH=${HOST_PATH} make -j${THREADS} \
+    && PATH=${HOST_PATH} make -j${THREADS} install \
+    && rm -rf $(pwd)
+
+# Workaround
+ENV NEW_SDK_ROOT=${WORKDIR}/sdk
+RUN mkdir ${NEW_SDK_ROOT} \
+    && cp -r ${ANDROID_SDK_ROOT}/licenses ${NEW_SDK_ROOT} \
+    && cp -r ${ANDROID_SDK_ROOT}/platforms ${NEW_SDK_ROOT} \
+    && cp -r ${ANDROID_SDK_ROOT}/build-tools ${NEW_SDK_ROOT}
+
+CMD set -ex \
+    && cd /monero-gui \
+    && mkdir -p build/Android/release \
+    && cd build/Android/release \
+    && cmake -G Ninja \
+    -DCMAKE_TOOLCHAIN_FILE="${ANDROID_NDK_ROOT}/build/cmake/android.toolchain.cmake" \
+    -DCMAKE_PREFIX_PATH="${PREFIX}" \
+    -DCMAKE_FIND_ROOT_PATH="${PREFIX}" \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DARCH="armv8-a" \
+    -DANDROID_NATIVE_API_LEVEL=${ANDROID_NATIVE_API_LEVEL} \
+    -DANDROID_ABI="arm64-v8a" \
+    -DANDROID_TOOLCHAIN=clang \
+    -DBoost_USE_STATIC_RUNTIME=ON \
+    -DLRELEASE_PATH="${PREFIX}/bin" \
+    -DQT_ANDROID_APPLICATION_BINARY="monero-wallet-gui" \
+    -DANDROID_SDK="${NEW_SDK_ROOT}" \
+    -DWITH_SCANNER=ON \
+    -DWITH_DESKTOP_ENTRY=OFF \
+    ../../.. \
+    && PATH=${HOST_PATH} cmake --build . --target generate_translations_header \
+    && sed -i -e "/^build .*monero-wallet-gui.*:.*LINKER/,/^$/ { s#monero/external/randomx/librandomx.a##; s#-lm#-lm monero/external/randomx/librandomx.a#; }" build.ninja \
+    && cmake --build . --target monero-wallet-gui \
+    && cmake --build . --target apk
