@@ -69,8 +69,8 @@ the same configured build tree completed all 197 targets with `--parallel 1`.
 | Pinned Core EPoSe unit binary | 238/238 passed, 121.037 s |
 | GUI EPoSe adapter/producer integration tests | 8/8 passed |
 | CTest discovery | `qwertycoin-gui-epose-tests` discovered and passed 1/1 |
-| QML functional suite | 15/15 passed, including bundled FontLoader status and square title-bar logo rendering |
-| QML scale-factor matrix | 15/15 at 100%, 125%, 150% and 200% |
+| QML functional suite | 18/18 passed, including bundled FontLoader status, square title-bar logo rendering and amount-before-currency wallet summary geometry |
+| QML scale-factor matrix | 18/18 at 100%, 125%, 150% and 200% |
 | Updated German catalog | 968/968 meaningful messages translated; one intentional empty spacer |
 | Offline fixed-seed restore smoke | Passed twice with the same public test address |
 | Isolated create/send regtest | Two new wallets; 1 QWC sent, confirmed and recipient balance verified |

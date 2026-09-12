@@ -238,6 +238,7 @@ Rectangle {
 
                 MoneroComponents.TextPlain {
                     id: currencyLabel
+                    objectName: "walletSummaryCurrency"
                     font.pixelSize: 16
                     text: {
                         if (persistentSettings.fiatPriceEnabled && persistentSettings.fiatPriceToggle) {
@@ -247,8 +248,8 @@ Rectangle {
                         }
                     }
                     color: MoneroComponents.Style.defaultFontColor
-                    anchors.left: parent.left
-                    anchors.leftMargin: 20
+                    anchors.left: balancePart2.right
+                    anchors.leftMargin: MoneroComponents.Style.spaceSm
                     anchors.top: parent.top
                     anchors.topMargin: 100
                     themeTransition: false
@@ -264,9 +265,10 @@ Rectangle {
 
                 MoneroComponents.TextPlain {
                     id: balancePart1
+                    objectName: "walletSummaryAmountWhole"
                     themeTransition: false
                     anchors.left: parent.left
-                    anchors.leftMargin: 58
+                    anchors.leftMargin: 20
                     anchors.baseline: currencyLabel.baseline
                     color: MoneroComponents.Style.defaultFontColor
                     Binding on color {
@@ -303,6 +305,7 @@ Rectangle {
                 }
                 MoneroComponents.TextPlain {
                     id: balancePart2
+                    objectName: "walletSummaryAmountFraction"
                     themeTransition: false
                     anchors.left: balancePart1.right
                     anchors.leftMargin: 2
