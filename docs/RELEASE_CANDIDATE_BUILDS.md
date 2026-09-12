@@ -24,6 +24,10 @@ the committed `qwertycoin/` Gitlink and the checked-out Core revision all agree.
 The workflow checks the Core worktree again after the build so the build cannot
 silently move or dirty the reviewed pin.
 
+Compiler caches live in the checkout-local `.ccache` directory and are keyed by
+platform and exact source revision. The workflow does not depend on a runner
+context in job-level environment declarations.
+
 Run targets sequentially so a platform failure can be reviewed before another
 hosted build is started. A typical review sequence is Linux, Windows, then
 macOS:
