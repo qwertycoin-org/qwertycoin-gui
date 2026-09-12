@@ -119,20 +119,30 @@ if [[ "$platform" == "Linux" && -n "$gui_binary" ]]; then
   "$(dirname "$0")/verify_linux_abi.sh" "$artifact_dir" "$linux_glibc_ceiling"
 fi
 
-# windeployqt places these directories next to the GUI executable. Preserve
-# them when packaging a native Windows build.
+# Deployment tools place runtime directories next to the GUI executable.
+# Preserve the complete windeployqt application directory on Windows: Qt 5
+# distributions use both plugin roots (for example platforms/) and QML import
+# roots (for example QtQuick/ and Qt/), and the exact set follows the imports
+# discovered for this build.
 if [[ -n "$gui_binary" ]]; then
   gui_binary_dir=$(dirname "$gui_binary")
-  for runtime_dir in platforms imageformats qml; do
-    if [[ -d "$gui_binary_dir/$runtime_dir" && ! -e "$artifact_dir/$runtime_dir" ]]; then
-      cp -R "$gui_binary_dir/$runtime_dir" "$artifact_dir/"
-    fi
-  done
-
   if [[ "${RUNNER_OS:-}" == "Windows" ]]; then
+    while IFS= read -r -d '' runtime_dir; do
+      runtime_name=$(basename "$runtime_dir")
+      if [[ ! -e "$artifact_dir/$runtime_name" ]]; then
+        cp -R "$runtime_dir" "$artifact_dir/"
+      fi
+    done < <(find "$gui_binary_dir" -mindepth 1 -maxdepth 1 -type d -print0)
+
     while IFS= read -r -d '' runtime_dll; do
       cp "$runtime_dll" "$artifact_dir/"
     done < <(find "$gui_binary_dir" -maxdepth 1 -type f -iname '*.dll' -print0)
+  else
+    for runtime_name in platforms imageformats qml; do
+      if [[ -d "$gui_binary_dir/$runtime_name" && ! -e "$artifact_dir/$runtime_name" ]]; then
+        cp -R "$gui_binary_dir/$runtime_name" "$artifact_dir/"
+      fi
+    done
   fi
 fi
 
