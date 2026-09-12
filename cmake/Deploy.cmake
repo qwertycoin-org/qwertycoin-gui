@@ -84,13 +84,18 @@ if(APPLE OR (WIN32 AND NOT STATIC))
             libglib-2.0-0.dll
             libfreetype-6.dll
             libbz2-1.dll
+            libpcre2-8-0.dll
             libpcre2-16-0.dll
+            libmd4c.dll
             libhidapi-0.dll
             libdouble-conversion.dll
             libgcrypt-20.dll
             libgpg-error-0.dll
             libsodium-26.dll
             libzmq.dll
+            libunbound-8.dll
+            libldns-3.dll
+            libexpat-1.dll
             #platform files
             libgcc_s_seh-1.dll
             #openssl files

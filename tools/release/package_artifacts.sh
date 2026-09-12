@@ -205,6 +205,11 @@ if [[ "${RUNNER_OS:-}" == "Windows" ]]; then
   require_file "Qt Quick DLL" Qt5Quick.dll
   require_file "ANGLE EGL runtime" libEGL.dll
   require_file "ANGLE OpenGL ES runtime" libGLESv2.dll
+  require_file "Unbound runtime" libunbound-8.dll
+  require_file "LDNS runtime" libldns-3.dll
+  require_file "Expat runtime" libexpat-1.dll
+  require_file "PCRE2 8-bit runtime" libpcre2-8-0.dll
+  require_file "MD4C runtime" libmd4c.dll
   require_file "Qt Windows platform plugin" platforms/qwindows.dll
   require_file "Qt SVG image plugin" imageformats/qsvg.dll
   # windeployqt places QML imports beside the executable. Some Qt 5
@@ -213,6 +218,7 @@ if [[ "${RUNNER_OS:-}" == "Windows" ]]; then
   require_file "Qt Quick Controls 2 QML module" QtQuick/Controls.2/qmldir qml/QtQuick/Controls.2/qmldir
   require_file "Qt Quick Layouts QML module" QtQuick/Layouts/qmldir qml/QtQuick/Layouts/qmldir
   require_file "Qt Labs Platform QML module" Qt/labs/platform/qmldir qml/Qt/labs/platform/qmldir
+  "$(dirname "$0")/verify_windows_runtime.sh" "$artifact_dir"
 fi
 
 if [[ "$platform" == "Darwin" ]]; then

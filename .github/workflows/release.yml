@@ -271,6 +271,10 @@ jobs:
             mingw-w64-x86_64-zeromq
             mingw-w64-x86_64-libsodium
             mingw-w64-x86_64-unbound
+            mingw-w64-x86_64-expat
+            mingw-w64-x86_64-ldns
+            mingw-w64-x86_64-md4c
+            mingw-w64-x86_64-pcre2
             mingw-w64-x86_64-hidapi
             mingw-w64-x86_64-libusb
             mingw-w64-x86_64-qt5-base
