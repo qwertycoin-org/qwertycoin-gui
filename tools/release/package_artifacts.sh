@@ -197,9 +197,12 @@ if [[ "${RUNNER_OS:-}" == "Windows" ]]; then
   require_file "ANGLE OpenGL ES runtime" libGLESv2.dll
   require_file "Qt Windows platform plugin" platforms/qwindows.dll
   require_file "Qt SVG image plugin" imageformats/qsvg.dll
-  require_file "Qt Quick Controls 2 QML module" qml/QtQuick/Controls.2/qmldir
-  require_file "Qt Quick Layouts QML module" qml/QtQuick/Layouts/qmldir
-  require_file "Qt Labs Platform QML module" qml/Qt/labs/platform/qmldir
+  # windeployqt places QML imports beside the executable. Some Qt 5
+  # distributions preserve a qml/ prefix, while MSYS2's deployment tool
+  # writes the standard import roots directly into the application folder.
+  require_file "Qt Quick Controls 2 QML module" QtQuick/Controls.2/qmldir qml/QtQuick/Controls.2/qmldir
+  require_file "Qt Quick Layouts QML module" QtQuick/Layouts/qmldir qml/QtQuick/Layouts/qmldir
+  require_file "Qt Labs Platform QML module" Qt/labs/platform/qmldir qml/Qt/labs/platform/qmldir
 fi
 
 if [[ "$platform" == "Darwin" ]]; then
