@@ -246,18 +246,6 @@ jobs:
           ref: ${{ inputs.expected_revision }}
           submodules: false
 
-      - name: Checkout and verify pinned Core
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "$(git rev-parse HEAD)" = "$EXPECTED_REVISION"
-          git submodule sync --recursive
-          git submodule update --init --recursive
-          test -f qwertycoin/.git
-          tools/check_core_pin.sh
-          tools/check_source_tree_clean.sh
-          test "$(git -C qwertycoin rev-parse HEAD)" = "$(git rev-parse HEAD:qwertycoin)"
-
       - name: Configure MSYS2
         uses: msys2/setup-msys2@66cd2cce69caa17b53920067426061ca1de3a884 # v2
         with:
@@ -287,6 +275,20 @@ jobs:
             mingw-w64-x86_64-qt5-svg
             mingw-w64-x86_64-qt5-tools
             mingw-w64-x86_64-angleproject
+
+      # Use the same MSYS2 Git for the recursive checkout and the post-build
+      # cleanliness check. Mixing Git-for-Windows and MSYS2 Git makes the Core
+      # tree appear modified solely because their autocrlf defaults differ.
+      - name: Checkout and verify pinned Core
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_REVISION"
+          git submodule sync --recursive
+          git submodule update --init --recursive
+          test -f qwertycoin/.git
+          tools/check_core_pin.sh
+          tools/check_source_tree_clean.sh
+          test "$(git -C qwertycoin rev-parse HEAD)" = "$(git rev-parse HEAD:qwertycoin)"
 
       - name: Restore compiler cache
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
