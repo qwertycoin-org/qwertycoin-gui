@@ -273,26 +273,15 @@ Rectangle {
 
             Image {
                 id: imgLogo
-                width: 155
-                height: 44
+                width: 190
+                height: 30
                 fillMode: Image.PreserveAspectFit
 
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
 
                 source: MoneroComponents.Style.titleBarLogoSource
-                visible: {
-                    if(!isOpenGL) return true;
-                    if(!MoneroComponents.Style.blackTheme) return true;
-                    return false;
-                }
-            }
-
-            Colorize {
-                visible: isOpenGL && MoneroComponents.Style.blackTheme
-                anchors.fill: imgLogo
-                source: imgLogo
-                saturation: 0.0
+                visible: true
             }
         }
 
@@ -303,6 +292,8 @@ Rectangle {
 
             MoneroComponents.TextPlain {
                 font.pixelSize: 20
+                font.family: MoneroComponents.Style.fontMedium.name
+                font.bold: true
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 width: parent.width
@@ -410,7 +401,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        height: MoneroComponents.Style.blackTheme ? 1 : 1
+        height: MoneroComponents.Style.contourWidth
         color: MoneroComponents.Style.titleBarBackgroundBorderColor
 
         MoneroEffects.ColorTransition {

@@ -59,7 +59,7 @@ Rectangle {
         width: parent.width
         height: parent.height
         z: parent.z + 1
-        color: MoneroComponents.Style._b_leftPanelBackgroundGradientStart
+        color: MoneroComponents.Style.cardColor
     }
 
     RowLayout {
@@ -86,7 +86,7 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
 
                 fillMode: Image.PreserveAspectFit
-                source: "qrc:///images/qwertycoin-logo.png"
+                source: MoneroComponents.Style.titleBarLogoSource
             }
         }
 
@@ -104,7 +104,7 @@ Rectangle {
                 height: 3
                 width: 15
                 image: MoneroComponents.Style.titleBarMinimizeSource
-                color: "white"
+                color: MoneroComponents.Style.defaultFontColor
                 opacity: 0.75
             }
 
@@ -112,7 +112,7 @@ Rectangle {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
-                onEntered: parent.color = "#44FFFFFF"
+                onEntered: parent.color = MoneroComponents.Style.hoverOverlayColor
                 onExited: parent.color = "transparent"
                 onClicked: root.minimizeClicked();
             }
@@ -129,7 +129,7 @@ Rectangle {
             Image {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
-                source: MoneroComponents.Style._b_titleBarFullscreenSource
+                source: MoneroComponents.Style.titleBarFullscreenSource
                 sourceSize.width: 16
                 sourceSize.height: 16
                 smooth: true
@@ -143,7 +143,7 @@ Rectangle {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
-                onEntered: parent.color = "#44FFFFFF"
+                onEntered: parent.color = MoneroComponents.Style.hoverOverlayColor
                 onExited: parent.color = "transparent"
                 onClicked: root.maximizeClicked();
             }
@@ -161,8 +161,8 @@ Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
                 height: 16
                 width: 16
-                image: MoneroComponents.Style._b_titleBarCloseSource
-                color: "white"
+                image: MoneroComponents.Style.titleBarCloseSource
+                color: MoneroComponents.Style.defaultFontColor
                 opacity: 0.75
             }
 
@@ -170,7 +170,7 @@ Rectangle {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
-                onEntered: parent.color = "#44FFFFFF"
+                onEntered: parent.color = MoneroComponents.Style.hoverOverlayColor
                 onExited: parent.color = "transparent"
                 onClicked: root.closeClicked();
             }

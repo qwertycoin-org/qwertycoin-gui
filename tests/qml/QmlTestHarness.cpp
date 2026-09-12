@@ -48,7 +48,7 @@ class QmlTestSetup : public QObject
     Q_OBJECT
 
 public:
-    QmlTestSetup() : m_accountsDir(QDir::tempPath() + QStringLiteral("/monero-gui-qml-test-XXXXXX")) {}
+    QmlTestSetup() : m_accountsDir(QDir::tempPath() + QStringLiteral("/qwertycoin-gui-qml-test-XXXXXX")) {}
 
 public slots:
     void qmlEngineAvailable(QQmlEngine *engine)
@@ -64,7 +64,7 @@ public slots:
         engine->rootContext()->setContextProperty(QStringLiteral("oshelper"), &m_osHelper);
         engine->rootContext()->setContextProperty(
             QStringLiteral("moneroAccountsDir"),
-            QDir(m_accountsDir.path()).filePath(QStringLiteral("Monero/wallets")));
+            QDir(m_accountsDir.path()).filePath(QStringLiteral("Qwertycoin/wallets")));
         engine->rootContext()->setContextProperty(QStringLiteral("defaultAccountName"), QStringLiteral("qml-test-wallet"));
         engine->rootContext()->setContextProperty(QStringLiteral("isAndroid"), false);
         engine->rootContext()->setContextProperty(QStringLiteral("isIOS"), false);
@@ -101,7 +101,7 @@ bool runQmlTestsIfRequested(int argc, char *argv[], int &result)
     int testArgc = testArgv.size();
     QmlTestSetup setup;
     result = quick_test_main_with_setup(
-        testArgc, testArgv.data(), "monero-gui-qml-tests", QML_TEST_SOURCE_DIR, &setup);
+        testArgc, testArgv.data(), "qwertycoin-gui-qml-tests", QML_TEST_SOURCE_DIR, &setup);
     return true;
 }
 

@@ -30,9 +30,9 @@
             written down to backup the wallet. Wallet files are encrypted with a passphrase
             to ensure they are useless if stolen.</p>
 
-        <p>This first Qwertycoin port keeps the Monero GUI license and attribution
-            while replacing the embedded core, network defaults, URI scheme, ticker,
-            application identity and primary branding.</p>
+        <p>The Qwertycoin desktop wallet keeps its inherited BSD-3-Clause license and
+            upstream attribution while providing Qwertycoin v2 networking, local
+            RandomX node operation and an EPoSe observer and producer interface.</p>
     </description>
 
     <launchable type="desktop-id">org.qwertycoin.QwertycoinGUI.desktop</launchable>
@@ -46,10 +46,6 @@
 
     <url type="homepage">https://qwertycoin.org</url>
     <url type="bugtracker">https://github.com/qwertycoin-org/qwertycoin-gui/issues</url>
-
-    <releases>
-        <release version="0.18.5.2-qwc-port.1" date="2026-09-04"/>
-    </releases>
 
     <custom>
       <value key="upstream::source">https://github.com/monero-project/monero-gui/tree/v0.18.5.2</value>

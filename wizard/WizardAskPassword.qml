@@ -71,13 +71,13 @@ ColumnLayout {
         var strengthString;
         if(strength <= 33){
             strengthString = qsTr("Low");
-            fillRect.color = "#FF0000";
+            fillRect.color = MoneroComponents.Style.errorColor;
         } else if(strength <= 66){
             strengthString = qsTr("Medium");
-            fillRect.color = (MoneroComponents.Style.blackTheme ? "#FFFF00" : "#FFCC00");
+            fillRect.color = MoneroComponents.Style.warningTextColor;
         } else {
             strengthString = qsTr("High");
-            fillRect.color = (MoneroComponents.Style.blackTheme ? "#00FF00" : "#008000");
+            fillRect.color = MoneroComponents.Style.successColor;
         }
 
         progressText.text = passwordStrengthText + strengthString + translationManager.emptyString;
@@ -142,7 +142,7 @@ ColumnLayout {
                     property int maxWidth: bar.width
                     width: (maxWidth * root.passwordFill) / 100
                     radius: 8
-                    color: "#FF0000"
+                    color: MoneroComponents.Style.errorColor
                 }
 
                 Rectangle {
@@ -199,7 +199,7 @@ ColumnLayout {
                 Layout.topMargin: 3
                 text: passwordsMatch ? qsTr("Passwords match!") : qsTr("Passwords do not match") + translationManager.emptyString
                 textFormat: Text.PlainText
-                color: passwordsMatch ? (MoneroComponents.Style.blackTheme ? "#00FF00" : "#008000") : "#FF0000"
+                color: passwordsMatch ? MoneroComponents.Style.successColor : MoneroComponents.Style.errorColor
                 font.family: MoneroComponents.Style.fontRegular.name
                 font.pixelSize: 14
                 themeTransition: false

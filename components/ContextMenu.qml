@@ -26,10 +26,10 @@ MouseArea {
         id: contextMenu
 
         background: Rectangle {
-            border.color: MoneroComponents.Style.buttonBackgroundColorDisabledHover
-            border.width: 1
-            radius: 2
-            color: MoneroComponents.Style.blackTheme ? MoneroComponents.Style.buttonBackgroundColorDisabled : "#E5E5E5"
+            border.color: MoneroComponents.Style.borderColor
+            border.width: MoneroComponents.Style.contourWidth
+            radius: MoneroComponents.Style.radiusMd
+            color: MoneroComponents.Style.cardColor
         }
 
         padding: 1

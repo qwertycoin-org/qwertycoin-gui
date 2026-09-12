@@ -53,8 +53,8 @@ Item {
     property alias tooltipPopup: tooltip.tooltipPopup
     signal clicked()
 
-    height: small ?  30 : 36
-    width: buttonLayout.width + 22
+    height: small ? MoneroComponents.Style.compactControlHeight : MoneroComponents.Style.controlHeight
+    width: buttonLayout.width + (small ? 24 : 32)
     implicitHeight: height
     implicitWidth: width
 
@@ -64,10 +64,22 @@ Item {
     }
 
     Rectangle {
+        anchors.fill: buttonRect
+        anchors.leftMargin: 2
+        anchors.topMargin: 3
+        color: MoneroComponents.Style.shadowColor
+        opacity: button.primary && button.enabled ? 0.42 : 0
+        radius: MoneroComponents.Style.radiusMd
+    }
+
+    Rectangle {
         id: buttonRect
         anchors.fill: parent
-        radius: 3
-        border.width: parent.focus && parent.enabled ? 1 : 0
+        radius: MoneroComponents.Style.radiusMd
+        border.width: parent.focus && parent.enabled ? MoneroComponents.Style.contourWidth : 1
+        border.color: parent.focus && parent.enabled
+                      ? MoneroComponents.Style.focusColor
+                      : (primary ? MoneroComponents.Style.shadowColor : MoneroComponents.Style.borderColor)
         opacity: 1
 
         state: button.enabled ? "active" : "disabled"
@@ -120,13 +132,13 @@ Item {
     RowLayout {
         id: buttonLayout
         height: button.height
-        spacing: 11
+        spacing: MoneroComponents.Style.spaceSm
         anchors.centerIn: parent
 
         MoneroComponents.TextPlain {
             id: label
             font.family: MoneroComponents.Style.fontBold.name
-            font.bold: button.primary ? true : false
+            font.bold: true
             font.pixelSize: button.fontSize
             color: !buttonArea.pressed ? button.textColor : "transparent"
             visible: text !== ""
@@ -183,6 +195,10 @@ Item {
         onEntered: tooltip.text ? tooltip.tooltipPopup.open() : ""
         onExited: tooltip.text ? tooltip.tooltipPopup.close() : ""
         cursorShape: Qt.PointingHandCursor
+    }
+
+    transform: Translate {
+        y: buttonArea.pressed && button.enabled ? 2 : 0
     }
 
     Keys.enabled: button.visible

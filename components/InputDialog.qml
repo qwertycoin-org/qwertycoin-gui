@@ -64,7 +64,7 @@ Item {
     ColumnLayout {
         z: parent.z + 1
         id: mainLayout
-        spacing: 10
+        spacing: MoneroComponents.Style.spaceMd
         anchors { fill: parent; margins: 35 }
 
         ColumnLayout {
@@ -79,7 +79,7 @@ Item {
                 Layout.fillWidth: true
 
                 font.pixelSize: 16
-                font.family: MoneroComponents.Style.fontLight.name
+                font.family: MoneroComponents.Style.fontRegular.name
 
                 color: MoneroComponents.Style.defaultFontColor
             }
@@ -91,8 +91,8 @@ Item {
                 Layout.fillWidth: true
                 horizontalAlignment: TextInput.AlignLeft
                 verticalAlignment: TextInput.AlignVCenter
-                font.family: MoneroComponents.Style.fontLight.name
-                font.pixelSize: 24
+                font.family: MoneroComponents.Style.fontRegular.name
+                font.pixelSize: 16
                 KeyNavigation.tab: okButton
                 bottomPadding: 10
                 leftPadding: 10
@@ -102,10 +102,10 @@ Item {
                 selectedTextColor: MoneroComponents.Style.textSelectedColor
 
                 background: Rectangle {
-                    radius: 2
+                    radius: MoneroComponents.Style.radiusMd
                     border.color: MoneroComponents.Style.inputBorderColorActive
-                    border.width: 1
-                    color: MoneroComponents.Style.blackTheme ? "black" : "#A9FFFFFF"
+                    border.width: MoneroComponents.Style.contourWidth
+                    color: MoneroComponents.Style.cardColor
                 }
 
                 Keys.enabled: root.visible

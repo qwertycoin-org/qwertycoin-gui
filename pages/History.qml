@@ -601,7 +601,7 @@ Rectangle {
                 }
                 color: {
                     if(!collapsed) return "transparent"
-                    return MoneroComponents.Style.blackTheme ? "#06FFFFFF" : "#04000000"
+                    return MoneroComponents.Style.subtleOverlayColor
                 }
 
                 Rectangle {
@@ -619,7 +619,7 @@ Rectangle {
                         width: 10
                         height: 10
                         radius: 8
-                        color: isout ? "#d85a00" : "#2eb358"
+                        color: isout ? MoneroComponents.Style.outgoingAmountColor : MoneroComponents.Style.incomingAmountColor
                     }
 
                     MoneroComponents.TextPlain {
@@ -631,7 +631,7 @@ Rectangle {
                         font.styleName: isFailed ? "Solid" : ""
                         font.pixelSize: 15
                         text: isFailed ? FontAwesome.times : FontAwesome.clockO
-                        color: isFailed ? "#FF0000" : MoneroComponents.Style.defaultFontColor
+                        color: isFailed ? MoneroComponents.Style.errorColor : MoneroComponents.Style.defaultFontColor
                         themeTransition: false
                     }
                 }

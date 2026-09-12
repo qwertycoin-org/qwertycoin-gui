@@ -26,3 +26,4 @@ test-*line
 test-*lib
 dictgen
 dict-*.h
+!dict-src.h

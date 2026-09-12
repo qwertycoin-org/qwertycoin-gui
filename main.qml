@@ -152,6 +152,7 @@ ApplicationWindow {
         if(seq === "Ctrl+S") middlePanel.state = "Transfer"
         else if(seq === "Ctrl+R") middlePanel.state = "Receive"
         else if(seq === "Ctrl+H") middlePanel.state = "History"
+        else if(seq === "Ctrl+P") middlePanel.state = "Epose"
         else if(seq === "Ctrl+B") middlePanel.state = "AddressBook"
         else if(seq === "Ctrl+E") middlePanel.state = "Settings"
         else if(seq === "Ctrl+D") middlePanel.state = "Advanced"
@@ -673,6 +674,7 @@ ApplicationWindow {
                 0,
                 persistentSettings.getWalletProxyAddress());
             walletManager.setDaemonAddressAsync(currentDaemonAddress);
+            configureEposeObservation();
         };
 
         if (typeof daemonManager != "undefined" && daemonRunning) {
@@ -703,7 +705,27 @@ ApplicationWindow {
             0,
             persistentSettings.getWalletProxyAddress());
         walletManager.setDaemonAddressAsync(currentDaemonAddress);
+        configureEposeObservation();
         firstBlockSeen = 0;
+    }
+
+    function configureEposeObservation() {
+        if (typeof eposeManager === "undefined")
+            return;
+        if (persistentSettings.useRemoteNode) {
+            const remoteNode = remoteNodesModel.currentRemoteNode();
+            if (remoteNode && remoteNode.address) {
+                eposeManager.configure(remoteNode.address,
+                                       remoteNode.username || "",
+                                       remoteNode.password || "",
+                                       false);
+            } else {
+                eposeManager.clear();
+            }
+        } else {
+            eposeManager.configure(localDaemonAddress, "", "",
+                                   persistentSettings.eposeServiceEnabled);
+        }
     }
 
     function onHeightRefreshed(bcHeight, dCurrentBlock, dTargetBlock) {
@@ -767,7 +789,21 @@ ApplicationWindow {
 
         const noSync = appWindow.walletMode === 0;
         const bootstrapNodeAddress = persistentSettings.walletMode < 2 ? "auto" : persistentSettings.bootstrapNodeAddress
-        daemonManager.start(flags, persistentSettings.nettype, persistentSettings.blockchainDataDir, bootstrapNodeAddress, noSync, persistentSettings.pruneBlockchain);
+        if (persistentSettings.eposeServiceEnabled && !noSync) {
+            daemonManager.startEposeService(
+                flags,
+                persistentSettings.nettype,
+                persistentSettings.blockchainDataDir,
+                bootstrapNodeAddress,
+                persistentSettings.eposeRewardAddress,
+                persistentSettings.eposeEndpointHost,
+                persistentSettings.eposeEndpointPort,
+                persistentSettings.eposeDiscoveryEndpoints,
+                noSync,
+                persistentSettings.pruneBlockchain);
+        } else {
+            daemonManager.start(flags, persistentSettings.nettype, persistentSettings.blockchainDataDir, bootstrapNodeAddress, noSync, persistentSettings.pruneBlockchain);
+        }
     }
 
     function stopDaemon(callback, splash){
@@ -788,6 +824,7 @@ ApplicationWindow {
     function onDaemonStarted(){
         console.log("daemon started");
         daemonStartStopInProgress = 0;
+        configureEposeObservation();
         if (currentWallet) {
             currentWallet.connected(true);
             // resume refresh
@@ -1107,10 +1144,10 @@ ApplicationWindow {
                 informationPopup.icon = StandardIcon.Critical;
             } else if (received > 0) {
                 if (in_pool) {
-                    informationPopup.text = qsTr("This address received %1 monero, but the transaction is not yet mined").arg(walletManager.displayAmount(received));
+                    informationPopup.text = qsTr("This address received %1 QWC, but the transaction is not yet mined").arg(walletManager.displayAmount(received));
                 }
                 else {
-                    informationPopup.text = qsTr("This address received %1 monero, with %2 confirmation(s).").arg(walletManager.displayAmount(received)).arg(confirmations);
+                    informationPopup.text = qsTr("This address received %1 QWC, with %2 confirmation(s).").arg(walletManager.displayAmount(received)).arg(confirmations);
                 }
             }
             else {
@@ -1419,6 +1456,14 @@ ApplicationWindow {
         property bool autosave: true
         property int autosaveMinutes: 10
         property bool pruneBlockchain: false
+
+        // Public EPoSe producer configuration. The private operator/service
+        // authorities remain exclusively in the Core-owned 0600 keystore.
+        property bool eposeServiceEnabled: false
+        property string eposeRewardAddress: ""
+        property string eposeEndpointHost: ""
+        property int eposeEndpointPort: 8198
+        property string eposeDiscoveryEndpoints: ""
 
         property bool fiatPriceEnabled: false
         property bool fiatPriceToggle: false
@@ -1802,6 +1847,12 @@ ApplicationWindow {
                     updateBalance();
                 }
 
+                onEposeClicked: {
+                    middlePanel.state = "Epose";
+                    middlePanel.flickable.contentY = 0;
+                    appWindow.configureEposeObservation();
+                }
+
                 onAddressBookClicked: {
                     middlePanel.state = "AddressBook";
                     middlePanel.flickable.contentY = 0;
@@ -1934,8 +1985,8 @@ ApplicationWindow {
             property alias text: content.text
             width: content.width + 12
             height: content.height + 17
-            color: "#FF6C3C"
-            //radius: 3
+            color: MoneroComponents.Style.accentGold
+            radius: MoneroComponents.Style.radiusSm
             visible:false;
 
             Image {
@@ -1951,9 +2002,9 @@ ApplicationWindow {
                 anchors.horizontalCenter: parent.horizontalCenter
                 y: 6
                 lineHeight: 0.7
-                font.family: "Arial"
+                font.family: MoneroComponents.Style.fontMedium.name
                 font.pixelSize: 12
-                color: "#FFFFFF"
+                color: "#141414"
             }
         }
     }
@@ -2063,7 +2114,10 @@ ApplicationWindow {
         anchors.bottom: parent.bottom
         width: statusMessageText.contentWidth + 20
         anchors.horizontalCenter: parent.horizontalCenter
-        color: MoneroComponents.Style.blackTheme ? "black" : "white"
+        color: MoneroComponents.Style.cardColor
+        radius: MoneroComponents.Style.radiusMd
+        border.width: MoneroComponents.Style.contourWidth
+        border.color: MoneroComponents.Style.borderColor
         height: 40
         MoneroComponents.TextPlain {
             id: statusMessageText
@@ -2297,7 +2351,7 @@ ApplicationWindow {
         visible: blur.visible
         anchors.fill: parent
         anchors.topMargin: titleBar.height
-        color: MoneroComponents.Style.blackTheme ? "black" : "white"
+        color: MoneroComponents.Style.canvasColor
         opacity: isOpenGL ? 0.3 : inputDialog.visible || splash.visible ? 0.7 : 1.0
 
         MoneroEffects.ColorTransition {

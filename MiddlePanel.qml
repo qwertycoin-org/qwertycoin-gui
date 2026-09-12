@@ -57,6 +57,7 @@ Rectangle {
     property Receive receiveView: Receive { }
     property Merchant merchantView: Merchant { }
     property History historyView: History { }
+    property Epose eposeView: Epose { }
     property Advanced advancedView: Advanced { }
     property Settings settingsView: Settings { }
     property AddressBook addressBookView: AddressBook { }
@@ -127,6 +128,10 @@ Rectangle {
                 name: "History"
                 PropertyChanges { target: root; currentView: historyView }
                 PropertyChanges { target: mainFlickable; contentHeight: historyView.contentHeight + 80}
+            }, State {
+                name: "Epose"
+                PropertyChanges { target: root; currentView: eposeView }
+                PropertyChanges { target: mainFlickable; contentHeight: eposeView.contentHeight }
             }, State {
                 name: "Transfer"
                 PropertyChanges { target: root; currentView: transferView }
@@ -246,10 +251,10 @@ Rectangle {
         }
     }
 
-    // border shadow
-    Image {
-        source: "qrc:///images/middlePanelShadow.png"
-        width: 12
+    // crisp panel separation
+    Rectangle {
+        color: MoneroComponents.Style.borderSubtleColor
+        width: MoneroComponents.Style.contourWidth
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: borderLeft.right

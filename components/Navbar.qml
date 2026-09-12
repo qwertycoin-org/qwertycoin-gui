@@ -44,12 +44,12 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
         columnSpacing: 0
-        property string fontColorActive: MoneroComponents.Style.blackTheme ? "white" : "white"
-        property string fontColorInActive: MoneroComponents.Style.blackTheme ? "white" : MoneroComponents.Style.dimmedFontColor
+        property string fontColorActive: "#141414"
+        property string fontColorInActive: MoneroComponents.Style.textSecondaryColor
         property int fontSize: 15
         property bool fontBold: true
-        property var fontFamily: MoneroComponents.Style.fontRegular.name
-        property string borderColor: MoneroComponents.Style.blackTheme ? "#808080" : "#B9B9B9"
+        property var fontFamily: MoneroComponents.Style.fontMedium.name
+        property string borderColor: MoneroComponents.Style.borderColor
         property int textMargin: {
             // left-right margins for a given cell
             if(appWindow.width < 890){
@@ -133,7 +133,7 @@ Rectangle {
                     Rectangle {
                         Layout.minimumHeight: 30
                         Layout.fillWidth: true
-                        color: items[index].active ? grid.borderColor : "transparent"
+                        color: items[index].active ? MoneroComponents.Style.accentGold : "transparent"
                         implicitHeight: children[0].implicitHeight
                         implicitWidth: children[0].implicitWidth
 

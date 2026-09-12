@@ -62,7 +62,7 @@ ListView {
 
         font.pixelSize: 14
         font.bold: false
-        color: "#767676"
+        color: MoneroComponents.Style.textSecondaryColor
         textFormat: Text.RichText
         text: parent.message
         selectionColor: MoneroComponents.Style.textSelectionColor
@@ -103,7 +103,7 @@ ListView {
                         anchors.verticalCenter: parent.verticalCenter
                         font.pixelSize: 13
                         font.bold: false
-                        color: "#707070"
+                        color: MoneroComponents.Style.textSecondaryColor
                         text: time_date + " (" + Utils.ago(time_epoch) + ") "
                         selectionColor: MoneroComponents.Style.textSelectionColor
                         selectByMouse: true
@@ -127,7 +127,7 @@ ListView {
                             readOnly: true
                             font.pixelSize: 12
                             font.bold: false
-                            color: "#707070"
+                            color: MoneroComponents.Style.textSecondaryColor
                             text: (hide_amount ? "(" + qsTr("show") + ")" : "(" + qsTr("hide") + ")") + translationManager.emptyString
                         }
 
@@ -152,7 +152,7 @@ ListView {
                         anchors.verticalCenter: parent.verticalCenter
                         font.pixelSize: 14
                         font.bold: true
-                        color: hide_amount ? "#707070" : "#009F1E"
+                        color: hide_amount ? MoneroComponents.Style.textSecondaryColor : MoneroComponents.Style.incomingAmountColor
                         text: hide_amount ? '-' : '+' + amount + (in_txpool ? ' (%1)'.arg(qsTr('unconfirmed')) : '')
                         selectionColor: MoneroComponents.Style.textSelectionColor
                         selectByMouse: true
@@ -185,7 +185,7 @@ ListView {
                         anchors.verticalCenter: parent.verticalCenter
                         font.pixelSize: 12
                         font.bold: false
-                        color: "#a8a8a8"
+                        color: MoneroComponents.Style.textSecondaryColor
                         text: {
                             if(in_txpool){
                                 return qsTr("Awaiting in txpool") + translationManager.emptyString;
@@ -253,7 +253,7 @@ ListView {
             anchors.left: parent.left
             anchors.top: container.bottom
             height: 1
-            color: "#F0F0F0"
+            color: MoneroComponents.Style.borderSubtleColor
         }
     }
 }

@@ -176,6 +176,10 @@ Item {
         name: "Wizard"
         when: windowShown
 
+        function test_bundled_brand_fonts_load() {
+            tryCompare(MoneroComponents.Style, "fontsReady", true, 5000)
+        }
+
         function walletPath(walletName) {
             return appWindow.accountsDir + "/" + walletName + "/" + walletName
         }

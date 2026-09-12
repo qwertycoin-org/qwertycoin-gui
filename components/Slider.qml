@@ -41,7 +41,7 @@ ColumnLayout {
             Rectangle {
                 width: parent.visualPosition * parent.width
                 height: parent.height
-                color: MoneroComponents.Style.green
+                color: MoneroComponents.Style.accentGold
                 radius: 2
             }
         }
@@ -52,8 +52,9 @@ ColumnLayout {
             implicitWidth: 18
             implicitHeight: 18
             radius: 8
-            color: parent.pressed ? "#f0f0f0" : "#f6f6f6"
-            border.color: MoneroComponents.Style.grey
+            color: parent.pressed ? MoneroComponents.Style.accentGoldSoft : MoneroComponents.Style.cardColor
+            border.color: parent.activeFocus ? MoneroComponents.Style.focusColor : MoneroComponents.Style.borderColor
+            border.width: MoneroComponents.Style.contourWidth
         }
 
         onMoved: parent.moved()

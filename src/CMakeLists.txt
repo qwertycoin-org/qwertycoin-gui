@@ -95,11 +95,11 @@ message(STATUS "OpenGL: libraries at ${OPENGL_LIBRARIES}")
 target_include_directories(qwertycoin-gui PUBLIC ${Qt5Gui_PRIVATE_INCLUDE_DIRS})
 
 target_include_directories(qwertycoin-gui PUBLIC
-	${CMAKE_SOURCE_DIR}/monero/include
-    ${CMAKE_SOURCE_DIR}/monero/src
-    ${CMAKE_SOURCE_DIR}/monero/external/easylogging++
-    ${CMAKE_SOURCE_DIR}/monero/contrib/epee/include
-    ${CMAKE_SOURCE_DIR}/monero/external/qrcodegen
+	${CMAKE_SOURCE_DIR}/qwertycoin/include
+    ${CMAKE_SOURCE_DIR}/qwertycoin/src
+    ${CMAKE_SOURCE_DIR}/qwertycoin/external/easylogging++
+    ${CMAKE_SOURCE_DIR}/qwertycoin/contrib/epee/include
+    ${CMAKE_SOURCE_DIR}/qwertycoin/external/qrcodegen
 	${CMAKE_CURRENT_SOURCE_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}/daemon
     ${CMAKE_CURRENT_SOURCE_DIR}/p2pool
@@ -137,9 +137,12 @@ target_link_libraries(qwertycoin-gui
     epee
     common
     net
+    epose
     wallet_api
     qrcodegen
     easylogging
+    Qt5::Network
+    Qt5::Concurrent
     ${QT5_LIBRARIES}
     ${EXTRA_LIBRARIES}
     openpgp
@@ -167,3 +170,38 @@ include(Deploy)
 install(TARGETS qwertycoin-gui
     DESTINATION bin
 )
+
+if(QML_TESTS)
+    add_executable(qwertycoin-gui-epose-tests
+        "${CMAKE_SOURCE_DIR}/tests/epose/tst_EposeIntegration.cpp"
+        daemon/DaemonManager.cpp
+        qt/EposeManager.cpp
+        qt/FutureScheduler.cpp
+    )
+    set_target_properties(qwertycoin-gui-epose-tests PROPERTIES
+        AUTOMOC ON
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    )
+    target_include_directories(qwertycoin-gui-epose-tests PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/daemon"
+        "${CMAKE_SOURCE_DIR}/qwertycoin/src"
+        "${CMAKE_SOURCE_DIR}/qwertycoin/contrib/epee/include"
+        "${CMAKE_SOURCE_DIR}/qwertycoin/external/easylogging++"
+    )
+    target_link_libraries(qwertycoin-gui-epose-tests
+        epee
+        common
+        net
+        epose
+        Qt5::Core
+        Qt5::Network
+        Qt5::Concurrent
+        Qt5::Qml
+        Qt5::Test
+        Qt5::Widgets
+        ${EXTRA_LIBRARIES}
+    )
+    add_test(NAME qwertycoin-gui-epose-tests
+             COMMAND qwertycoin-gui-epose-tests)
+endif()

@@ -13,10 +13,10 @@ Rectangle {
     Layout.fillWidth: true
     Layout.preferredHeight: warningLayout.height
 
-    color: MoneroComponents.Style.titleBarButtonHoverColor
-    radius: 4
-    border.color: MoneroComponents.Style.inputBorderColorInActive
-    border.width: 1
+    color: MoneroComponents.Style.warningSurfaceColor
+    radius: MoneroComponents.Style.radiusMd
+    border.color: MoneroComponents.Style.accentGold
+    border.width: MoneroComponents.Style.contourWidth
 
     signal linkActivated;
 
@@ -30,10 +30,10 @@ Rectangle {
             Layout.alignment: Qt.AlignVCenter
             Layout.preferredHeight: 33
             Layout.preferredWidth: 33
-            Layout.rightMargin: 12
-            Layout.leftMargin: 18
-            Layout.topMargin: 12
-            Layout.bottomMargin: 12
+            Layout.rightMargin: MoneroComponents.Style.spaceMd
+            Layout.leftMargin: MoneroComponents.Style.spaceLg
+            Layout.topMargin: MoneroComponents.Style.spaceMd
+            Layout.bottomMargin: MoneroComponents.Style.spaceMd
             source: "qrc:///images/warning.png"
         }
 

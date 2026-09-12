@@ -38,7 +38,10 @@ import "effects/" as MoneroEffects
 
 Rectangle {
     id: root
-    color: "transparent"
+    color: MoneroComponents.Style.cardColor
+    radius: MoneroComponents.Style.radiusLg
+    border.width: MoneroComponents.Style.contourWidth
+    border.color: MoneroComponents.Style.borderColor
     visible: false
     property alias title: dialogTitle.text
     property alias text: dialogContent.text
@@ -97,15 +100,14 @@ Rectangle {
         closeCallback();
     }
 
-    // TODO: implement without hardcoding sizes
-    width: 520
-    height: 380
+    width: Math.min(560, Math.max(320, parent ? parent.width - 48 : 560))
+    height: Math.min(460, Math.max(320, parent ? parent.height - 96 : 420))
 
     ColumnLayout {
         id: mainLayout
-        spacing: 10
+        spacing: MoneroComponents.Style.spaceMd
         anchors.fill: parent
-        anchors.margins: 20
+        anchors.margins: MoneroComponents.Style.spaceXl
 
         RowLayout {
             id: column
@@ -114,8 +116,8 @@ Rectangle {
 
             MoneroComponents.Label {
                 id: dialogTitle
-                fontSize: 18
-                fontFamily: "Arial"
+                fontSize: 24
+                fontFamily: MoneroComponents.Style.fontDisplay.name
                 color: MoneroComponents.Style.defaultFontColor
             }
         }
@@ -166,7 +168,7 @@ Rectangle {
         // Ok/Cancel buttons
         RowLayout {
             id: buttons
-            spacing: 60
+            spacing: MoneroComponents.Style.spaceLg
             Layout.alignment: Qt.AlignHCenter
 
             MoneroComponents.StandardButton {
@@ -216,23 +218,23 @@ Rectangle {
                 root.rejected()
             }
             cursorShape: Qt.PointingHandCursor
-            onEntered: closeButton.color = "#262626";
+            onEntered: closeButton.color = MoneroComponents.Style.titleBarButtonHoverColor;
             onExited: closeButton.color = "transparent";
         }
     }
 
     // window borders
     Rectangle{
-        width: 1
-        color: MoneroComponents.Style.grey
+        width: 0
+        color: "transparent"
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
     }
 
     Rectangle{
-        width: 1
-        color: MoneroComponents.Style.grey
+        width: 0
+        color: "transparent"
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom

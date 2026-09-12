@@ -39,6 +39,8 @@
 #include "qt/FutureScheduler.h"
 #include "NetworkType.h"
 
+class EposeIntegrationTest;
+
 class DaemonManager : public QObject
 {
     Q_OBJECT
@@ -48,6 +50,25 @@ public:
     ~DaemonManager();
 
     Q_INVOKABLE bool start(const QString &flags, NetworkType::Type nettype, const QString &dataDir = "", const QString &bootstrapNodeAddress = "", bool noSync = false, bool pruneBlockchain = false);
+    Q_INVOKABLE QVariantMap validateEposeServiceConfig(
+        const QString &flags,
+        NetworkType::Type nettype,
+        const QString &dataDir,
+        const QString &rewardAddress,
+        const QString &endpointHost,
+        int endpointPort,
+        const QString &discoveryEndpoints) const;
+    Q_INVOKABLE bool startEposeService(
+        const QString &flags,
+        NetworkType::Type nettype,
+        const QString &dataDir,
+        const QString &bootstrapNodeAddress,
+        const QString &rewardAddress,
+        const QString &endpointHost,
+        int endpointPort,
+        const QString &discoveryEndpoints,
+        bool noSync = false,
+        bool pruneBlockchain = false);
     Q_INVOKABLE void stopAsync(NetworkType::Type nettype, const QString &dataDir, const QJSValue& callback);
 
     Q_INVOKABLE bool noSync() const noexcept;
@@ -61,6 +82,22 @@ public:
     Q_INVOKABLE QString getArgs(const QString &dataDir);
 
 private:
+
+    friend class EposeIntegrationTest;
+
+    bool startWithArguments(const QStringList &customArguments,
+                            NetworkType::Type nettype,
+                            const QString &dataDir,
+                            const QString &bootstrapNodeAddress,
+                            bool noSync,
+                            bool pruneBlockchain);
+    QStringList eposeServiceArguments(
+        const QString &flags,
+        const QString &rewardAddress,
+        const QString &endpointHost,
+        int endpointPort,
+        const QVariantMap &validation) const;
+    QString eposeKeystorePath(const QString &dataDir, NetworkType::Type nettype) const;
 
     bool running(NetworkType::Type nettype, const QString &dataDir) const;
     bool sendCommand(const QStringList &cmd, NetworkType::Type nettype, const QString &dataDir, QString &message) const;

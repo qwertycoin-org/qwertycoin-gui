@@ -33,6 +33,7 @@ import "../" as MoneroComponents
 
 Item {
     id: root
+    readonly property bool softwareFallback: !isOpenGL || GraphicsInfo.api === GraphicsInfo.Software
     property string fallBackColor: ""
     property string blackColorStart: ""
     property string blackColorStop: ""
@@ -49,14 +50,14 @@ Item {
 
     // background software renderer
     Rectangle {
-        visible: !isOpenGL
+        visible: root.softwareFallback
         anchors.fill: parent
         color: root.fallBackColor
     }
 
     // background opengl
     LinearGradient {
-        visible: isOpenGL
+        visible: !root.softwareFallback
         anchors.fill: parent
         start: root.start
         end: root.end
@@ -76,7 +77,7 @@ Item {
         states: [
             State {
                 name: "black";
-                when: isOpenGL && MoneroComponents.Style.blackTheme
+                when: !root.softwareFallback && MoneroComponents.Style.blackTheme
                 PropertyChanges {
                     target: gradientStart
                     color: root.blackColorStart
@@ -87,7 +88,7 @@ Item {
                 }
             }, State {
                 name: "white";
-                when: isOpenGL && !MoneroComponents.Style.blackTheme
+                when: !root.softwareFallback && !MoneroComponents.Style.blackTheme
                 PropertyChanges {
                     target: gradientStart
                     color: root.whiteColorStart

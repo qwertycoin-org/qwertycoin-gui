@@ -38,13 +38,13 @@ Rectangle {
     x: parent.width/2 - root.width/2
     y: parent.height/2 - root.height/2
     // TODO: implement without hardcoding sizes
-    width: 580
+    width: Math.min(580, Math.max(320, parent.width - 48))
     height: 400
-    color: MoneroComponents.Style.blackTheme ? "black" : "white"
+    color: MoneroComponents.Style.cardColor
     visible: false
-    radius: 10
-    border.color: MoneroComponents.Style.blackTheme ? Qt.rgba(255, 255, 255, 0.25) : Qt.rgba(0, 0, 0, 0.25)
-    border.width: 1
+    radius: MoneroComponents.Style.radiusLg
+    border.color: MoneroComponents.Style.borderColor
+    border.width: MoneroComponents.Style.contourWidth
     Keys.enabled: true
     Keys.onEscapePressed: {
         root.close()
@@ -81,8 +81,8 @@ Rectangle {
             Layout.alignment: Qt.AlignCenter
 
             MoneroComponents.Label {
-                fontSize: 18
-                fontFamily: "Arial"
+                fontSize: 24
+                fontFamily: MoneroComponents.Style.fontDisplay.name
                 horizontalAlignment: Text.AlignHCenter
                 text: {
                     if (appWindow.viewOnly){

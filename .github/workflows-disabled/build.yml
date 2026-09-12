@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: false
+          submodules: recursive
 
       - name: Validate metadata
         run: |
@@ -56,9 +56,11 @@ jobs:
 
       - name: Check submodule declaration
         run: |
-          grep -q 'path = monero' .gitmodules
+          grep -q '\[submodule "qwertycoin"\]' .gitmodules
+          grep -q 'path = qwertycoin' .gitmodules
           grep -q 'qwertycoin-org/qwertycoin.git' .gitmodules
-          git ls-tree HEAD monero | grep -q '1c4c1bf10c387887a42243dc690a65abb6c6e786'
+          git ls-tree HEAD qwertycoin | grep -q '09086f7dbaaf1a4ff16bddeaa1d729f9ff65eca6'
+          tools/check_core_pin.sh
 
       - name: Validate release automation
         run: |

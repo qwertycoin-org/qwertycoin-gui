@@ -43,13 +43,13 @@ Rectangle {
     x: parent.width/2 - root.width/2
     y: parent.height/2 - root.height/2
     // TODO: implement without hardcoding sizes
-    width: 590
+    width: Math.min(590, Math.max(320, parent.width - 48))
     height: layout.height + layout.anchors.margins * 2
-    color: MoneroComponents.Style.blackTheme ? "black" : "white"
+    color: MoneroComponents.Style.cardColor
     visible: false
-    radius: 10
-    border.color: MoneroComponents.Style.blackTheme ? Qt.rgba(255, 255, 255, 0.25) : Qt.rgba(0, 0, 0, 0.25)
-    border.width: 1
+    radius: MoneroComponents.Style.radiusLg
+    border.color: MoneroComponents.Style.borderColor
+    border.width: MoneroComponents.Style.contourWidth
     Keys.enabled: true
     Keys.onEscapePressed: {
         root.close()
@@ -160,8 +160,8 @@ Rectangle {
             MoneroComponents.Label {
                 id: dialogTitle
                 Layout.fillWidth: true
-                fontSize: 18
-                fontFamily: "Arial"
+                fontSize: 24
+                fontFamily: MoneroComponents.Style.fontDisplay.name
                 horizontalAlignment: Text.AlignHCenter
                 text: {
                     if (appWindow.viewOnly) {
@@ -341,7 +341,7 @@ Rectangle {
 
                 Text {
                     property bool maliciousTxFee: parseFloat(root.transactionFee) > 0.01
-                    color: maliciousTxFee ? "red" : MoneroComponents.Style.defaultFontColor
+                    color: maliciousTxFee ? MoneroComponents.Style.errorColor : MoneroComponents.Style.defaultFontColor
                     font.pixelSize: maliciousTxFee ? 20 : 15
                     text: {
                         if (currentWallet) {

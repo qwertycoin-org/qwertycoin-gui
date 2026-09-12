@@ -42,7 +42,9 @@ Drawer {
     y: titleBar.height
 
     background: Rectangle {
-        color: MoneroComponents.Style.blackTheme ? "#0d0d0d" : "white"
+        color: MoneroComponents.Style.cardColor
+        border.width: MoneroComponents.Style.contourWidth
+        border.color: MoneroComponents.Style.borderSubtleColor
         width: parent.width
     }
 
@@ -50,7 +52,7 @@ Drawer {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        color: "red"
+        color: MoneroComponents.Style.cardColor
 
         ListView {
             id: languagesListView
@@ -71,7 +73,7 @@ Drawer {
 
             delegate: Rectangle {
                 id: item
-                color: index == languagesListView.currentIndex ? MoneroComponents.Style.titleBarButtonHoverColor : "transparent"
+                color: index == languagesListView.currentIndex ? MoneroComponents.Style.raisedColor : "transparent"
                 width: sideBar.width
                 height: 32
 
@@ -102,8 +104,8 @@ Drawer {
                     anchors.left: parent.left
                     anchors.leftMargin: 0
                     height: parent.height
-                    width: 2
-                    color: index == languagesListView.currentIndex ? MoneroComponents.Style.buttonBackgroundColor : "transparent"
+                    width: MoneroComponents.Style.contourWidth
+                    color: index == languagesListView.currentIndex ? MoneroComponents.Style.accentGold : "transparent"
                 }
 
                 Rectangle {

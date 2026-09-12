@@ -49,8 +49,8 @@ Window {
         id: rect
         width: content.width + 12
         height: content.height + 17
-        color: "#FF6C3C"
-        //radius: 3
+        color: MoneroComponents.Style.accentGold
+        radius: MoneroComponents.Style.radiusSm
 
         Image {
             id: tip
@@ -65,9 +65,9 @@ Window {
             anchors.horizontalCenter: parent.horizontalCenter
             y: 6
             lineHeight: 0.7
-            font.family: "Arial"
+            font.family: MoneroComponents.Style.fontMedium.name
             font.pixelSize: 12
-            color: "#FFFFFF"
+            color: "#141414"
         }
     }
 }

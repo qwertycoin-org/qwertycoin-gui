@@ -91,8 +91,8 @@ Rectangle {
             anchors.right: parent.right
             anchors.top: progressText.bottom
             anchors.topMargin: 4
-            height: 8
-            radius: 8
+            height: 10
+            radius: MoneroComponents.Style.radiusSm
             color: MoneroComponents.Style.progressBarBackgroundColor
 
             states: [
@@ -120,8 +120,8 @@ Rectangle {
                 height: bar.height
                 property int maxWidth: bar.width
                 width: (maxWidth * fillLevel) / 100
-                radius: 8
-                color: "#FA6800"
+                radius: MoneroComponents.Style.radiusSm
+                color: MoneroComponents.Style.accentGold
             }
 
             Rectangle {

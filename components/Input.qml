@@ -34,8 +34,8 @@ import "../components" as MoneroComponents
 TextField {
     id: textField
     font.family: MoneroComponents.Style.fontRegular.name
-    font.pixelSize: 18
-    font.bold: true
+    font.pixelSize: 16
+    font.bold: false
     horizontalAlignment: TextInput.AlignLeft
     selectByMouse: true
     color: MoneroComponents.Style.defaultFontColor

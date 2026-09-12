@@ -17,13 +17,14 @@
         <file>images/whatIsIcon.png</file>
         <file>images/whatIsIcon@2x.png</file>
         <file>components/MenuButton.qml</file>
-        <file>monero/utils/gpg_keys/binaryfate.asc</file>
-        <file>monero/utils/gpg_keys/fluffypony.asc</file>
-        <file>monero/utils/gpg_keys/luigi1111.asc</file>
+        <file>qwertycoin/utils/gpg_keys/binaryfate.asc</file>
+        <file>qwertycoin/utils/gpg_keys/fluffypony.asc</file>
+        <file>qwertycoin/utils/gpg_keys/luigi1111.asc</file>
         <file>pages/Account.qml</file>
         <file>pages/Advanced.qml</file>
         <file>pages/Transfer.qml</file>
         <file>pages/History.qml</file>
+        <file>pages/Epose.qml</file>
         <file>pages/AddressBook.qml</file>
         <file>pages/Mining.qml</file>
         <file>components/ContextMenu.qml</file>
@@ -35,7 +36,6 @@
         <file>components/TipItem.qml</file>
         <file>images/tip.png</file>
         <file>components/MenuButtonDivider.qml</file>
-        <file>images/monero-vector.svg</file>
         <file>components/StandardDropdown.qml</file>
         <file>images/whiteDropIndicator.png</file>
         <file>images/whiteDropIndicator@2x.png</file>
@@ -139,9 +139,6 @@
         <file>images/card-background-black7@2x.png</file>
         <file>images/card-background-white.png</file>
         <file>images/card-background-white@2x.png</file>
-        <file>images/moneroLogo_white.png</file>
-        <file>images/titlebarLogo.png</file>
-        <file>images/titlebarLogo@2x.png</file>
         <file>pages/merchant/MerchantTitlebar.qml</file>
         <file>images/menuButtonGradient.png</file>
         <file>fonts/Roboto-Medium.ttf</file>
@@ -152,15 +149,22 @@
         <file>fonts/RobotoMono-Regular.ttf</file>
         <file>fonts/RobotoMono-Light.ttf</file>
         <file>fonts/RobotoMono-Bold.ttf</file>
+        <file>fonts/Inter/Inter-Regular.otf</file>
+        <file>fonts/Inter/Inter-SemiBold.otf</file>
+        <file>fonts/Archivo/Archivo-Black.otf</file>
+        <file>images/brand/qwertycoin-mark.svg</file>
+        <file>images/brand/qwertycoin-wordmark-dark.svg</file>
+        <file>images/brand/qwertycoin-wordmark-light.svg</file>
         <file>components/Style.qml</file>
+        <file>components/BrandCard.qml</file>
+        <file>components/SectionHeader.qml</file>
+        <file>components/StatusChip.qml</file>
         <file>components/qmldir</file>
         <file>components/InlineButton.qml</file>
         <file>images/lightning.png</file>
         <file>images/lightning@2x.png</file>
         <file>images/logout.png</file>
         <file>images/logout@2x.png</file>
-        <file>images/moneroIcon-28x28.png</file>
-        <file>images/moneroIcon-28x28@2x.png</file>
         <file>images/lightning-white.png</file>
         <file>images/lightning-white@2x.png</file>
         <file>components/InputMulti.qml</file>
@@ -258,8 +262,6 @@
         <file>images/arrow-right-in-circle@2x.png</file>
         <file>images/right.svg</file>
         <file>images/middlePanelShadow.png</file>
-        <file>images/themes/white/titlebarLogo@2x.png</file>
-        <file>images/themes/white/titlebarLogo.png</file>
         <file>images/fullscreen.svg</file>
         <file>images/close.svg</file>
         <file>images/minimize.svg</file>

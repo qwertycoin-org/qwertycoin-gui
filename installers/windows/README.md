@@ -1,45 +1,33 @@
-# Monero GUI Wallet Windows Installer #
+# Qwertycoin GUI Windows Installer
 
 Copyright (c) 2017-2024, The Monero Project
+Copyright (c) 2026, The Qwertycoin Project
 
-## Introduction ##
+This directory contains the Inno Setup definition for a future Qwertycoin GUI
+Windows package. The original BSD-3-Clause license and Monero Project
+attribution are retained in `LICENSE`.
 
-This is a *Inno Setup* script `Monero.iss` plus some related files
-that allows you to build a standalone Windows installer (.exe) for
-the GUI wallet that comes with the Fluorine Fermi release of Monero.
+## Status
 
-This turns the GUI wallet into a more or less standard Windows program,
-by default installed into a subdirectory of `C:\Program Files`, a
-program group with some icons in the *Start* menu, and automatic
-uninstall support. It helps lowering the "barrier to entry"
-somewhat, especially for less technically experienced users of
-Monero.
+The installer is a packaging template. It is not a signed Qwertycoin release
+until the exact Windows x86_64 build has completed the documented native test,
+code-signing and release review gates.
 
-As the setup script in file [Monero.iss](Monero.iss) has to list many
-files and directories of the GUI wallet package to install by name,
-this version of the script only works with exactly the GUI wallet
-for Monero release *Fluorine Fermi* that you find on
-[the official download page](https://getmonero.org/downloads/).
+## Building locally
 
-It should however be easy to modify the script for future
-versions of the GUI wallet.
+1. Produce the reviewed Qwertycoin Windows artifact set.
+2. Copy its complete contents into `installers/windows/bin/`.
+3. Confirm that at least these files exist:
+   - `qwertycoin-gui.exe`
+   - `qwertycoind.exe`
+   - `qwertycoin-wallet-cli.exe`
+   - `qwertycoin-wallet-rpc.exe`
+   - all required Qt/QML plugins and runtime libraries
+4. Open `Qwertycoin.iss` in the agreed Inno Setup version and compile it.
+5. Verify the resulting installer on a disposable Windows machine before any
+   signing or publication.
 
-## License ##
+The template registers only the `qwertycoin:` payment URI. It does not enable
+the updater, hardware-wallet support, P2Pool or any other unvalidated feature.
 
-See [LICENSE](LICENSE).
-
-## Building ##
-
-You can only build on Windows, and the result is always a
-Windows .exe file that can act as a standalone installer for the
-GUI wallet.
-
-Note that the installer build process is now reproducible / deterministic. For details check the file [Deterministic.md](Deterministic.md).
-
-The build steps in detail:
-
-1. Install *Inno Setup*. You can get it from [here](http://www.jrsoftware.org/isdl.php)
-2. Get the Inno Setup script plus related files by cloning the whole [monero-gui GitHub repository](https://github.com/monero-project/monero-gui); you will only need the files in the installer directory `installers\windows` however.
-3. The setup script is written to take the GUI wallet files from a subdirectory named `bin`; so create `installers\windows\bin`, get the zip file of the GUI wallet from [here](https://getmonero.org/downloads/), unpack it somewhere, and copy all the files and subdirectories in the single subdirectory there (currently named `monero-gui-0.18.0.0`) to this `bin` subdirectory
-4. Start Inno Setup, load `Monero.iss` and compile it
-5. The result i.e. the finished installer will be the file `mysetup.exe` in the `installers\windows\Output` subdirectory
+See [Deterministic.md](Deterministic.md) for reproducibility constraints.
