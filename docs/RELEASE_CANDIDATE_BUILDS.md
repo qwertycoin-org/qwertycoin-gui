@@ -14,7 +14,8 @@ under `.github/workflows-disabled/`.
 
 Each invocation builds exactly one target:
 
-- `linux` — Linux x86_64 tarball;
+- `linux` — Linux x86_64 tarball built on Ubuntu 22.04 with a
+  `GLIBC_2.35` compatibility ceiling;
 - `windows` — Windows x86_64 zip;
 - `macos` — macOS Apple Silicon tarball containing the `.app` bundle.
 
@@ -51,7 +52,8 @@ the GUI, pinned daemon, wallet CLI, wallet RPC, brand assets, fonts and licenses
 It also validates the platform runtime:
 
 - Linux recursively bundles non-glibc ELF dependencies, assigns relative
-  RPATHs and proves that no non-system library resolves outside the package;
+  RPATHs, proves that no non-system library resolves outside the package and
+  rejects every ELF object that requires a glibc symbol newer than 2.35;
 - Windows preserves the top-level Qt/dependency DLLs produced by `windeployqt`
   and requires the platform, SVG and QML modules;
 - macOS requires the Qt frameworks, Cocoa/SVG plugins and QML modules produced
@@ -59,8 +61,9 @@ It also validates the platform runtime:
   ad-hoc bundle signature.
 
 Every package contains `BUILD-INFO.txt` with GUI/Core revisions, runner
-platform and Qt version. The per-file SHA-256 manifest is verified before the
-archive is uploaded. Uploaded review artifacts expire after seven days.
+platform and Qt version. Linux also records the enforced glibc ceiling. The
+per-file SHA-256 manifest is verified before the archive is uploaded. Uploaded
+review artifacts expire after seven days.
 
 ## Signing and publication boundary
 
