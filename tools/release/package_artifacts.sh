@@ -57,8 +57,34 @@ cp -R fonts/Archivo fonts/Inter images/appicons images/brand \
   "$artifact_dir/share/qwertycoin-gui/"
 
 if [[ "$(uname -s)" == "Linux" && -n "$gui_binary" ]]; then
-  qt_plugin_dir=${QWC_QT_PLUGIN_DIR:-"$(qmake -query QT_INSTALL_PLUGINS)"}
-  qt_qml_dir=${QWC_QT_QML_DIR:-"$(qmake -query QT_INSTALL_QML)"}
+  qt_plugin_dir=${QWC_QT_PLUGIN_DIR:-}
+  qt_qml_dir=${QWC_QT_QML_DIR:-}
+
+  # Prefer the Qt installation that configured this exact build tree. This is
+  # important for review prefixes and extracted SDKs where the qmake found in
+  # PATH may describe a different, incomplete system Qt installation.
+  qt_core_cmake_dir=""
+  if [[ -f "$build_dir/CMakeCache.txt" ]]; then
+    qt_core_cmake_dir=$(sed -n 's/^Qt5Core_DIR:PATH=//p' "$build_dir/CMakeCache.txt" | head -n 1)
+  fi
+  if [[ "$qt_core_cmake_dir" == */cmake/Qt5Core ]]; then
+    qt_lib_dir=${qt_core_cmake_dir%/cmake/Qt5Core}
+    if [[ -z "$qt_plugin_dir" && -d "$qt_lib_dir/qt5/plugins" ]]; then
+      qt_plugin_dir="$qt_lib_dir/qt5/plugins"
+    fi
+    if [[ -z "$qt_qml_dir" && -d "$qt_lib_dir/qt5/qml" ]]; then
+      qt_qml_dir="$qt_lib_dir/qt5/qml"
+    fi
+  fi
+
+  if [[ -z "$qt_plugin_dir" || -z "$qt_qml_dir" ]]; then
+    if ! command -v qmake >/dev/null 2>&1; then
+      echo "unable to locate Qt runtime paths from CMakeCache.txt or qmake" >&2
+      exit 1
+    fi
+    [[ -n "$qt_plugin_dir" ]] || qt_plugin_dir=$(qmake -query QT_INSTALL_PLUGINS)
+    [[ -n "$qt_qml_dir" ]] || qt_qml_dir=$(qmake -query QT_INSTALL_QML)
+  fi
   for runtime_dir in platforms imageformats xcbglintegrations platformthemes; do
     if [[ -d "$qt_plugin_dir/$runtime_dir" ]]; then
       mkdir -p "$artifact_dir/plugins/$runtime_dir"
