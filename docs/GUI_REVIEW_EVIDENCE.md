@@ -142,5 +142,7 @@ test data and are not represented as a live mainnet snapshot.
   this branch and remain release gates.
 - Hardware wallets, inherited P2Pool launch/download, fiat feeds and automatic
   updates remain fail-closed pending dedicated QWC validation.
-- Workflow templates remain exclusively in `.github/workflows-disabled/`.
-  No GitHub-hosted workflow was started for this work.
+- No GitHub-hosted workflow was started for the GUI integration review. After
+  that review merged, a separate manual-only release-candidate workflow was
+  prepared; build and Flatpak templates remain disabled and release publication
+  remains outside its scope.

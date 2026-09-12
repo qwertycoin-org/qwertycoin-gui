@@ -75,13 +75,18 @@ suite is run from the exact Gitlink. See `GUI_REVIEW_EVIDENCE.md` for commands
 and results.
 
 No connected native macOS Apple Silicon or Windows x86_64 build machine was
-available for this review. Their disabled workflow templates and packaging
-paths were updated statically, but neither a cross-build nor Linux screenshots
-are reported as native platform evidence. Codesigning, notarization, release
-tags and public packages remain later release tasks.
+available for the GUI integration review. A manual-only release-candidate
+workflow now provides native hosted builds for those targets, but a workflow
+completion is not recorded as a platform pass until its downloaded artifact is
+inspected and launched. Codesigning, notarization, release tags and public
+packages remain later release tasks.
 
 ## Workflow state
 
-Templates remain only under `.github/workflows-disabled/`. This work does not
-create `.github/workflows/`, enable triggers or start manual GitHub Actions.
-All acceptance configurations explicitly set `DEV_MODE=OFF`.
+Only `.github/workflows/release.yml` is active, with a manual
+`workflow_dispatch` trigger and one selected platform per invocation. Build and
+Flatpak templates remain under `.github/workflows-disabled/`. The release
+candidate workflow requires an exact GUI SHA, verifies the committed Core pin
+before and after compilation, and sets `DEV_MODE=OFF`. It creates temporary
+review artifacts only; it has no push, pull-request, tag, release or publication
+trigger.

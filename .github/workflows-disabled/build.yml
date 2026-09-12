@@ -66,6 +66,6 @@ jobs:
         run: |
           test -x tools/smoke/restore_from_seed.sh
           test -x tools/release/package_artifacts.sh
-          grep -q 'macos-26' .github/workflows-disabled/release.yml
-          grep -q 'windows-2025' .github/workflows-disabled/release.yml
-          grep -q 'ubuntu-24.04' .github/workflows-disabled/release.yml
+          grep -q 'macos-26' .github/workflows/release.yml
+          grep -q 'windows-2025' .github/workflows/release.yml
+          grep -q 'ubuntu-24.04' .github/workflows/release.yml
