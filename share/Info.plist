@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
   <key>LSMinimumSystemVersion</key>
-  <string>10.10.0</string>
+  <string>15.0</string>
 
   <key>NSPrincipalClass</key>
   <string>NSApplication</string>
@@ -30,7 +30,7 @@
   <string>org.qwertycoin.qwertycoin-gui</string>
 
   <key>CFBundleVersion</key>
-  <string>@VERSION_LONG@</string>
+  <string>@VERSION@</string>
 
   <key>CFBundleShortVersionString</key>
   <string>@VERSION@</string>

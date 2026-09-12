@@ -164,6 +164,12 @@ printf 'source_revision=%s\ncore_revision=%s\nrunner_os=%s\nrunner_arch=%s\nqt_v
   >"$artifact_dir/BUILD-INFO.txt"
 if [[ "$platform" == "Linux" ]]; then
   printf 'glibc_ceiling=%s\n' "$linux_glibc_ceiling" >>"$artifact_dir/BUILD-INFO.txt"
+elif [[ "$platform" == "Darwin" ]]; then
+  if [[ -z "${QWC_MACOS_MIN_VERSION:-}" ]]; then
+    echo "QWC_MACOS_MIN_VERSION is required for a macOS release package" >&2
+    exit 1
+  fi
+  printf 'macos_min_version=%s\n' "$QWC_MACOS_MIN_VERSION" >>"$artifact_dir/BUILD-INFO.txt"
 fi
 
 require_file() {
@@ -247,6 +253,40 @@ if [[ "$platform" == "Darwin" ]]; then
   require_file "embedded macOS wallet CLI" "$mac_bundle_relative/Contents/MacOS/qwertycoin-wallet-cli"
   require_file "embedded macOS wallet RPC" "$mac_bundle_relative/Contents/MacOS/qwertycoin-wallet-rpc"
 
+  macos_version_exceeds() {
+    local candidate=$1
+    local ceiling=$2
+    local candidate_major=0 candidate_minor=0 candidate_patch=0
+    local ceiling_major=0 ceiling_minor=0 ceiling_patch=0
+
+    IFS=. read -r candidate_major candidate_minor candidate_patch <<<"$candidate"
+    IFS=. read -r ceiling_major ceiling_minor ceiling_patch <<<"$ceiling"
+    candidate_minor=${candidate_minor:-0}
+    candidate_patch=${candidate_patch:-0}
+    ceiling_minor=${ceiling_minor:-0}
+    ceiling_patch=${ceiling_patch:-0}
+
+    (( 10#$candidate_major > 10#$ceiling_major ||
+       (10#$candidate_major == 10#$ceiling_major && 10#$candidate_minor > 10#$ceiling_minor) ||
+       (10#$candidate_major == 10#$ceiling_major && 10#$candidate_minor == 10#$ceiling_minor && 10#$candidate_patch > 10#$ceiling_patch) ))
+  }
+
+  bundle_info_plist="$mac_bundle/Contents/Info.plist"
+  bundle_min_version=$(/usr/libexec/PlistBuddy -c 'Print :LSMinimumSystemVersion' "$bundle_info_plist")
+  bundle_build_version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$bundle_info_plist")
+  if [[ ! "$bundle_min_version" =~ ^[0-9]+([.][0-9]+){0,2}$ ]]; then
+    echo "macOS bundle has an invalid minimum system version: $bundle_min_version" >&2
+    exit 1
+  fi
+  if [[ "$bundle_min_version" != "$QWC_MACOS_MIN_VERSION" ]]; then
+    echo "macOS bundle minimum version does not match the release target: $bundle_min_version" >&2
+    exit 1
+  fi
+  if [[ ! "$bundle_build_version" =~ ^[0-9]+([.][0-9]+){0,2}$ ]]; then
+    echo "macOS bundle has an invalid CFBundleVersion: $bundle_build_version" >&2
+    exit 1
+  fi
+
   codesign --verify --deep --strict "$mac_bundle"
   mac_mach_count=0
   while IFS= read -r -d '' mach_file; do
@@ -277,12 +317,38 @@ if [[ "$platform" == "Darwin" ]]; then
       echo "macOS bundle contains a non-portable runtime search path: $mach_file" >&2
       exit 1
     fi
+    mach_min_version_count=0
+    while IFS= read -r mach_min_version; do
+      [[ -n "$mach_min_version" ]] || continue
+      mach_min_version_count=$((mach_min_version_count + 1))
+      if [[ ! "$mach_min_version" =~ ^[0-9]+([.][0-9]+){0,2}$ ]]; then
+        echo "macOS bundle contains an invalid Mach-O deployment target: $mach_min_version ($mach_file)" >&2
+        exit 1
+      fi
+      if macos_version_exceeds "$mach_min_version" "$bundle_min_version"; then
+        echo "macOS bundle contains a Mach-O requiring macOS $mach_min_version above the declared $bundle_min_version minimum: $mach_file" >&2
+        exit 1
+      fi
+    done < <(
+      otool -l "$mach_file" |
+        awk '
+          $1 == "cmd" && $2 == "LC_BUILD_VERSION" { want_build_version = 1; next }
+          want_build_version && $1 == "minos" { print $2; want_build_version = 0 }
+          $1 == "cmd" && $2 == "LC_VERSION_MIN_MACOSX" { want_legacy_version = 1; next }
+          want_legacy_version && $1 == "version" { print $2; want_legacy_version = 0 }
+        '
+    )
+    if (( mach_min_version_count == 0 )); then
+      echo "macOS bundle contains a Mach-O without a deployment target: $mach_file" >&2
+      exit 1
+    fi
   done < <(find "$mac_bundle" -type f -print0)
   if (( mac_mach_count == 0 )); then
     echo "macOS bundle contains no Mach-O files" >&2
     exit 1
   fi
-  printf 'macOS runtime verified: %d arm64 Mach-O files, no runner-local dependencies\n' "$mac_mach_count"
+  printf 'macOS runtime verified: %d arm64 Mach-O files, minimum macOS %s, no runner-local dependencies\n' \
+    "$mac_mach_count" "$bundle_min_version"
 fi
 
 (

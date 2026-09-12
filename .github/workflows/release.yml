@@ -141,13 +141,15 @@ jobs:
     name: macOS Apple Silicon
     needs: validate-inputs
     if: ${{ inputs.target == 'macos' }}
-    runs-on: macos-26
+    runs-on: macos-15
     timeout-minutes: 360
     env:
       ARTIFACT_PREFIX: ${{ inputs.release_name }}
       EXPECTED_REVISION: ${{ inputs.expected_revision }}
       CCACHE_DIR: .ccache
       HOMEBREW_NO_AUTO_UPDATE: 1
+      MACOSX_DEPLOYMENT_TARGET: "15.0"
+      QWC_MACOS_MIN_VERSION: "15.0"
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -195,6 +197,7 @@ jobs:
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DARCH=armv8-a \
             -DBUILD_64=ON \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET="${QWC_MACOS_MIN_VERSION}" \
             -DMANUAL_SUBMODULES=1 \
             -DDEV_MODE=OFF \
             -DWITH_UPDATER=OFF \
