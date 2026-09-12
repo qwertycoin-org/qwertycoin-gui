@@ -193,6 +193,8 @@ if [[ "${RUNNER_OS:-}" == "Windows" ]]; then
   require_file "Qt GUI DLL" Qt5Gui.dll
   require_file "Qt QML DLL" Qt5Qml.dll
   require_file "Qt Quick DLL" Qt5Quick.dll
+  require_file "ANGLE EGL runtime" libEGL.dll
+  require_file "ANGLE OpenGL ES runtime" libGLESv2.dll
   require_file "Qt Windows platform plugin" platforms/qwindows.dll
   require_file "Qt SVG image plugin" imageformats/qsvg.dll
   require_file "Qt Quick Controls 2 QML module" qml/QtQuick/Controls.2/qmldir
