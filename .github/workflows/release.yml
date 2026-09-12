@@ -240,6 +240,11 @@ jobs:
       ARTIFACT_PREFIX: ${{ inputs.release_name }}
       EXPECTED_REVISION: ${{ inputs.expected_revision }}
       CCACHE_DIR: .ccache
+      # Apply before actions/checkout so Git-for-Windows and MSYS2 Git both
+      # materialize and verify the exact LF-normalized repository contents.
+      GIT_CONFIG_COUNT: "1"
+      GIT_CONFIG_KEY_0: core.autocrlf
+      GIT_CONFIG_VALUE_0: "false"
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
