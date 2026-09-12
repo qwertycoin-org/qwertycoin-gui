@@ -12,6 +12,8 @@ if(APPLE OR (WIN32 AND NOT STATIC))
         # third-party install names as well as the GUI's Qt dependencies.
         add_custom_command(TARGET deploy
                            POST_BUILD
+                           COMMAND ${CMAKE_COMMAND} -E make_directory
+                                   "$<TARGET_FILE_DIR:qwertycoin-gui>/../Frameworks"
                            COMMAND ${CMAKE_COMMAND} -E copy
                                    "$<TARGET_FILE:daemon>"
                                    "$<TARGET_FILE_DIR:qwertycoin-gui>/qwertycoind"
