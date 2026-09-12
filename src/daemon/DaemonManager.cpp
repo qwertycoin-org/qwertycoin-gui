@@ -28,6 +28,8 @@
 
 #include "DaemonManager.h"
 #include "common/util.h"
+#include "epose/resource_policy_v2.h"
+#include "epose/service_node_config.h"
 #include <QElapsedTimer>
 #include <QFile>
 #include <QMutexLocker>
@@ -43,12 +45,117 @@
 #include <QVariantMap>
 #include <QVariant>
 #include <QMap>
+#include <QRegularExpression>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/asio/ip/address.hpp>
 
 namespace {
     static const int DAEMON_START_TIMEOUT_SECONDS = 120;
+
+    QStringList splitDaemonFlags(const QString &flags)
+    {
+        QStringList result;
+        QString token;
+        QChar quote;
+        bool escaped = false;
+        for (const QChar character : flags)
+        {
+            if (escaped)
+            {
+                token.append(character);
+                escaped = false;
+            }
+            else if (character == QLatin1Char('\\'))
+            {
+                escaped = true;
+            }
+            else if (!quote.isNull())
+            {
+                if (character == quote)
+                    quote = QChar();
+                else
+                    token.append(character);
+            }
+            else if (character == QLatin1Char('\'') || character == QLatin1Char('"'))
+            {
+                quote = character;
+            }
+            else if (character.isSpace())
+            {
+                if (!token.isEmpty())
+                {
+                    result.append(token);
+                    token.clear();
+                }
+            }
+            else
+            {
+                token.append(character);
+            }
+        }
+        if (escaped)
+            token.append(QLatin1Char('\\'));
+        if (!token.isEmpty())
+            result.append(token);
+        return result;
+    }
+
+    bool canonicalEposeDnsName(const QString &host)
+    {
+        const QByteArray bytes = host.toLatin1();
+        if (host.isEmpty() || bytes.size() > 253 || host.startsWith(QLatin1Char('.'))
+            || host.endsWith(QLatin1Char('.')) || !host.contains(QLatin1Char('.')))
+        {
+            return false;
+        }
+
+        const QStringList labels = host.split(QLatin1Char('.'));
+        for (const QString &label : labels)
+        {
+            if (label.isEmpty() || label.size() > 63 || label.startsWith(QLatin1Char('-'))
+                || label.endsWith(QLatin1Char('-')))
+            {
+                return false;
+            }
+            for (const QChar character : label)
+            {
+                const ushort code = character.unicode();
+                if (!((code >= 'a' && code <= 'z') || (code >= '0' && code <= '9')
+                      || code == '-'))
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    bool canonicalPublicEposeHost(const QString &host)
+    {
+        boost::system::error_code error;
+        const auto address = boost::asio::ip::make_address(host.toStdString(), error);
+        if (!error)
+        {
+            return QString::fromStdString(address.to_string()) == host
+                && qwertycoin::epose::public_probe_address_v2(host.toStdString());
+        }
+        return canonicalEposeDnsName(host);
+    }
 }
 
 bool DaemonManager::start(const QString &flags, NetworkType::Type nettype, const QString &dataDir, const QString &bootstrapNodeAddress, bool noSync /* = false*/, bool pruneBlockchain /* = false*/)
+{
+    return startWithArguments(splitDaemonFlags(flags), nettype, dataDir,
+                              bootstrapNodeAddress, noSync, pruneBlockchain);
+}
+
+bool DaemonManager::startWithArguments(const QStringList &customArguments,
+                                       NetworkType::Type nettype,
+                                       const QString &dataDir,
+                                       const QString &bootstrapNodeAddress,
+                                       bool noSync,
+                                       bool pruneBlockchain)
 {
     if (!QFileInfo(m_qwertycoind).isFile())
     {
@@ -70,11 +177,7 @@ bool DaemonManager::start(const QString &flags, NetworkType::Type nettype, const
         arguments << "--stagenet";
 
     // Custom startup flags for daemon
-    foreach (const QString &str, flags.split(" ")) {
-          qDebug() << QString(" [%1] ").arg(str);
-          if (!str.isEmpty())
-            arguments << str;
-    }
+    arguments << customArguments;
 
     // Custom data-dir
     if(!dataDir.isEmpty()) {
@@ -102,7 +205,7 @@ bool DaemonManager::start(const QString &flags, NetworkType::Type nettype, const
     // --max-concurrency based on threads available.
     int32_t concurrency = qMax(1, QThread::idealThreadCount() / 2);
 
-    if(!flags.contains("--max-concurrency", Qt::CaseSensitive)){
+    if(!customArguments.contains("--max-concurrency", Qt::CaseSensitive)){
         arguments << "--max-concurrency" << QString::number(concurrency);
     }
 
@@ -139,6 +242,170 @@ bool DaemonManager::start(const QString &flags, NetworkType::Type nettype, const
     });
 
     return true;
+}
+
+QString DaemonManager::eposeKeystorePath(const QString &dataDir, const NetworkType::Type nettype) const
+{
+    const QString base = dataDir.trimmed().isEmpty()
+        ? QString::fromStdString(tools::get_default_data_dir())
+        : QDir::cleanPath(dataDir.trimmed());
+    const QString network = nettype == NetworkType::TESTNET ? QStringLiteral("testnet")
+                          : (nettype == NetworkType::STAGENET ? QStringLiteral("stagenet")
+                                                              : QStringLiteral("mainnet"));
+    return QDir(base).filePath(QStringLiteral("epose-v2/%1/service-keystore-v2").arg(network));
+}
+
+QVariantMap DaemonManager::validateEposeServiceConfig(
+    const QString &flags, const NetworkType::Type nettype, const QString &dataDir,
+    const QString &rewardAddress, const QString &endpointHost, const int endpointPort,
+    const QString &discoveryEndpoints) const
+{
+    QVariantMap result{{QStringLiteral("valid"), false},
+                       {QStringLiteral("keystorePath"), eposeKeystorePath(dataDir, nettype)}};
+
+    const QStringList rawArguments = splitDaemonFlags(flags);
+    static const QStringList forbiddenPrefixes{
+        QStringLiteral("--epose-v2-"),
+        QStringLiteral("--service-node"),
+        QStringLiteral("--service-reward"),
+        QStringLiteral("--rpc-restricted-bind"),
+        QStringLiteral("--restricted-rpc"),
+        QStringLiteral("--confirm-external-bind")
+    };
+    for (const QString &argument : rawArguments)
+    {
+        for (const QString &prefix : forbiddenPrefixes)
+        {
+            if (argument.startsWith(prefix, Qt::CaseSensitive))
+            {
+                result.insert(QStringLiteral("error"),
+                              tr("Remove %1 from custom daemon flags. EPoSe manages this option.")
+                                  .arg(argument.section(QLatin1Char('='), 0, 0)));
+                return result;
+            }
+        }
+    }
+
+    cryptonote::network_type coreNettype = cryptonote::MAINNET;
+    if (nettype == NetworkType::TESTNET)
+        coreNettype = cryptonote::TESTNET;
+    else if (nettype == NetworkType::STAGENET)
+        coreNettype = cryptonote::STAGENET;
+
+    cryptonote::account_public_address parsedAddress{};
+    std::string addressError;
+    if (!qwertycoin::epose::parse_reward_address(
+            rewardAddress.trimmed().toStdString(), coreNettype, parsedAddress, addressError))
+    {
+        result.insert(QStringLiteral("error"),
+                      tr("Invalid primary reward address for the selected network: %1")
+                          .arg(QString::fromStdString(addressError)));
+        return result;
+    }
+
+    const QString host = endpointHost.trimmed();
+    if (!canonicalPublicEposeHost(host))
+    {
+        result.insert(QStringLiteral("error"),
+                      tr("Endpoint host must be a canonical public IP address or lowercase DNS name."));
+        return result;
+    }
+    if (endpointPort < 1 || endpointPort > 65535)
+    {
+        result.insert(QStringLiteral("error"), tr("Endpoint port must be between 1 and 65535."));
+        return result;
+    }
+    if (endpointPort == cryptonote::get_config(coreNettype).RPC_DEFAULT_PORT)
+    {
+        result.insert(QStringLiteral("error"),
+                      tr("The restricted EPoSe endpoint port must differ from the local administrative RPC port (%1).")
+                          .arg(cryptonote::get_config(coreNettype).RPC_DEFAULT_PORT));
+        return result;
+    }
+
+    QStringList discoveryUrls;
+    const QStringList candidates = discoveryEndpoints.split(
+        QRegularExpression(QStringLiteral("[\\s,;]+")), Qt::SkipEmptyParts);
+    for (const QString &candidate : candidates)
+    {
+        const QUrl url(candidate, QUrl::StrictMode);
+        if (!url.isValid() || url.scheme() != QStringLiteral("http")
+            || !canonicalPublicEposeHost(url.host())
+            || url.port() < 1 || url.port() > 65535
+            || (!url.path().isEmpty() && url.path() != QStringLiteral("/"))
+            || !url.userInfo().isEmpty() || url.hasQuery() || url.hasFragment())
+        {
+            result.insert(QStringLiteral("error"),
+                          tr("Discovery endpoint is invalid: %1. Use http://host:port only.")
+                              .arg(candidate));
+            return result;
+        }
+        discoveryUrls.append(url.toString(QUrl::RemovePath | QUrl::StripTrailingSlash));
+    }
+    if (discoveryUrls.isEmpty())
+    {
+        result.insert(QStringLiteral("error"),
+                      tr("At least one EPoSe discovery endpoint is required."));
+        return result;
+    }
+
+    result.insert(QStringLiteral("valid"), true);
+    result.insert(QStringLiteral("error"), QString());
+    result.insert(QStringLiteral("endpoint"), QStringLiteral("%1:%2").arg(host).arg(endpointPort));
+    result.insert(QStringLiteral("discoveryEndpoints"), discoveryUrls);
+    result.insert(QStringLiteral("keystoreExists"), QFileInfo::exists(eposeKeystorePath(dataDir, nettype)));
+    return result;
+}
+
+bool DaemonManager::startEposeService(
+    const QString &flags, const NetworkType::Type nettype, const QString &dataDir,
+    const QString &bootstrapNodeAddress, const QString &rewardAddress,
+    const QString &endpointHost, const int endpointPort,
+    const QString &discoveryEndpoints, const bool noSync, const bool pruneBlockchain)
+{
+    const QVariantMap validation = validateEposeServiceConfig(
+        flags, nettype, dataDir, rewardAddress, endpointHost, endpointPort, discoveryEndpoints);
+    if (!validation.value(QStringLiteral("valid")).toBool())
+    {
+        emit daemonStartFailure(validation.value(QStringLiteral("error")).toString());
+        return false;
+    }
+
+    const QStringList arguments = eposeServiceArguments(
+        flags, rewardAddress, endpointHost, endpointPort, validation);
+
+    return startWithArguments(arguments, nettype, dataDir, bootstrapNodeAddress,
+                              noSync, pruneBlockchain);
+}
+
+QStringList DaemonManager::eposeServiceArguments(
+    const QString &flags, const QString &rewardAddress,
+    const QString &endpointHost, const int endpointPort,
+    const QVariantMap &validation) const
+{
+    QStringList arguments = splitDaemonFlags(flags);
+    arguments << QStringLiteral("--epose-v2-service")
+              << QStringLiteral("--epose-v2-keystore")
+              << validation.value(QStringLiteral("keystorePath")).toString()
+              << QStringLiteral("--epose-v2-reward-address")
+              << rewardAddress.trimmed()
+              << QStringLiteral("--epose-v2-endpoint-host")
+              << endpointHost.trimmed()
+              << QStringLiteral("--epose-v2-endpoint-port")
+              << QString::number(endpointPort)
+              << QStringLiteral("--rpc-restricted-bind-port")
+              << QString::number(endpointPort)
+              << QStringLiteral("--rpc-restricted-bind-ip")
+              << QStringLiteral("0.0.0.0")
+              << QStringLiteral("--confirm-external-bind");
+    if (endpointHost.contains(QLatin1Char(':')))
+        arguments << QStringLiteral("--rpc-use-ipv6")
+                  << QStringLiteral("--rpc-restricted-bind-ipv6-address")
+                  << QStringLiteral("::");
+    const QStringList discoveryUrls = validation.value(QStringLiteral("discoveryEndpoints")).toStringList();
+    for (const QString &url : discoveryUrls)
+        arguments << QStringLiteral("--epose-v2-discovery-endpoint") << url;
+    return arguments;
 }
 
 void DaemonManager::stopAsync(NetworkType::Type nettype, const QString &dataDir, const QJSValue& callback)

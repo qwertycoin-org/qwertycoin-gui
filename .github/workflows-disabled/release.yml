@@ -58,6 +58,7 @@ jobs:
           cmake -S . -B build/release \
             -DCMAKE_BUILD_TYPE=Release \
             -DMANUAL_SUBMODULES=1 \
+            -DDEV_MODE=OFF \
             -DWITH_UPDATER=OFF \
             -DUSE_DEVICE_TREZOR=OFF \
             -DQML_TESTS=OFF
@@ -111,12 +112,15 @@ jobs:
             -DARCH=armv8-a \
             -DBUILD_64=ON \
             -DMANUAL_SUBMODULES=1 \
+            -DDEV_MODE=OFF \
             -DWITH_UPDATER=OFF \
             -DUSE_DEVICE_TREZOR=OFF \
             -DQML_TESTS=OFF
 
       - name: Build
-        run: cmake --build build/release --target qwertycoin-gui simplewallet wallet_rpc_server --parallel 3
+        run: |
+          cmake --build build/release --target qwertycoin-gui simplewallet wallet_rpc_server --parallel 3
+          cmake --build build/release --target deploy --parallel 1
 
       - name: Package artifacts
         run: tools/release/package_artifacts.sh build/release "${ARTIFACT_PREFIX}-macos-arm64" dist
@@ -180,12 +184,15 @@ jobs:
             -DARCH=default \
             -DSTATIC=OFF \
             -DMANUAL_SUBMODULES=1 \
+            -DDEV_MODE=OFF \
             -DWITH_UPDATER=OFF \
             -DUSE_DEVICE_TREZOR=OFF \
             -DQML_TESTS=OFF
 
       - name: Build
-        run: cmake --build build/release --target qwertycoin-gui simplewallet wallet_rpc_server --parallel 2
+        run: |
+          cmake --build build/release --target qwertycoin-gui simplewallet wallet_rpc_server --parallel 2
+          cmake --build build/release --target deploy --parallel 1
 
       - name: Package artifacts
         run: tools/release/package_artifacts.sh build/release "${ARTIFACT_PREFIX}-windows-x86_64" dist

@@ -52,7 +52,7 @@ Item {
     property alias tooltip: label.tooltip
     signal clicked()
 
-    height: 25
+    height: 26
     width: checkBoxLayout.width
     opacity: enabled ? 1 : 0.7
 
@@ -81,14 +81,16 @@ Item {
                 id: backgroundRect
                 visible: checkBox.border
                 anchors.fill: parent
-                radius: 3
-                color: checkBox.enabled ? "transparent" : MoneroComponents.Style.inputBoxBackgroundDisabled
+                radius: MoneroComponents.Style.radiusSm
+                color: checkBox.checked ? MoneroComponents.Style.accentGold
+                                        : (checkBox.enabled ? MoneroComponents.Style.cardColor : MoneroComponents.Style.inputBoxBackgroundDisabled)
                 border.color:
                     if (checkBox.activeFocus) {
                         return MoneroComponents.Style.inputBorderColorActive;
                     } else {
-                        return MoneroComponents.Style.inputBorderColorInActive;
+                        return checkBox.checked ? MoneroComponents.Style.accentGold : MoneroComponents.Style.inputBorderColorInActive;
                     }
+                border.width: MoneroComponents.Style.contourWidth
             }
 
             MoneroEffects.ImageMask {
@@ -97,7 +99,7 @@ Item {
                 anchors.centerIn: parent
                 width: checkBox.imgWidth
                 height: checkBox.imgHeight
-                color: MoneroComponents.Style.defaultFontColor
+                color: checkBox.checked ? "#141414" : MoneroComponents.Style.defaultFontColor
                 fontAwesomeFallbackIcon: checkBox.fontAwesomeIcons ? getIcon() : FontAwesome.plus
                 fontAwesomeFallbackSize: 14
                 image: checkBox.fontAwesomeIcons ? "" : getIcon()

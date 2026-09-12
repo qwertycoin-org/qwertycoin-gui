@@ -133,7 +133,7 @@ ColumnLayout {
             font.styleName: "Solid"
             font.pixelSize: 15
             text: wordsMatch ? FontAwesome.checkCircle : FontAwesome.exclamationCircle
-            color: wordsMatch ? (MoneroComponents.Style.blackTheme ? "#00FF00" : "#008000") : "#FF0000"
+            color: wordsMatch ? MoneroComponents.Style.successColor : MoneroComponents.Style.errorColor
             themeTransition: false
             onTextChanged: {
                 if (wizardCreateWallet2.seedListGrid && wordsMatch) {

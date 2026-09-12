@@ -81,7 +81,7 @@ const QString getLogPath(const QString &userDefinedLogFilePath, bool portable)
     }
 
     if(TailsOS::detect() && TailsOS::usePersistence)
-        return QDir::homePath() + "/Persistent/Monero/logs/" + defaultLogName;
+        return QDir::homePath() + "/Persistent/Qwertycoin/logs/" + defaultLogName;
     else {
         QDir appDir(osPath + "/" + appFolder);
         if(!appDir.exists())

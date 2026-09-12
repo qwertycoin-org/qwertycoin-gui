@@ -172,9 +172,33 @@ Item {
         }
     }
 
+    Image {
+        id: titleBarLogoProbe
+        width: 190
+        height: 30
+        opacity: 0
+        source: MoneroComponents.Style.titleBarLogoSource
+        fillMode: Image.PreserveAspectFit
+    }
+
     TestCase {
         name: "Wizard"
         when: windowShown
+
+        function test_bundled_brand_fonts_load() {
+            tryCompare(MoneroComponents.Style, "fontsReady", true, 5000)
+        }
+
+        function test_titlebar_brand_mark_preserves_square_aspect_ratio() {
+            compare(MoneroComponents.Style._b_titleBarLogoSource,
+                    "qrc:/images/brand/qwertycoin-mark.svg")
+            compare(MoneroComponents.Style._w_titleBarLogoSource,
+                    "qrc:/images/brand/qwertycoin-mark.svg")
+            tryCompare(titleBarLogoProbe, "status", Image.Ready, 5000)
+            compare(titleBarLogoProbe.sourceSize.width, titleBarLogoProbe.sourceSize.height)
+            compare(Math.round(titleBarLogoProbe.paintedWidth), Math.round(titleBarLogoProbe.paintedHeight))
+            compare(Math.round(titleBarLogoProbe.paintedHeight), 30)
+        }
 
         function walletPath(walletName) {
             return appWindow.accountsDir + "/" + walletName + "/" + walletName

@@ -66,7 +66,7 @@ ColumnLayout {
                     Layout.fillHeight: true
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
-                    color: "darkgrey"
+                    color: MoneroComponents.Style.textSecondaryColor
                     width: 2
                 }
 

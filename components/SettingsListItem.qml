@@ -20,9 +20,10 @@ ColumnLayout {
     Rectangle {
         id: root
         Layout.fillWidth: true
-        Layout.minimumHeight: 75
+        Layout.minimumHeight: 80
         Layout.preferredHeight: rect.height + 15
-        color: "transparent"
+        color: MoneroComponents.Style.cardColor
+        radius: MoneroComponents.Style.radiusMd
 
         Rectangle {
             id: divider
@@ -70,9 +71,9 @@ ColumnLayout {
                 anchors.leftMargin: 16
                 anchors.top: parent.top
                 color: MoneroComponents.Style.defaultFontColor
-                opacity: MoneroComponents.Style.blackTheme ? 1.0 : 0.8
+                opacity: 1.0
                 font.bold: true
-                font.family: MoneroComponents.Style.fontRegular.name
+                font.family: MoneroComponents.Style.fontMedium.name
                 font.pixelSize: 16
             }
 

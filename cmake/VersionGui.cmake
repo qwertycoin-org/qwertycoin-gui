@@ -27,7 +27,7 @@
 # THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 function (write_static_version_header tag)
-    set(VERSION_TAG_GUI "${tag}" CACHE STRING "The tag portion of the Monero GUI software version" FORCE)
+    set(VERSION_TAG_GUI "${tag}" CACHE STRING "The source tag portion of the Qwertycoin GUI software version" FORCE)
   configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/version.js.in" "${CMAKE_CURRENT_SOURCE_DIR}/version.js")
 endfunction ()
 

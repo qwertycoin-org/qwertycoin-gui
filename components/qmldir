@@ -1,1 +1,4 @@
 singleton Style 1.0 Style.qml
+BrandCard 1.0 BrandCard.qml
+SectionHeader 1.0 SectionHeader.qml
+StatusChip 1.0 StatusChip.qml

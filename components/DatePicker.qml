@@ -43,7 +43,7 @@ Item {
     property date currentDate
     property bool showCurrentDate: true
     property color backgroundColor : MoneroComponents.Style.appWindowBorderColor
-    property color errorColor : "red"
+    property color errorColor : MoneroComponents.Style.errorColor
     property bool error: false
     property alias inputLabel: inputLabel
 
@@ -105,7 +105,7 @@ Item {
             anchors.left: parent.left
             anchors.leftMargin: 2
             anchors.right: parent.right
-            property string headerFontColor: MoneroComponents.Style.blackTheme ? "#e6e6e6" : "#333333"
+            property string headerFontColor: MoneroComponents.Style.defaultFontColor
             spacing: 0
 
             function setDate(date) {
@@ -337,13 +337,13 @@ Item {
                                   }
                               } else {
                                   if (dayArea.containsMouse) {
-                                      dayRect.color = MoneroComponents.Style.blackTheme ? "#20FFFFFF" : "#10000000"
+                                      dayRect.color = MoneroComponents.Style.hoverOverlayColor
                                   } else {
                                       dayRect.color = "transparent";
                                   }
                               }
                               if(!styleData.valid) return "transparent"
-                              if(styleData.date.toDateString() === (new Date()).toDateString()) return "#FFFF00"
+                              if(styleData.date.toDateString() === (new Date()).toDateString()) return MoneroComponents.Style.warningTextColor
                               if(!styleData.visibleMonth) return MoneroComponents.Style.lightGreyFontColor
                               if(dayArea.pressed) return MoneroComponents.Style.defaultFontColor
                               return MoneroComponents.Style.defaultFontColor

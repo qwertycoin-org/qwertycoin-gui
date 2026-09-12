@@ -90,7 +90,7 @@ Rectangle {
                 wrapMode: Text.WordWrap;
                 leftPadding: 0
                 topPadding: 0
-                text: qsTr("This makes it easier to send or receive Monero and reduces errors when typing in addresses manually.") + translationManager.emptyString
+                text: qsTr("This makes it easier to send or receive Qwertycoin and reduces errors when typing addresses manually.") + translationManager.emptyString
                 width: parent.width
             }
 
@@ -318,8 +318,8 @@ Rectangle {
                 Layout.topMargin: 20
                 KeyNavigation.backtab: deleteButton.visible ? deleteButton: cancelButton
                 KeyNavigation.tab: resolveButton.visible ? resolveButton : descriptionLine
-                labelText: "<style type='text/css'>a {text-decoration: none; color: #858585; font-size: 14px;}</style> %1"
-                    .arg(qsTr("Address")) + translationManager.emptyString
+                labelText: "<style type='text/css'>a {text-decoration: none; color: %2; font-size: 14px;}</style> %1"
+                    .arg(qsTr("Address")).arg(MoneroComponents.Style.linkColor) + translationManager.emptyString
                 placeholderText: {
                     if(persistentSettings.nettype == NetworkType.MAINNET){
                         return "QWC.. / qwertycoin:.. / OpenAlias";
@@ -421,8 +421,8 @@ Rectangle {
                 Layout.fillWidth: true
                 fontSize: 16
                 placeholderFontSize: 16
-                labelText: "<style type='text/css'>a {text-decoration: none; color: #858585; font-size: 14px;}</style> %1"
-                    .arg(qsTr("Description")) + translationManager.emptyString
+                labelText: "<style type='text/css'>a {text-decoration: none; color: %2; font-size: 14px;}</style> %1"
+                    .arg(qsTr("Description")).arg(MoneroComponents.Style.linkColor) + translationManager.emptyString
                 placeholderText: qsTr("Add a name...") + translationManager.emptyString
                 onAccepted: addButton.enabled ? addButton.clicked() : ""
             }

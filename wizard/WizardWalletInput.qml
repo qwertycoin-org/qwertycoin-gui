@@ -121,7 +121,7 @@ GridLayout {
                 font.styleName: "Solid"
                 font.pixelSize: 15
                 text: FontAwesome.exclamationCircle
-                color: "#FF0000"
+                color: MoneroComponents.Style.errorColor
                 themeTransition: false
             }
 
@@ -130,7 +130,7 @@ GridLayout {
                 textFormat: Text.PlainText
                 font.family: MoneroComponents.Style.fontRegular.name
                 font.pixelSize: 14
-                color: "#FF0000"
+                color: MoneroComponents.Style.errorColor
                 themeTransition: false
                 Accessible.role: Accessible.StaticText
                 Accessible.name: text
@@ -210,7 +210,7 @@ GridLayout {
                 font.styleName: "Solid"
                 font.pixelSize: 15
                 text: FontAwesome.exclamationCircle
-                color: "#FF0000"
+                color: MoneroComponents.Style.errorColor
                 themeTransition: false
             }
 
@@ -219,7 +219,7 @@ GridLayout {
                 textFormat: Text.PlainText
                 font.family: MoneroComponents.Style.fontRegular.name
                 font.pixelSize: 14
-                color: "#FF0000"
+                color: MoneroComponents.Style.errorColor
                 themeTransition: false
                 Accessible.role: Accessible.StaticText
                 Accessible.name: text

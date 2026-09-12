@@ -5,10 +5,10 @@ include(CMakeDependentOption)
 
 message(STATUS "Initiating compile using CMake ${CMAKE_VERSION}")
 
-set(VERSION_MAJOR "18")
-set(VERSION_MINOR "5")
-set(VERSION_REVISION "2")
-set(VERSION "0.${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_REVISION}")
+set(VERSION_MAJOR "2")
+set(VERSION_MINOR "0")
+set(VERSION_REVISION "0")
+set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_REVISION}")
 
 option(STATIC "Link libraries statically, requires static Qt")
 
@@ -16,8 +16,11 @@ option(USE_DEVICE_TREZOR "Trezor support compilation" OFF)
 option(WITH_SCANNER "Enable webcam QR scanner" OFF)
 option(WITH_DESKTOP_ENTRY "Ask to install desktop entry on first startup" ON)
 option(WITH_UPDATER "Regularly check for new updates" OFF)
-option(DEV_MODE "Checkout latest monero master on build" OFF)
+option(DEV_MODE "Enable GUI development diagnostics without changing the pinned Core" OFF)
 cmake_dependent_option(QML_TESTS "Build QML tests" ON "NOT STATIC;NOT ANDROID;NOT IOS" OFF)
+if(QML_TESTS)
+  enable_testing()
+endif()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -44,40 +47,30 @@ endif()
 if(NOT MANUAL_SUBMODULES)
   find_package(Git)
   if(GIT_FOUND)
-    if(NOT DEV_MODE)
-      function (check_submodule relative_path)
-        execute_process(COMMAND git rev-parse "HEAD" WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${relative_path} OUTPUT_VARIABLE localHead)
-        execute_process(COMMAND git rev-parse "HEAD:${relative_path}" WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} OUTPUT_VARIABLE checkedHead)
-        string(COMPARE EQUAL "${localHead}" "${checkedHead}" upToDate)
-        if (upToDate)
-          message(STATUS "Submodule '${relative_path}' is up-to-date")
-        else()
-          message(FATAL_ERROR "Submodule '${relative_path}' is not using the checked head. Please update all submodules with\ngit submodule update --init --force --recursive\nor run cmake with -DMANUAL_SUBMODULES=1,\n or if you want to build from latest master run cmake with -DDEV_MODE=ON,\n or run make devmode")
-        endif()
-      endfunction ()
-      message(STATUS "Checking submodules")
-      check_submodule(monero)
-    else()
-      execute_process(COMMAND ${GIT_EXECUTABLE} fetch WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/monero RESULT_VARIABLE GIT_FETCH_RESULT)
-      execute_process(COMMAND ${GIT_EXECUTABLE} checkout -f origin/master WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/monero RESULT_VARIABLE GIT_CHECKOUT_MASTER_RESULT)
-      execute_process(COMMAND ${GIT_EXECUTABLE} submodule sync --recursive WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/monero RESULT_VARIABLE GIT_SUBMODULE_SYNC_RESULT)
-      execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --force --recursive WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/monero RESULT_VARIABLE GIT_SUBMODULE_UPDATE_RESULT)
-      if(NOT GIT_FETCH_RESULT EQUAL "0" OR NOT GIT_CHECKOUT_MASTER_RESULT EQUAL "0" OR NOT GIT_SUBMODULE_SYNC_RESULT EQUAL "0" OR NOT GIT_SUBMODULE_UPDATE_RESULT EQUAL "0")
-        message(FATAL_ERROR "Updating git submodule to master (-DDEV_MODE=ON) failed")
+    function (check_submodule relative_path)
+      execute_process(COMMAND git rev-parse "HEAD" WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${relative_path} OUTPUT_VARIABLE localHead OUTPUT_STRIP_TRAILING_WHITESPACE)
+      execute_process(COMMAND git rev-parse "HEAD:${relative_path}" WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} OUTPUT_VARIABLE checkedHead OUTPUT_STRIP_TRAILING_WHITESPACE)
+      string(COMPARE EQUAL "${localHead}" "${checkedHead}" upToDate)
+      if (upToDate)
+        message(STATUS "Submodule '${relative_path}' is at the pinned Gitlink ${checkedHead}")
+      else()
+        message(FATAL_ERROR "Submodule '${relative_path}' is not using the pinned Gitlink. Run git submodule sync --recursive && git submodule update --init --recursive, or use -DMANUAL_SUBMODULES=1 only together with tools/check_core_pin.sh.")
       endif()
-    endif()
+    endfunction ()
+    message(STATUS "Checking submodules")
+    check_submodule(qwertycoin)
   endif()
 endif()
 
-add_subdirectory(monero)
+add_subdirectory(qwertycoin)
 add_subdirectory(external)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-get_directory_property(ARCH_WIDTH DIRECTORY "monero" DEFINITION ARCH_WIDTH)
-get_directory_property(Boost_VERSION_STRING DIRECTORY "monero" DEFINITION Boost_VERSION_STRING)
+get_directory_property(ARCH_WIDTH DIRECTORY "qwertycoin" DEFINITION ARCH_WIDTH)
+get_directory_property(Boost_VERSION_STRING DIRECTORY "qwertycoin" DEFINITION Boost_VERSION_STRING)
 
 if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
   add_definitions(-DQT_NO_DEBUG)
@@ -122,7 +115,7 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
     endif()
 endif()
 
-set(QT5_LIBRARIES
+set(QT5_MODULES
   Qt5Core
   Qt5Quick
   Qt5Gui
@@ -132,15 +125,15 @@ set(QT5_LIBRARIES
 )
 
 if(QML_TESTS)
-  list(APPEND QT5_LIBRARIES Qt5QuickTest Qt5Test)
+  list(APPEND QT5_MODULES Qt5QuickTest Qt5Test)
 endif()
 
 if(WITH_SCANNER)
-  list(APPEND QT5_LIBRARIES Qt5Multimedia)
+  list(APPEND QT5_MODULES Qt5Multimedia)
 endif()
 
 if(APPLE)
-  list(APPEND QT5_LIBRARIES Qt5MacExtras)
+  list(APPEND QT5_MODULES Qt5MacExtras)
 endif()
 
 if(UNIX)
@@ -158,25 +151,33 @@ set(QT_MIN_VERSION "5.12")
 
 find_package(PkgConfig REQUIRED)
 
-# TODO: drop this once we switch to Qt 5.14+
-pkg_check_modules(Qt5QmlModels_PKG_CONFIG QUIET Qt5QmlModels)
-if(Qt5QmlModels_PKG_CONFIG_FOUND)
-  list(APPEND QT5_LIBRARIES Qt5QmlModels)
+# TODO: drop the optional lookup once we require Qt 5.14+
+find_package(Qt5QmlModels ${QT_MIN_VERSION} QUIET)
+if(TARGET Qt5::QmlModels)
+  list(APPEND QT5_MODULES Qt5QmlModels)
 endif()
 
-foreach(QT5_MODULE ${QT5_LIBRARIES})
+foreach(QT5_MODULE ${QT5_MODULES})
   find_package(${QT5_MODULE} ${QT_MIN_VERSION} REQUIRED)
   include_directories(${${QT5_MODULE}_INCLUDE_DIRS})
 endforeach()
 
-if(NOT (CMAKE_CROSSCOMPILING AND ANDROID))
-  pkg_check_modules(QT5_PKG_CONFIG REQUIRED ${QT5_LIBRARIES})
-else()
+# EPoSe observation is a GUI-only concern. Keep these target-scoped so their
+# include paths and definitions do not invalidate every embedded Core object.
+find_package(Qt5Network ${QT_MIN_VERSION} REQUIRED)
+find_package(Qt5Concurrent ${QT_MIN_VERSION} REQUIRED)
+if(QML_TESTS)
+  find_package(Qt5Widgets ${QT_MIN_VERSION} REQUIRED)
+endif()
+
+if(CMAKE_CROSSCOMPILING AND ANDROID)
   set(QT5_LIBRARIES_ABI)
-  foreach(QT5_MODULE ${QT5_LIBRARIES})
+  foreach(QT5_MODULE ${QT5_MODULES})
     list(APPEND QT5_LIBRARIES_ABI "${QT5_MODULE}_${CMAKE_ANDROID_ARCH_ABI}")
   endforeach()
   pkg_check_modules(QT5_PKG_CONFIG REQUIRED ${QT5_LIBRARIES_ABI})
+elseif(STATIC)
+  pkg_check_modules(QT5_PKG_CONFIG REQUIRED ${QT5_MODULES})
 endif()
 
 get_target_property(QMAKE_IMPORTED_LOCATION Qt5::qmake IMPORTED_LOCATION)
@@ -186,7 +187,7 @@ if(APPLE AND NOT STATIC)
   set(CMAKE_BUILD_RPATH "${QT_INSTALL_PREFIX}/lib")
 endif()
 
-if(QT5_PKG_CONFIG_FOUND)
+if(STATIC OR (CMAKE_CROSSCOMPILING AND ANDROID))
   set(QT5_PKG_CONFIG "QT5_PKG_CONFIG")
   if(STATIC)
     set(QT5_PKG_CONFIG "${QT5_PKG_CONFIG}_STATIC")
@@ -206,6 +207,15 @@ if(QT5_PKG_CONFIG_FOUND)
   set(QT5_LIBRARIES ${${QT5_PKG_CONFIG}_LIBRARIES} ${${QT5_PKG_CONFIG}_LDFLAGS_OTHER})
   include_directories(${${QT5_PKG_CONFIG}_INCLUDE_DIRS})
   link_directories(${${QT5_PKG_CONFIG}_LIBRARY_DIRS})
+else()
+  # Dynamic desktop builds must use CMake's imported Qt targets. Plain
+  # pkg-config library names lose the selected CMAKE_PREFIX_PATH and make a
+  # portable Qt toolchain fail at the final link step.
+  set(QT5_LIBRARIES)
+  foreach(QT5_MODULE ${QT5_MODULES})
+    string(REGEX REPLACE "^Qt5" "" QT5_COMPONENT "${QT5_MODULE}")
+    list(APPEND QT5_LIBRARIES "Qt5::${QT5_COMPONENT}")
+  endforeach()
 endif()
 
 list(APPEND QT5_LIBRARIES

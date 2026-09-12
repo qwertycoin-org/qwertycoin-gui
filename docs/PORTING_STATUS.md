@@ -1,58 +1,87 @@
-# Qwertycoin GUI Porting Status
+# Qwertycoin GUI porting status
 
-## Upstream Basis
+## Reviewed source pair
 
-The initial port uses `monero-project/monero-gui` tag `v0.18.5.2`.
+| Component | Revision | Role |
+| --- | --- | --- |
+| GUI baseline | `25719fb7ab08af5465b1ce4d7a51208bcf9a1e8b` | Qwertycoin GUI baseline derived from Monero GUI `v0.18.5.2` |
+| Qwertycoin Core | `09086f7dbaaf1a4ff16bddeaa1d729f9ff65eca6` | Final QWC v2 Core plus out-of-tree GUI CMake integration fix |
+| Core mainnet merge | `e6e0b46b6603bc5c1402df63696b514ba735f8ee` | Final consensus/network baseline contained by the pinned Core revision |
 
-Reasoning:
+The Core is a Git submodule at `qwertycoin/`, not `monero/`. Its remote is
+`https://github.com/qwertycoin-org/qwertycoin.git`. Builds with
+`DEV_MODE=OFF` respect the recorded Gitlink and never fetch, check out or
+discard another Core revision.
 
-- It is the newest 0.18.5.x GUI bugfix tag available for the Monero GUI line.
-- It remains close to the Qwertycoin v2 core baseline derived from Monero v0.18.5.1.
-- Starting from a release tag is safer than importing upstream `master`.
+Mainnet binding:
 
-## Repository Layout
+- genesis: `906629482787e94cb00463696a0e95ec75a480da09257c6270c65ba1a74a76b0`;
+- EPoSe parameter hash: `e5654b4f5fa27faa51a80ca1e93bb877c3bd3345d0a803b6e7ab55c05189c20d`;
+- P2P/RPC/wallet-RPC/ZMQ ports: 8196/8197/8198/8199;
+- URI scheme: `qwertycoin:`.
 
-- `origin`: official Qwertycoin GUI repository.
-- `upstream`: Monero GUI upstream.
-- `monero/`: Qwertycoin v2 core submodule, intentionally kept at the original path expected by the upstream GUI build system.
+## Implemented
 
-## Completed First-Port Items
+- Qwertycoin light/dark design system using bundled Inter and Archivo fonts,
+  approved Q mark/wordmark, platform application icons and local resources.
+- Shared controls, wizard, accounts, transfer, receive, history, address book,
+  signing, settings, merchant view, dialogs and main navigation migrated to the
+  common QML style tokens.
+- QWC names, eight-decimal amounts, ports, data paths, daemon executable and
+  URI handling retained or corrected without resetting existing wallet files.
+- Typed asynchronous EPoSe observer with per-source status/time, bounded
+  requests, exact integer transport and stale-response rejection after daemon
+  or network changes.
+- Dedicated EPoSe view separating observed network state, local producer
+  process state, registration, effectiveness, qualification and reward preview.
+- Explicit local producer configuration using the current Core flags and a
+  public primary QWC reward address. The GUI never asks for wallet private view
+  or spend keys.
+- Local daemon validation for public restricted-RPC probe endpoints, distinct
+  administrative RPC port and network/genesis-bound service keystore path.
+- German and English text updated for changed views. Other inherited
+  translations remain available but are not represented as fully refreshed.
+- Packaging helper now fails when required binaries, fonts, icons, Qt platform
+  or SVG plugins, QML imports or `qt.conf` are missing.
 
-- Application name: `Qwertycoin GUI`.
-- Binary target: `qwertycoin-gui`.
-- Local daemon binary: `qwertycoind`.
-- QWC logo and 192px icon included as repository assets.
-- Main visible wallet currency text changed from XMR to QWC.
-- Mainnet RPC defaults changed to QWC ports.
-- `qwertycoin:` URI handling added.
-- QWC wallet/config/log/export paths added.
-- Update checks disabled until QWC release infrastructure exists.
-- Hardware wallet creation disabled in the first port because QWC device support is not validated.
-- Trezor compilation is disabled by default for the same reason; enabling it needs a dedicated QWC device compatibility audit.
-- Fiat conversion disabled until QWC-specific price providers are configured.
-- Core submodule updated to the official Qwertycoin v2 repository at
-  `1c4c1bf10c387887a42243dc690a65abb6c6e786`.
-- Restore-from-seed smoke script added for built wallet CLI binaries.
-- Disabled release-build workflow template retained for Linux x86_64, macOS
-  Apple Silicon, and Windows x86_64 pending explicit CI activation.
+## Deliberately unavailable
 
-## Known Porting Gaps
+- Legacy `get_service_node_registration_payload` is observed only as a retired
+  compatibility method; registration and renewal remain owned by the local
+  Core producer.
+- Reward preview is shown as unavailable when the pinned Core returns
+  `preview_available=false`; this is not labelled as disabled EPoSe.
+- Descriptor update, deregistration, key recovery and envelope submission have
+  no GUI buttons because no reviewed administrative backend contract supports
+  them at this pin.
+- Inherited Monero P2Pool download/launch remains disabled. Solo RandomX mining
+  remains separate from EPoSe.
+- Hardware-wallet creation, fiat feeds and automatic updates remain disabled
+  until QWC-specific compatibility and release infrastructure are reviewed.
 
-- QML module names and many wrapper classes still use upstream `moneroComponents` / `Monero::` API names. This is expected in the first port and should not be renamed blindly.
-- Translation files still contain many upstream strings and need a separate i18n pass.
-- Signed/notarized platform packaging needs real Linux/macOS/Windows validation.
-- P2Pool support is inherited from upstream and not release-validated for QWC.
-- The inherited Monero P2Pool download and launch path is disabled fail-closed;
-  solo RandomX mining remains available.
-- Hardware wallets need a dedicated compatibility audit.
-- Remote-node defaults are not finalized.
+## Compatibility names and attribution
 
-## Required Smoke Tests
+Internal `Monero::`, `moneroComponents`, translation catalog names and other
+upstream ABI/API identifiers intentionally remain where renaming would add risk
+without user benefit. Copyright notices, BSD-3-Clause terms and third-party
+licenses are preserved. They are not public Qwertycoin product labels.
 
-- Build `qwertycoin-gui` on Linux x64.
-- Build on macOS ARM64.
-- Create a new QWC mainnet wallet and verify the address starts with `QWC`.
-- Restore the same wallet from seed and verify the same address with
-  `tools/smoke/restore_from_seed.sh`.
-- Connect to a QWC daemon on RPC port `8197`.
-- Send QWC from wallet A to wallet B after daemon connectivity is validated.
+## Validation status
+
+Linux x86_64 is the required review platform and is exercised with a clean
+dynamic Qt 5.15 build, QML tests, EPoSe adapter tests, offline restore, isolated
+create/send regtest and package-content verification. The pinned Core EPoSe
+suite is run from the exact Gitlink. See `GUI_REVIEW_EVIDENCE.md` for commands
+and results.
+
+No connected native macOS Apple Silicon or Windows x86_64 build machine was
+available for this review. Their disabled workflow templates and packaging
+paths were updated statically, but neither a cross-build nor Linux screenshots
+are reported as native platform evidence. Codesigning, notarization, release
+tags and public packages remain later release tasks.
+
+## Workflow state
+
+Templates remain only under `.github/workflows-disabled/`. This work does not
+create `.github/workflows/`, enable triggers or start manual GitHub Actions.
+All acceptance configurations explicitly set `DEV_MODE=OFF`.

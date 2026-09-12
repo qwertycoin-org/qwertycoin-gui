@@ -41,7 +41,7 @@ Item {
     height: 26
     width: layout.width
     // legacy properties
-    property var checkedColor: MoneroComponents.Style.blackTheme ? "white" : "#666666"
+    property var checkedColor: MoneroComponents.Style.accentGold
     property var borderColor: checked ? MoneroComponents.Style.inputBorderColorActive : MoneroComponents.Style.inputBorderColorInActive
 
     function toggle(){
@@ -56,6 +56,7 @@ Item {
             id: button
             color: "transparent"
             border.color: borderColor
+            border.width: MoneroComponents.Style.contourWidth
             height: radioButton.height
             width: radioButton.height
             radius: radioButton.height
@@ -68,7 +69,7 @@ Item {
                 width: 10
                 height: 10
                 radius: 10
-                opacity: 0.8
+                opacity: 1
             }
         }
 

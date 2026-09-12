@@ -37,14 +37,14 @@ import "../components" as MoneroComponents
 RowLayout {
     id: rowlayout
     Layout.fillWidth: true
-    Layout.bottomMargin: 10
+    Layout.bottomMargin: MoneroComponents.Style.spaceSm
     property alias imageIcon: icon.source
     property bool checkbox: false
     property alias checked: checkboxItem.checked
     property alias headerText: header.text
     property alias bodyText: body.text
     signal menuClicked();
-    spacing: 10
+    spacing: MoneroComponents.Style.spaceMd
 
     Item {
         Layout.preferredWidth: 70
@@ -100,7 +100,7 @@ RowLayout {
             color: MoneroComponents.Style.defaultFontColor
             opacity: MoneroComponents.Style.blackTheme ? 1.0 : 0.8
             font.bold: true
-            font.family: MoneroComponents.Style.fontRegular.name
+            font.family: MoneroComponents.Style.fontMedium.name
             font.pixelSize: {
                 if (wizardController.layoutScale == 4) {
                     return 16;

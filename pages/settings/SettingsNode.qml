@@ -73,7 +73,7 @@ Rectangle{
                 Layout.fillHeight: true
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
-                color: "darkgrey"
+                color: MoneroComponents.Style.textSecondaryColor
                 width: 2
             }
 
@@ -166,7 +166,7 @@ Rectangle{
                 Layout.fillHeight: true
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
-                color: "darkgrey"
+                color: MoneroComponents.Style.textSecondaryColor
                 width: 2
             }
 
@@ -222,7 +222,7 @@ Rectangle{
                     wrapMode: Text.WordWrap;
                     leftPadding: 0
                     topPadding: 0
-                    text: qsTr("Uses a third-party server to connect to the Monero network. Less secure, but easier on your computer.") + translationManager.emptyString
+                    text: qsTr("Uses a third-party server to connect to the Qwertycoin network. Easier on your computer, but the operator can observe your requests.") + translationManager.emptyString
                     width: parent.width - (remoteNodeIcon.width + remoteNodeIcon.anchors.leftMargin + anchors.leftMargin)
                 }
 
@@ -251,7 +251,7 @@ Rectangle{
 
         MoneroComponents.WarningBox {
             Layout.topMargin: 46
-            text: qsTr("To find a remote node, type 'Monero remote node' into your favorite search engine. Please ensure the node is run by a trusted third-party.") + translationManager.emptyString
+            text: qsTr("Use a Qwertycoin remote node operated by a party you trust. A local node provides stronger privacy and independent verification.") + translationManager.emptyString
             visible: persistentSettings.useRemoteNode
         }
 
@@ -287,7 +287,7 @@ Rectangle{
                     Layout.fillWidth: true
                     fontSize: 15
                     labelFontSize: 14
-                    property string style: "<style type='text/css'>a {cursor:pointer;text-decoration: none; color: #FF6C3C}</style>"
+                    property string style: "<style type='text/css'>a {cursor:pointer;text-decoration: none; color: %1}</style>".arg(MoneroComponents.Style.linkColor)
                     labelText: qsTr("Blockchain location") + style + " <a href='#'> (%1)</a>".arg(qsTr("Change")) + translationManager.emptyString
                     labelButtonText: qsTr("Reset") + translationManager.emptyString
                     labelButtonVisible: text

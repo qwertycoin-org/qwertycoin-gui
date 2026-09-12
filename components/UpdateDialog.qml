@@ -79,7 +79,7 @@ Popup {
 
         Text {
             id: errorText
-            color: "red"
+            color: MoneroComponents.Style.errorColor
             font.family: MoneroComponents.Style.fontRegular.name
             font.pixelSize: 18
             text: updateDialog.error

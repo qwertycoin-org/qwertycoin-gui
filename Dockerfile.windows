@@ -2,6 +2,7 @@ FROM ubuntu:20.04
 
 ARG THREADS=1
 ARG QT_VERSION=v5.15.19-lts-lgpl
+ARG QWERTYCOIN_CORE_COMMIT=09086f7dbaaf1a4ff16bddeaa1d729f9ff65eca6
 ENV SOURCE_DATE_EPOCH=1397818193
 
 RUN apt update && \
@@ -12,12 +13,15 @@ RUN apt update && \
 RUN update-alternatives --set x86_64-w64-mingw32-g++ $(which x86_64-w64-mingw32-g++-posix) && \
     update-alternatives --set x86_64-w64-mingw32-gcc $(which x86_64-w64-mingw32-gcc-posix)
 
-RUN git clone -b v0.18.5.1 --depth 1 https://github.com/monero-project/monero && \
-    cd monero && \
-    git reset --hard 4f92268d7c16741cfb41e5bbe2aa46cc260a9ea5 && \
+RUN git init qwertycoin && \
+    cd qwertycoin && \
+    git remote add origin https://github.com/qwertycoin-org/qwertycoin.git && \
+    git fetch --depth 1 origin ${QWERTYCOIN_CORE_COMMIT} && \
+    git checkout --detach FETCH_HEAD && \
+    test "$(git rev-parse HEAD)" = "${QWERTYCOIN_CORE_COMMIT}" && \
     cp -a contrib/depends / && \
     cd .. && \
-    rm -rf monero
+    rm -rf qwertycoin
 
 RUN make -j$THREADS -C /depends HOST=x86_64-w64-mingw32 NO_QT=1
 

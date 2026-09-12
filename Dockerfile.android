@@ -214,7 +214,7 @@ RUN mkdir ${NEW_SDK_ROOT} \
     && cp -r ${ANDROID_SDK_ROOT}/build-tools ${NEW_SDK_ROOT}
 
 CMD set -ex \
-    && cd /monero-gui \
+    && cd /qwertycoin-gui \
     && mkdir -p build/Android/release \
     && cd build/Android/release \
     && cmake -G Ninja \
@@ -228,12 +228,12 @@ CMD set -ex \
     -DANDROID_TOOLCHAIN=clang \
     -DBoost_USE_STATIC_RUNTIME=ON \
     -DLRELEASE_PATH="${PREFIX}/bin" \
-    -DQT_ANDROID_APPLICATION_BINARY="monero-wallet-gui" \
+    -DQT_ANDROID_APPLICATION_BINARY="qwertycoin-gui" \
     -DANDROID_SDK="${NEW_SDK_ROOT}" \
     -DWITH_SCANNER=ON \
     -DWITH_DESKTOP_ENTRY=OFF \
     ../../.. \
     && PATH=${HOST_PATH} cmake --build . --target generate_translations_header \
-    && sed -i -e "/^build .*monero-wallet-gui.*:.*LINKER/,/^$/ { s#monero/external/randomx/librandomx.a##; s#-lm#-lm monero/external/randomx/librandomx.a#; }" build.ninja \
-    && cmake --build . --target monero-wallet-gui \
+    && sed -i -e "/^build .*qwertycoin-gui.*:.*LINKER/,/^$/ { s#qwertycoin/external/randomx/librandomx.a##; s#-lm#-lm qwertycoin/external/randomx/librandomx.a#; }" build.ninja \
+    && cmake --build . --target qwertycoin-gui \
     && cmake --build . --target apk

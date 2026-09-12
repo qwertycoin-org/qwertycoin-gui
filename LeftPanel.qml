@@ -56,6 +56,7 @@ Rectangle {
     Clipboard { id: clipboard }
 
     signal historyClicked()
+    signal eposeClicked()
     signal transferClicked()
     signal receiveClicked()
     signal advancedClicked()
@@ -66,6 +67,7 @@ Rectangle {
     function selectItem(pos) {
         menuColumn.previousButton.checked = false
         if(pos === "History") menuColumn.previousButton = historyButton
+        else if(pos === "Epose") menuColumn.previousButton = eposeButton
         else if(pos === "Transfer") menuColumn.previousButton = transferButton
         else if(pos === "Receive")  menuColumn.previousButton = receiveButton
         else if(pos === "AddressBook") menuColumn.previousButton = addressBookButton
@@ -114,17 +116,28 @@ Rectangle {
                 height: 490
                 width: 260
 
-                Image {
+                Rectangle {
                     id: card
-                    visible: !isOpenGL || MoneroComponents.Style.blackTheme
                     width: 260
                     height: 135
-                    fillMode: Image.PreserveAspectFit
-                    source: MoneroComponents.Style.blackTheme ? "qrc:///images/card-background-black" + (currentAccountIndex % MoneroComponents.Style.accountColors.length) + ".png" : "qrc:///images/card-background-white.png"
+                    color: MoneroComponents.Style.raisedColor
+                    radius: MoneroComponents.Style.radiusLg
+                    border.width: MoneroComponents.Style.contourWidth
+                    border.color: MoneroComponents.Style.accountColors[currentAccountIndex % MoneroComponents.Style.accountColors.length]
+
+                    Image {
+                        anchors.left: parent.left
+                        anchors.top: parent.top
+                        anchors.margins: MoneroComponents.Style.spaceLg
+                        width: 28
+                        height: 28
+                        fillMode: Image.PreserveAspectFit
+                        source: "qrc:/images/brand/qwertycoin-mark.svg"
+                    }
                 }
 
                 DropShadow {
-                    visible: isOpenGL && !MoneroComponents.Style.blackTheme
+                    visible: false
                     anchors.fill: card
                     horizontalOffset: 3
                     verticalOffset: 3
@@ -145,7 +158,7 @@ Rectangle {
                     anchors.leftMargin: 192
                     font.bold: true
                     font.pixelSize: 12
-                    color: "#f33434"
+                    color: MoneroComponents.Style.errorColor
                     themeTransition: false
                 }
 
@@ -159,7 +172,7 @@ Rectangle {
                     anchors.rightMargin: 8
                     font.pixelSize: 12
                     font.bold: true
-                    color: "#ff9323"
+                    color: MoneroComponents.Style.accentGold
                     themeTransition: false
                 }
             }
@@ -176,7 +189,7 @@ Rectangle {
                     fontSize: 12
                     id: accountIndex
                     text: qsTr("Account") + translationManager.emptyString + " #" + currentAccountIndex
-                    color: MoneroComponents.Style.blackTheme ? "white" : "black"
+                    color: MoneroComponents.Style.defaultFontColor
                     anchors.left: parent.left
                     anchors.leftMargin: 60
                     anchors.top: parent.top
@@ -195,7 +208,7 @@ Rectangle {
                     fontSize: 16
                     id: accountLabel
                     textWidth: 170
-                    color: MoneroComponents.Style.blackTheme ? "white" : "black"
+                    color: MoneroComponents.Style.defaultFontColor
                     anchors.left: parent.left
                     anchors.leftMargin: 60
                     anchors.top: parent.top
@@ -215,7 +228,7 @@ Rectangle {
                     fontSize: 16
                     visible: isSyncing
                     text: qsTr("Syncing...") + translationManager.emptyString
-                    color: MoneroComponents.Style.blackTheme ? "white" : "black"
+                    color: MoneroComponents.Style.defaultFontColor
                     anchors.left: parent.left
                     anchors.leftMargin: 20
                     anchors.bottom: currencyLabel.top
@@ -225,6 +238,7 @@ Rectangle {
 
                 MoneroComponents.TextPlain {
                     id: currencyLabel
+                    objectName: "walletSummaryCurrency"
                     font.pixelSize: 16
                     text: {
                         if (persistentSettings.fiatPriceEnabled && persistentSettings.fiatPriceToggle) {
@@ -233,9 +247,9 @@ Rectangle {
                             return "QWC"
                         }
                     }
-                    color: MoneroComponents.Style.blackTheme ? "white" : "black"
-                    anchors.left: parent.left
-                    anchors.leftMargin: 20
+                    color: MoneroComponents.Style.defaultFontColor
+                    anchors.left: balancePart2.right
+                    anchors.leftMargin: MoneroComponents.Style.spaceSm
                     anchors.top: parent.top
                     anchors.topMargin: 100
                     themeTransition: false
@@ -251,11 +265,12 @@ Rectangle {
 
                 MoneroComponents.TextPlain {
                     id: balancePart1
+                    objectName: "walletSummaryAmountWhole"
                     themeTransition: false
                     anchors.left: parent.left
-                    anchors.leftMargin: 58
+                    anchors.leftMargin: 20
                     anchors.baseline: currencyLabel.baseline
-                    color: MoneroComponents.Style.blackTheme ? "white" : "black"
+                    color: MoneroComponents.Style.defaultFontColor
                     Binding on color {
                         when: balancePart1MouseArea.containsMouse || balancePart2MouseArea.containsMouse
                         value: MoneroComponents.Style.orange
@@ -290,6 +305,7 @@ Rectangle {
                 }
                 MoneroComponents.TextPlain {
                     id: balancePart2
+                    objectName: "walletSummaryAmountFraction"
                     themeTransition: false
                     anchors.left: balancePart1.right
                     anchors.leftMargin: 2
@@ -458,6 +474,28 @@ Rectangle {
 
             MoneroComponents.MenuButtonDivider {
                 visible: historyButton.present
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: 20
+            }
+
+            // ------------- EPoSe tab ---------------
+            MoneroComponents.MenuButton {
+                id: eposeButton
+                visible: appWindow.walletMode >= 2
+                anchors.left: parent.left
+                anchors.right: parent.right
+                text: qsTr("EPoSe") + translationManager.emptyString
+                symbol: (isMac ? "⌃" : qsTr("Ctrl+")) + "P" + translationManager.emptyString
+                onClicked: {
+                    parent.previousButton.checked = false
+                    parent.previousButton = eposeButton
+                    panel.eposeClicked()
+                }
+            }
+
+            MoneroComponents.MenuButtonDivider {
+                visible: eposeButton.present && appWindow.walletMode >= 2
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.leftMargin: 20

@@ -39,14 +39,14 @@ Popup {
     property alias title: header.text
 
     background: Rectangle {
-        border.color: MoneroComponents.Style.blackTheme ? Qt.rgba(255, 255, 255, 0.25) : Qt.rgba(0, 0, 0, 0.25)
-        border.width: 1
-        color: MoneroComponents.Style.blackTheme ? "black" : "white"
-        radius: 10
+        border.color: MoneroComponents.Style.borderColor
+        border.width: MoneroComponents.Style.contourWidth
+        color: MoneroComponents.Style.cardColor
+        radius: MoneroComponents.Style.radiusLg
     }
     closePolicy: Popup.CloseOnEscape
     focus: true
-    padding: 20
+    padding: MoneroComponents.Style.spaceXl
     x: (appWindow.width - width) / 2
     y: (appWindow.height - height) / 2
 
@@ -58,8 +58,8 @@ Popup {
             id: header
             color: MoneroComponents.Style.defaultFontColor
             font.bold: true
-            font.family: MoneroComponents.Style.fontRegular.name
-            font.pixelSize: 18
+            font.family: MoneroComponents.Style.fontDisplay.name
+            font.pixelSize: 24
             visible: text != ""
         }
     }

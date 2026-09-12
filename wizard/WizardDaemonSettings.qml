@@ -78,7 +78,7 @@ ColumnLayout {
             labelText: {
                 const label = qsTr("Blockchain location (optional)");
                 if (persistentSettings.blockchainDataDir) {
-                    const style = "<style type='text/css'>a {cursor:pointer;text-decoration: none; color: #FF6C3C}</style>";
+                    const style = "<style type='text/css'>a {cursor:pointer;text-decoration: none; color: %1}</style>".arg(MoneroComponents.Style.linkColor);
                     return label + style + "<a href='#'> (%1)</a>".arg(qsTr("Reset")) + translationManager.emptyString;
                 } else {
                     return label + translationManager.emptyString;

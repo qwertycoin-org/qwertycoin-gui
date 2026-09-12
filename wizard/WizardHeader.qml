@@ -40,7 +40,7 @@ ColumnLayout {
     property string subtitle: ""
     property alias imageIcon: icon.source
     property bool subtitleVisible: true
-    spacing: 4
+    spacing: MoneroComponents.Style.spaceSm
     Layout.maximumWidth: wizardController.wizardSubViewWidth
 
     RowLayout {
@@ -56,16 +56,17 @@ ColumnLayout {
 
         Text {
             text: title
-            font.family: MoneroComponents.Style.fontRegular.name
+            font.family: MoneroComponents.Style.fontDisplay.name
             color: MoneroComponents.Style.defaultFontColor
-            opacity: MoneroComponents.Style.blackTheme ? 1.0 : 0.8
+            opacity: 1.0
+            font.bold: true
             font.pixelSize: {
                 if (wizardController.layoutScale == 4) {
-                    return 16;
+                    return 20;
                 } else if (wizardController.layoutScale == 3) {
-                    return 28;
+                    return 30;
                 } else if (wizardController.layoutScale <= 2) {
-                    return 32;
+                    return 34;
                 }
             }
 
@@ -86,13 +87,13 @@ ColumnLayout {
         Layout.alignment: Qt.AlignLeft
         visible: parent.subtitle !== "" && subtitleVisible
 
-        color: MoneroComponents.Style.dimmedFontColor
+        color: MoneroComponents.Style.textSecondaryColor
         text: subtitle
 
         font.family: MoneroComponents.Style.fontRegular.name
         font.pixelSize: {
             if (wizardController.layoutScale <= 2 ) {
-                return 16;
+                return 15;
             } else {
                 return 14;
             }

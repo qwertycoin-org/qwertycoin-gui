@@ -67,7 +67,7 @@ Item {
                 verticalOffset: 3
                 radius: 8.0
                 samples: 16
-                color: "#20000000"
+                color: MoneroComponents.Style.shadowColor
                 smooth: true
                 source: checkbox
             }
@@ -76,7 +76,7 @@ Item {
             id: content
             font.pixelSize: 14
             font.bold: false
-            color: "white"
+            color: MoneroComponents.Style.defaultFontColor
             text: ""
             themeTransition: false
         }

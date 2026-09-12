@@ -156,7 +156,7 @@ Item {
                             MoneroComponents.TextPlain {
                                 font.pixelSize: 16
                                 font.bold: true
-                                color: "#767676"
+                                color: MoneroComponents.Style.textSecondaryColor
                                 text: qsTr("Sales") + translationManager.emptyString
                                 themeTransition: false
                             }
@@ -174,7 +174,7 @@ Item {
                     Rectangle {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 1
-                        color: "#d9d9d9"
+                        color: MoneroComponents.Style.borderSubtleColor
                     }
 
                     MerchantTrackingList {
@@ -213,7 +213,7 @@ Item {
                 verticalOffset: 3
                 radius: 8.0
                 samples: 16
-                color: "#20000000"
+                color: MoneroComponents.Style.shadowColor
                 smooth: true
                 source: tracker
             }
@@ -273,7 +273,7 @@ Item {
                 verticalOffset: 3
                 radius: 8.0
                 samples: 16
-                color: "#30000000"
+                color: MoneroComponents.Style.shadowColor
                 smooth: true
                 source: qrImg
             }
@@ -292,11 +292,12 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     font.pixelSize: 12
                     font.bold: false
-                    color: "white"
-                    text: "<style type='text/css'>a {text-decoration: none; color: #FF6C3C; font-size: 12px;}</style>%1: %2 <a href='#'>(%3)</a>"
+                    color: MoneroComponents.Style.defaultFontColor
+                    text: "<style type='text/css'>a {text-decoration: none; color: %4; font-size: 12px;}</style>%1: %2 <a href='#'>(%3)</a>"
                         .arg(qsTr("Currently selected address"))
                         .arg(Utils.htmlEscape(addressLabel))
-                        .arg(qsTr("Change")) + translationManager.emptyString
+                        .arg(qsTr("Change"))
+                        .arg(MoneroComponents.Style.linkColor) + translationManager.emptyString
                     textFormat: Text.RichText
                     themeTransition: false
 
@@ -320,7 +321,7 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     font.pixelSize: 12
                     font.bold: false
-                    color: "white"
+                    color: MoneroComponents.Style.defaultFontColor
                     text: qsTr("(right-click, save as)") + translationManager.emptyString
                     themeTransition: false
                 }
@@ -364,7 +365,7 @@ Item {
                             MoneroComponents.TextPlain {
                                 font.pixelSize: 14
                                 font.bold: true
-                                color: "#767676"
+                                color: MoneroComponents.Style.textSecondaryColor
                                 text: qsTr("Payment URL") + translationManager.emptyString
                                 themeTransition: false
                             }
@@ -413,11 +414,11 @@ Item {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 1
 
-                        color: "#d9d9d9"
+                        color: MoneroComponents.Style.borderSubtleColor
                     }
 
                     MoneroComponents.TextPlain {
-                        property string _color: "#767676"
+                        property string _color: MoneroComponents.Style.textSecondaryColor
                         Layout.fillWidth: true
                         Layout.margins: 20
                         Layout.topMargin: 10
@@ -458,7 +459,7 @@ Item {
                 verticalOffset: 3
                 radius: 8.0
                 samples: 16
-                color: "#20000000"
+                color: MoneroComponents.Style.shadowColor
                 smooth: true
                 source: payment_url_container
             }
@@ -476,7 +477,7 @@ Item {
                     MoneroComponents.TextPlain {
                         font.pixelSize: 14
                         font.bold: false
-                        color: "white"
+                        color: MoneroComponents.Style.defaultFontColor
                         text: qsTr("Amount to receive") + " (QWC)" + translationManager.emptyString
                         themeTransition: false
                     }
@@ -500,9 +501,9 @@ Item {
                             horizontalAlignment: TextInput.AlignLeft
                             verticalAlignment: TextInput.AlignVCenter
                             selectByMouse: true
-                            color: "#424242"
-                            selectionColor: "#3f3fe3"
-                            selectedTextColor: "white"
+                            color: MoneroComponents.Style.inputBoxColor
+                            selectionColor: MoneroComponents.Style.textSelectionColor
+                            selectedTextColor: MoneroComponents.Style.textSelectedColor
                             placeholderText: "0.00"
 
                             background: Rectangle {

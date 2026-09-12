@@ -12,7 +12,7 @@ MenuItem {
     property alias glyphIcon: glyphIcon.text
 
     background: Rectangle {
-        color: MoneroComponents.Style.buttonBackgroundColorDisabledHover
+        color: MoneroComponents.Style.raisedColor
         opacity: 0
 
         MouseArea {
@@ -45,14 +45,14 @@ MenuItem {
         Text {
             id: glyphIcon
 
-            color: MoneroComponents.Style.buttonTextColor
+            color: MoneroComponents.Style.defaultFontColor
             font.family: glyphIconSolid ? FontAwesome.fontFamilySolid : FontAwesome.fontFamily
             font.pixelSize: 14
             font.styleName: glyphIconSolid ? "Solid" : "Regular"
         }
 
         Text {
-            color: MoneroComponents.Style.blackTheme ? MoneroComponents.Style.buttonTextColor : MoneroComponents.Style.defaultFontColor
+            color: MoneroComponents.Style.defaultFontColor
             font.family: MoneroComponents.Style.fontRegular.name
             font.pixelSize: 14
             Layout.fillWidth: true

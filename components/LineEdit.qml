@@ -44,11 +44,11 @@ ColumnLayout {
     property bool tabNavigationEnabled: true
     property alias text: input.text
 
-    property int inputPaddingLeft: 10
-    property int inputPaddingRight: 10
-    property int inputPaddingTop: 10
-    property int inputPaddingBottom: 10
-    property int inputRadius: 4
+    property int inputPaddingLeft: MoneroComponents.Style.spaceMd
+    property int inputPaddingRight: MoneroComponents.Style.spaceMd
+    property int inputPaddingTop: MoneroComponents.Style.spaceSm
+    property int inputPaddingBottom: MoneroComponents.Style.spaceSm
+    property int inputRadius: MoneroComponents.Style.radiusMd
 
     property bool password: false
     property bool passwordHidden: true
@@ -58,9 +58,9 @@ ColumnLayout {
     property bool placeholderCenter: false
     property string placeholderFontFamily: MoneroComponents.Style.fontRegular.name
     property bool placeholderFontBold: false
-    property int placeholderFontSize: 18
-    property string placeholderColor: MoneroComponents.Style.defaultFontColor
-    property real placeholderOpacity: 0.35
+    property int placeholderFontSize: 16
+    property string placeholderColor: MoneroComponents.Style.textSecondaryColor
+    property real placeholderOpacity: 0.9
     property real placeholderLeftMargin: {
         if (placeholderCenter) {
             return undefined;
@@ -90,7 +90,7 @@ ColumnLayout {
     }
 
     property string fontFamily: MoneroComponents.Style.fontRegular.name
-    property int fontSize: 18
+    property int fontSize: 16
     property bool fontBold: false
     property alias fontColor: input.color
     property bool error: false
@@ -98,14 +98,14 @@ ColumnLayout {
     property alias labelText: inputLabel.text
     property alias labelColor: inputLabel.color
     property alias labelTextFormat: inputLabel.textFormat
-    property string backgroundColor: "transparent"
+    property string backgroundColor: MoneroComponents.Style.inputBoxBackground
     property string tipText: ""
     property int labelFontSize: 16
     property bool labelFontBold: false
     property alias labelWrapMode: inputLabel.wrapMode
     property alias labelHorizontalAlignment: inputLabel.horizontalAlignment
     property bool showingHeader: inputLabel.text !== "" || copyButton
-    property int inputHeight: 39
+    property int inputHeight: MoneroComponents.Style.controlHeight
 
     signal labelLinkActivated(); // input label, rich text <a> signal
     signal editingFinished();
@@ -164,7 +164,7 @@ ColumnLayout {
         id: inputLabelRect
         color: "transparent"
         Layout.fillWidth: true
-        height: (inputLabel.height + 10)
+        height: (inputLabel.height + MoneroComponents.Style.spaceSm)
         visible: showingHeader ? true : false
 
         MoneroComponents.TextPlain {
@@ -291,9 +291,10 @@ ColumnLayout {
             id: inputFill
             color: backgroundColor
             anchors.fill: parent
-            border.width: borderDisabled ? 0 : 1
+            border.width: borderDisabled ? 0 : MoneroComponents.Style.contourWidth
             border.color: borderColor
             radius: item.inputRadius
+            z: -1
         }
 
         RowLayout {

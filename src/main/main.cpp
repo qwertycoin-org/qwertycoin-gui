@@ -71,6 +71,7 @@
 #include "qt/TailsOS.h"
 #include "qt/KeysFiles.h"
 #include "qt/MoneroSettings.h"
+#include "qt/EposeManager.h"
 #include "qt/NetworkAccessBlockingFactory.h"
 #ifdef QML_TESTS
 #include "QmlTestHarness.h"
@@ -409,6 +410,9 @@ Verify update binary using 'shasum'-compatible (SHA256 algo) output signed by tw
     qmlRegisterUncreatableType<TranslationManager>("moneroComponents.TranslationManager", 1, 0, "TranslationManager",
                                                    "TranslationManager can't be instantiated directly");
 
+    qmlRegisterUncreatableType<EposeManager>("qwertycoinComponents.Epose", 1, 0, "EposeManager",
+                                             "EposeManager can't be instantiated directly");
+
     qmlRegisterUncreatableType<TransactionHistoryModel>("moneroComponents.TransactionHistoryModel", 1, 0, "TransactionHistoryModel",
                                                         "TransactionHistoryModel can't be instantiated directly");
 
@@ -476,6 +480,9 @@ Verify update binary using 'shasum'-compatible (SHA256 algo) output signed by tw
     engine.rootContext()->setContextProperty("logger", &logger);
 
     engine.rootContext()->setContextProperty("mainApp", &app);
+
+    EposeManager eposeManager;
+    engine.rootContext()->setContextProperty("eposeManager", &eposeManager);
 
     engine.rootContext()->setContextProperty("IPC", ipc);
 

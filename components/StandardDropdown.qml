@@ -56,8 +56,8 @@ ColumnLayout {
     property bool showingHeader: dropdownLabel.text !== ""
     property int labelFontSize: 14
     property bool labelFontBold: false
-    property int dropdownHeight: 39
-    property int fontSize: 14
+    property int dropdownHeight: MoneroComponents.Style.controlHeight
+    property int fontSize: 15
     property int fontItemSize: 14
     property string colorBorder: MoneroComponents.Style.inputBorderColorInActive
     property string colorHeaderBackground: "transparent"
@@ -90,10 +90,10 @@ ColumnLayout {
 
     Rectangle {
         id: head
-        color: dropArea.containsMouse ? MoneroComponents.Style.titleBarButtonHoverColor : "transparent"
-        border.width: dropdown.headerBorder ? 1 : 0
-        border.color: dropdown.colorBorder
-        radius: 4
+        color: dropArea.containsMouse ? MoneroComponents.Style.raisedColor : MoneroComponents.Style.cardColor
+        border.width: dropdown.headerBorder ? MoneroComponents.Style.contourWidth : 0
+        border.color: dropArea.containsMouse || dropdown.expanded ? MoneroComponents.Style.focusColor : dropdown.colorBorder
+        radius: MoneroComponents.Style.radiusMd
         Layout.fillWidth: true
         Layout.preferredHeight: dropdownHeight
 
@@ -153,7 +153,10 @@ ColumnLayout {
             y: head.y + head.height
             clip: true
             height: dropdown.expanded ? columnid.height : 0
-            color: dropdown.pressedColor
+            color: MoneroComponents.Style.cardColor
+            border.width: MoneroComponents.Style.contourWidth
+            border.color: MoneroComponents.Style.borderColor
+            radius: MoneroComponents.Style.radiusMd
 
             Behavior on height {
                 NumberAnimation { duration: 100; easing.type: Easing.InQuad }
@@ -181,7 +184,7 @@ ColumnLayout {
                         anchors.right: parent.right
                         height: (dropdown.dropdownHeight * 0.75)
                         //radius: index === repeater.count - 1 ? 4 : 0
-                        color: itemArea.containsMouse || index === columnid.currentIndex || itemArea.containsMouse ? dropdown.releasedColor : dropdown.pressedColor
+                        color: itemArea.containsMouse || index === columnid.currentIndex ? MoneroComponents.Style.raisedColor : MoneroComponents.Style.cardColor
 
                         MoneroComponents.TextPlain {
                             id: col1Text
@@ -193,7 +196,7 @@ ColumnLayout {
                             font.family: MoneroComponents.Style.fontRegular.name
                             font.bold: false
                             font.pixelSize: fontItemSize
-                            color: itemArea.containsMouse || index === columnid.currentIndex || itemArea.containsMouse ? "#FA6800" : "#FFFFFF"
+                            color: index === columnid.currentIndex ? MoneroComponents.Style.accentViolet : MoneroComponents.Style.defaultFontColor
                             text: qsTr(column1) + translationManager.emptyString
                         }
 
@@ -204,7 +207,7 @@ ColumnLayout {
                             anchors.rightMargin: 45
                             font.family: MoneroComponents.Style.fontRegular.name
                             font.pixelSize: 14
-                            color: "#FFFFFF"
+                            color: MoneroComponents.Style.textSecondaryColor
                             text: ""
                         }
 

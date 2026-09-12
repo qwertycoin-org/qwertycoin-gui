@@ -626,7 +626,7 @@ Rectangle {
 
                             MoneroComponents.Label {
                                 id: idLabel
-                                color: index === appWindow.current_subaddress_table_index ? MoneroComponents.Style.defaultFontColor : "#757575"
+                                color: index === appWindow.current_subaddress_table_index ? MoneroComponents.Style.defaultFontColor : MoneroComponents.Style.textSecondaryColor
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.left: parent.left
                                 anchors.leftMargin: 6

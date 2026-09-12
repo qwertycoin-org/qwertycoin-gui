@@ -59,7 +59,7 @@ Rectangle {
 
     color: "transparent"
     property bool present: !under || under.checked || checked || under.numSelectedChildren > 0
-    height: present ? ((appWindow.height >= 800) ? 44  : 38 ) : 0
+    height: present ? ((appWindow.height >= 800) ? 48 : 42) : 0
 
     LinearGradient {
         visible: isOpenGL && (button.checked || buttonArea.containsMouse)
@@ -92,7 +92,7 @@ Rectangle {
         anchors.leftMargin: 20
         height: parent.height
         width: 2
-        color: button.checked ? MoneroComponents.Style.accountColors[currentAccountIndex % MoneroComponents.Style.accountColors.length] : "transparent"
+        color: button.checked ? MoneroComponents.Style.accentGold : "transparent"
 
         // button text
         MoneroComponents.TextPlain {
@@ -103,8 +103,9 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.right
             anchors.leftMargin: button.getOffset() + 8
+            font.family: MoneroComponents.Style.fontMedium.name
             font.bold: true
-            font.pixelSize: 14
+            font.pixelSize: 15
         }
     }
 

@@ -130,4 +130,5 @@ modules:
     post-install:
       - install -Dpm644 share/org.qwertycoin.QwertycoinGUI.desktop $FLATPAK_DEST/share/applications/$FLATPAK_ID.desktop
       - install -Dpm644 share/org.qwertycoin.QwertycoinGUI.metainfo.xml $FLATPAK_DEST/share/metainfo/$FLATPAK_ID.metainfo.xml
-      - for x in 16 24 32 48 64 96 128 256; do install -Dpm644 images/appicons/${x}x${x}.png $FLATPAK_DEST/share/icons/hicolor/${x}x${x}/apps/$FLATPAK_ID.png; done
+      - for x in 16 24 32 48 64 96 128 256 512; do install -Dpm644 images/appicons/${x}x${x}.png $FLATPAK_DEST/share/icons/hicolor/${x}x${x}/apps/$FLATPAK_ID.png; done
+      - install -Dpm644 images/brand/qwertycoin-mark.svg $FLATPAK_DEST/share/icons/hicolor/scalable/apps/$FLATPAK_ID.svg
