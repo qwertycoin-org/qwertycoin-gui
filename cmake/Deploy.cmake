@@ -51,10 +51,10 @@ if(APPLE OR (WIN32 AND NOT STATIC))
         endif()
 
     elseif(WIN32)
-        find_program(QMAKE_EXECUTABLE qmake HINTS "${_qt_bin_dir}")
-        find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${_qt_bin_dir}")
+        find_program(QMAKE_EXECUTABLE NAMES qmake qmake-qt5 HINTS "${_qt_bin_dir}")
+        find_program(WINDEPLOYQT_EXECUTABLE NAMES windeployqt windeployqt-qt5 HINTS "${_qt_bin_dir}")
         if(NOT QMAKE_EXECUTABLE OR NOT WINDEPLOYQT_EXECUTABLE)
-            message(WARNING "Deploy requires qmake.exe and windeployqt.exe (no -qt5 suffix) in ${_qt_bin_dir}")
+            message(FATAL_ERROR "Deploy requires Qt 5 qmake and windeployqt in ${_qt_bin_dir}")
         endif()
         add_custom_command(TARGET deploy POST_BUILD
                            COMMAND "${CMAKE_COMMAND}" -E env PATH="${_qt_bin_dir}" "${WINDEPLOYQT_EXECUTABLE}" "$<TARGET_FILE:qwertycoin-gui>" -no-translations -qmldir="${CMAKE_SOURCE_DIR}"
