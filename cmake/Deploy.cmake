@@ -68,6 +68,13 @@ if(APPLE OR (WIN32 AND NOT STATIC))
             )
         endif()
 
+        add_custom_command(TARGET deploy
+                           POST_BUILD
+                           COMMAND "${CMAKE_SOURCE_DIR}/tools/release/normalize_macos_install_ids.sh"
+                                   "$<TARGET_FILE_DIR:qwertycoin-gui>/../.."
+                           COMMENT "Normalizing macOS install IDs..."
+        )
+
         # Apple Silicon requires all binaries to be codesigned
         find_program(CODESIGN_EXECUTABLE NAMES codesign)
         if(CODESIGN_EXECUTABLE)
