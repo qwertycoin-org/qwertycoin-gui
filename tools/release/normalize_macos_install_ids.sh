@@ -11,6 +11,7 @@ if [[ ! -d "$bundle/Contents/MacOS" ]]; then
   echo "invalid macOS application bundle: $bundle" >&2
   exit 1
 fi
+frameworks="$bundle/Contents/Frameworks"
 
 for tool in file otool install_name_tool; do
   command -v "$tool" >/dev/null 2>&1 || {
@@ -19,7 +20,8 @@ for tool in file otool install_name_tool; do
   }
 done
 
-normalized=0
+normalized_ids=0
+normalized_dependencies=0
 while IFS= read -r -d '' mach_file; do
   [[ "$(file -Lb "$mach_file")" == Mach-O* ]] || continue
 
@@ -27,9 +29,39 @@ while IFS= read -r -d '' mach_file; do
   case "$install_id" in
     /opt/homebrew/*|/usr/local/*|/Users/runner/*|/opt/hostedtoolcache/*)
       install_name_tool -id "@rpath/$(basename "$mach_file")" "$mach_file"
-      normalized=$((normalized + 1))
+      normalized_ids=$((normalized_ids + 1))
       ;;
   esac
+
+  while IFS= read -r dependency; do
+    [[ -n "$dependency" && "$dependency" != "$install_id" ]] || continue
+    case "$dependency" in
+      /opt/homebrew/*|/usr/local/*|/Users/runner/*|/opt/hostedtoolcache/*)
+        replacement=""
+        if [[ "$dependency" =~ /([^/]+)\.framework/(.+)$ ]]; then
+          framework_name=${BASH_REMATCH[1]}
+          framework_suffix=${BASH_REMATCH[2]}
+          bundled_dependency="$frameworks/$framework_name.framework/$framework_suffix"
+          if [[ -e "$bundled_dependency" ]]; then
+            replacement="@executable_path/../Frameworks/$framework_name.framework/$framework_suffix"
+          fi
+        else
+          dependency_name=$(basename "$dependency")
+          if [[ -e "$frameworks/$dependency_name" ]]; then
+            replacement="@executable_path/../Frameworks/$dependency_name"
+          fi
+        fi
+
+        if [[ -z "$replacement" ]]; then
+          echo "runner-local dependency was not bundled: $dependency ($mach_file)" >&2
+          exit 1
+        fi
+        install_name_tool -change "$dependency" "$replacement" "$mach_file"
+        normalized_dependencies=$((normalized_dependencies + 1))
+        ;;
+    esac
+  done < <(otool -L "$mach_file" | tail -n +2 | sed -E 's/^[[:space:]]*([^[:space:]]+).*/\1/')
 done < <(find "$bundle" -type f -print0)
 
-printf 'Normalized %d runner-local Mach-O install IDs\n' "$normalized"
+printf 'Normalized %d runner-local Mach-O install IDs and %d dependencies\n' \
+  "$normalized_ids" "$normalized_dependencies"
