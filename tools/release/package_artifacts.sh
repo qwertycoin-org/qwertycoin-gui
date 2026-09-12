@@ -184,6 +184,7 @@ if [[ "$platform" == "Linux" && -n "$gui_binary" ]]; then
   require_file "Qt Quick Controls 2 QML module" qml/QtQuick/Controls.2/qmldir
   require_file "Qt Quick Layouts QML module" qml/QtQuick/Layouts/qmldir
   require_file "Qt Graphical Effects QML module" qml/QtGraphicalEffects/qmldir
+  require_file "Qt Labs Platform QML module" qml/Qt/labs/platform/qmldir
   require_file "Qt runtime path configuration" qt.conf
 fi
 
@@ -196,6 +197,7 @@ if [[ "${RUNNER_OS:-}" == "Windows" ]]; then
   require_file "Qt SVG image plugin" imageformats/qsvg.dll
   require_file "Qt Quick Controls 2 QML module" qml/QtQuick/Controls.2/qmldir
   require_file "Qt Quick Layouts QML module" qml/QtQuick/Layouts/qmldir
+  require_file "Qt Labs Platform QML module" qml/Qt/labs/platform/qmldir
 fi
 
 if [[ "$platform" == "Darwin" ]]; then
@@ -211,6 +213,7 @@ if [[ "$platform" == "Darwin" ]]; then
   require_file "macOS SVG image plugin" "$mac_bundle_relative/Contents/PlugIns/imageformats/libqsvg.dylib"
   require_file "macOS Qt Quick Controls 2 QML module" "$mac_bundle_relative/Contents/Resources/qml/QtQuick/Controls.2/qmldir"
   require_file "macOS Qt Quick Layouts QML module" "$mac_bundle_relative/Contents/Resources/qml/QtQuick/Layouts/qmldir"
+  require_file "macOS Qt Labs Platform QML module" "$mac_bundle_relative/Contents/Resources/qml/Qt/labs/platform/qmldir"
 
   codesign --verify --deep --strict "$mac_bundle"
   while IFS= read -r -d '' mach_file; do
