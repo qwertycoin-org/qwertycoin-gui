@@ -134,11 +134,14 @@ tools/release/package_artifacts.sh \
   build/gui-review qwertycoin-gui-linux-x86_64-review dist
 ```
 
-Workflow templates remain under `.github/workflows-disabled/`; they are review
-material and cannot run as GitHub Actions. They must not be moved into
-`.github/workflows/` until native platform validation and explicit release
-approval. Local artifacts are unsigned review builds. Windows code signing,
-macOS signing/notarization and publication remain separate release tasks.
+One manual release-candidate workflow is available at
+`.github/workflows/release.yml`. It accepts only an explicit 40-character GUI
+commit SHA and builds one selected platform per invocation; pushes, pull
+requests and tags do not start it. The normal build and Flatpak templates remain
+disabled. See [manual release-candidate builds](docs/RELEASE_CANDIDATE_BUILDS.md)
+for the review sequence and artifact checks. Windows code signing, macOS
+Developer ID signing/notarization and publication remain separate release
+tasks.
 
 ## Deliberately unavailable
 

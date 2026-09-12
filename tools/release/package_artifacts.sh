@@ -10,6 +10,22 @@ build_dir=$1
 artifact_name=$2
 output_dir=$3
 
+if [[ ! "$artifact_name" =~ ^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$ ]]; then
+  echo "artifact name contains unsupported characters" >&2
+  exit 64
+fi
+
+if [[ ! -d "$build_dir" ]]; then
+  echo "build directory does not exist: $build_dir" >&2
+  exit 1
+fi
+
+source_revision=$(git rev-parse HEAD)
+if [[ -n "${EXPECTED_REVISION:-}" && "$source_revision" != "$EXPECTED_REVISION" ]]; then
+  echo "source revision does not match the requested release revision" >&2
+  exit 1
+fi
+
 if [[ -e "$output_dir/$artifact_name" || -e "$output_dir/$artifact_name.sha256" \
       || -e "$output_dir/$artifact_name.tar.gz" || -e "$output_dir/$artifact_name.zip" ]]; then
   echo "refusing to reuse an existing artifact path: $output_dir/$artifact_name" >&2
@@ -20,6 +36,7 @@ mkdir -p "$output_dir/$artifact_name"
 
 artifact_dir="$output_dir/$artifact_name"
 gui_binary=""
+platform=$(uname -s)
 
 copy_if_found() {
   local name=$1
@@ -56,7 +73,7 @@ mkdir -p "$artifact_dir/share/qwertycoin-gui"
 cp -R fonts/Archivo fonts/Inter images/appicons images/brand \
   "$artifact_dir/share/qwertycoin-gui/"
 
-if [[ "$(uname -s)" == "Linux" && -n "$gui_binary" ]]; then
+if [[ "$platform" == "Linux" && -n "$gui_binary" ]]; then
   qt_plugin_dir=${QWC_QT_PLUGIN_DIR:-}
   qt_qml_dir=${QWC_QT_QML_DIR:-}
 
@@ -84,6 +101,7 @@ if [[ "$(uname -s)" == "Linux" && -n "$gui_binary" ]]; then
     fi
     [[ -n "$qt_plugin_dir" ]] || qt_plugin_dir=$(qmake -query QT_INSTALL_PLUGINS)
     [[ -n "$qt_qml_dir" ]] || qt_qml_dir=$(qmake -query QT_INSTALL_QML)
+    [[ -n "${qt_lib_dir:-}" ]] || qt_lib_dir=$(qmake -query QT_INSTALL_LIBS)
   fi
   for runtime_dir in platforms imageformats xcbglintegrations platformthemes; do
     if [[ -d "$qt_plugin_dir/$runtime_dir" ]]; then
@@ -94,6 +112,9 @@ if [[ "$(uname -s)" == "Linux" && -n "$gui_binary" ]]; then
   mkdir -p "$artifact_dir/qml"
   cp -R "$qt_qml_dir/." "$artifact_dir/qml/"
   printf '[Paths]\nPlugins = plugins\nQml2Imports = qml\n' >"$artifact_dir/qt.conf"
+
+  QWC_RUNTIME_LIBRARY_PATH="$qt_lib_dir${QWC_RUNTIME_LIBRARY_PATH:+:$QWC_RUNTIME_LIBRARY_PATH}" \
+    "$(dirname "$0")/bundle_linux_runtime.sh" "$artifact_dir"
 fi
 
 # windeployqt places these directories next to the GUI executable. Preserve
@@ -105,7 +126,24 @@ if [[ -n "$gui_binary" ]]; then
       cp -R "$gui_binary_dir/$runtime_dir" "$artifact_dir/"
     fi
   done
+
+  if [[ "${RUNNER_OS:-}" == "Windows" ]]; then
+    while IFS= read -r -d '' runtime_dll; do
+      cp "$runtime_dll" "$artifact_dir/"
+    done < <(find "$gui_binary_dir" -maxdepth 1 -type f -iname '*.dll' -print0)
+  fi
 fi
+
+core_revision=$(git rev-parse HEAD:qwertycoin)
+qt_version=unknown
+if command -v qmake >/dev/null 2>&1; then
+  qt_version=$(qmake -query QT_VERSION)
+elif command -v qmake-qt5 >/dev/null 2>&1; then
+  qt_version=$(qmake-qt5 -query QT_VERSION)
+fi
+printf 'source_revision=%s\ncore_revision=%s\nrunner_os=%s\nrunner_arch=%s\nqt_version=%s\n' \
+  "$source_revision" "$core_revision" "${RUNNER_OS:-$platform}" "${RUNNER_ARCH:-unknown}" "$qt_version" \
+  >"$artifact_dir/BUILD-INFO.txt"
 
 require_file() {
   local description=$1
@@ -131,13 +169,52 @@ require_file "Inter license" share/qwertycoin-gui/Inter/LICENSE.txt
 require_file "Qwertycoin application icon" share/qwertycoin-gui/appicons/256x256.png
 require_file "Qwertycoin brand mark" share/qwertycoin-gui/brand/qwertycoin-mark.svg
 
-if [[ "$(uname -s)" == "Linux" && -n "$gui_binary" ]]; then
+if [[ "$platform" == "Linux" && -n "$gui_binary" ]]; then
   require_file "Qt xcb platform plugin" plugins/platforms/libqxcb.so
   require_file "Qt SVG image plugin" plugins/imageformats/libqsvg.so
+  require_file "Qt Core shared library" lib/libQt5Core.so.5
+  require_file "Qt GUI shared library" lib/libQt5Gui.so.5
+  require_file "Qt QML shared library" lib/libQt5Qml.so.5
+  require_file "Qt Quick shared library" lib/libQt5Quick.so.5
   require_file "Qt Quick Controls 2 QML module" qml/QtQuick/Controls.2/qmldir
   require_file "Qt Quick Layouts QML module" qml/QtQuick/Layouts/qmldir
   require_file "Qt Graphical Effects QML module" qml/QtGraphicalEffects/qmldir
   require_file "Qt runtime path configuration" qt.conf
+fi
+
+if [[ "${RUNNER_OS:-}" == "Windows" ]]; then
+  require_file "Qt Core DLL" Qt5Core.dll
+  require_file "Qt GUI DLL" Qt5Gui.dll
+  require_file "Qt QML DLL" Qt5Qml.dll
+  require_file "Qt Quick DLL" Qt5Quick.dll
+  require_file "Qt Windows platform plugin" platforms/qwindows.dll
+  require_file "Qt SVG image plugin" imageformats/qsvg.dll
+  require_file "Qt Quick Controls 2 QML module" qml/QtQuick/Controls.2/qmldir
+  require_file "Qt Quick Layouts QML module" qml/QtQuick/Layouts/qmldir
+fi
+
+if [[ "$platform" == "Darwin" ]]; then
+  mac_bundle=$(find "$artifact_dir" -type d \( -name 'qwertycoin-gui.app' -o -name 'Qwertycoin GUI.app' \) | head -n 1 || true)
+  if [[ -z "$mac_bundle" ]]; then
+    echo "missing required macOS application bundle" >&2
+    exit 1
+  fi
+  mac_bundle_relative=${mac_bundle#"$artifact_dir/"}
+  require_file "macOS Qt Core framework" "$mac_bundle_relative/Contents/Frameworks/QtCore.framework"
+  require_file "macOS Qt Quick framework" "$mac_bundle_relative/Contents/Frameworks/QtQuick.framework"
+  require_file "macOS Cocoa platform plugin" "$mac_bundle_relative/Contents/PlugIns/platforms/libqcocoa.dylib"
+  require_file "macOS SVG image plugin" "$mac_bundle_relative/Contents/PlugIns/imageformats/libqsvg.dylib"
+  require_file "macOS Qt Quick Controls 2 QML module" "$mac_bundle_relative/Contents/Resources/qml/QtQuick/Controls.2/qmldir"
+  require_file "macOS Qt Quick Layouts QML module" "$mac_bundle_relative/Contents/Resources/qml/QtQuick/Layouts/qmldir"
+
+  codesign --verify --deep --strict "$mac_bundle"
+  while IFS= read -r -d '' mach_file; do
+    [[ "$(file -Lb "$mach_file")" == Mach-O* ]] || continue
+    if otool -L "$mach_file" | tail -n +2 | grep -E '/opt/homebrew|/usr/local|/Users/runner|/opt/hostedtoolcache'; then
+      echo "macOS bundle contains a non-portable dependency: $mach_file" >&2
+      exit 1
+    fi
+  done < <(find "$mac_bundle" -type f -print0)
 fi
 
 (
