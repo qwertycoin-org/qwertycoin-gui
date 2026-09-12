@@ -29,8 +29,10 @@ if [[ "$remote_url" != "$expected_remote" ]]; then
   exit 1
 fi
 
-if [[ -n "$(git -C "$core_path" status --porcelain --untracked-files=normal)" ]]; then
+core_status=$(git -C "$core_path" status --porcelain --untracked-files=normal)
+if [[ -n "$core_status" ]]; then
   echo "qwertycoin submodule has local changes" >&2
+  printf '%s\n' "$core_status" >&2
   exit 1
 fi
 
