@@ -55,7 +55,8 @@ It also validates the platform runtime:
   RPATHs, proves that no non-system library resolves outside the package and
   rejects every ELF object that requires a glibc symbol newer than 2.35. Its
   required runtime set includes the Qt Labs Platform integration used by the
-  native menu and file-dialog components;
+  native menu and file-dialog components. The packaged GUI must also load its
+  complete QML root cleanly with the offscreen software renderer;
 - Windows preserves the top-level Qt/dependency DLLs produced by `windeployqt`
   and requires the platform, SVG, Qt Quick and Qt Labs Platform QML modules;
 - macOS requires the Qt frameworks, Cocoa/SVG plugins, Qt Quick and Qt Labs

@@ -459,14 +459,24 @@ Verify update binary using 'shasum'-compatible (SHA256 algo) output signed by tw
     qmlRegisterType<QrCodeScanner>("moneroComponents.QRCodeScanner", 1, 0, "QRCodeScanner");
 #endif
 
+    // Context objects must outlive the QML engine. In particular, the
+    // --test-qml release smoke exits immediately after loading main.qml; if
+    // these objects are destroyed first, QML re-evaluates their bindings as
+    // null during shutdown and hides real runtime warnings in the noise.
+    OSCursor cursor;
+    OSHelper osHelper;
+    EposeManager eposeManager;
+#ifndef Q_OS_IOS
+    DaemonManager daemonManager;
+    P2PoolManager p2poolManager;
+#endif
+
     QQmlApplicationEngine engine;
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
     engine.setNetworkAccessManagerFactory(new NetworkAccessBlockingFactory);
 #endif
-    OSCursor cursor;
     engine.rootContext()->setContextProperty("globalCursor", &cursor);
-    OSHelper osHelper;
     engine.rootContext()->setContextProperty("oshelper", &osHelper);
 
     engine.addImportPath(":/fonts");
@@ -481,7 +491,6 @@ Verify update binary using 'shasum'-compatible (SHA256 algo) output signed by tw
 
     engine.rootContext()->setContextProperty("mainApp", &app);
 
-    EposeManager eposeManager;
     engine.rootContext()->setContextProperty("eposeManager", &eposeManager);
 
     engine.rootContext()->setContextProperty("IPC", ipc);
@@ -492,8 +501,6 @@ Verify update binary using 'shasum'-compatible (SHA256 algo) output signed by tw
 
 // Exclude daemon manager from IOS
 #ifndef Q_OS_IOS
-    DaemonManager daemonManager;
-    P2PoolManager p2poolManager;
     engine.rootContext()->setContextProperty("daemonManager", &daemonManager);
     engine.rootContext()->setContextProperty("p2poolManager", &p2poolManager);
 #endif
