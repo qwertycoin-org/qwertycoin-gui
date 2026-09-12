@@ -1,75 +1,70 @@
-# macOS:
+# Qwertycoin GUI deployment notes
 
-Use macOS 10.12 - 10.13 for better backwards compability.
+These instructions describe local candidate packaging. They do not authorize a
+release, tag, signature, notarization or publication.
 
-1. `HOMEBREW_OPTFLAGS="-march=core2" HOMEBREW_OPTIMIZATION_LEVEL="O0" brew install boost zmq libpgm libsodium expat protobuf@21 libgcrypt hidapi libusb cmake pkg-config && brew link protobuf@21`
+## Common requirements
 
-2. Get the latest LTS from here: https://www.qt.io/offline-installers and install
+1. Use a clean recursive checkout of the reviewed GUI revision.
+2. Run `git submodule sync --recursive` and
+   `git submodule update --init --recursive`.
+3. Run `tools/check_core_pin.sh` before and after the build.
+4. Configure every candidate with `MANUAL_SUBMODULES=1`, `DEV_MODE=OFF`,
+   `WITH_UPDATER=OFF` and unvalidated device support disabled.
+5. Build `qwertycoin-gui`, `qwertycoind`, `qwertycoin-wallet-cli` and
+   `qwertycoin-wallet-rpc` from the same checkout.
+6. Verify the package contains the Qt platform/SVG plugins, required QML import
+   tree, bundled fonts/licenses, icons, README, license and `qt.conf`.
 
-3. `git clone --recursive -b v0.X.Y.Z --depth 1 https://github.com/monero-project/monero-gui`
+The exact Core Gitlink, genesis and EPoSe parameter binding are documented in
+`README.md`. Do not substitute a daemon from another revision.
 
-4. Compile `monero-wallet-gui.app`
+## Linux x86_64 review package
 
-```bash
-mkdir build && cd build
-cmake -D CMAKE_BUILD_TYPE=Release -D ARCH=default -D CMAKE_PREFIX_PATH=/path/to/Qt5.12.8/5.12.8/clang_64 ..
-make
-make deploy
+```sh
+cmake -S . -B build/release -G Ninja \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DSTATIC=OFF \
+  -DMANUAL_SUBMODULES=1 \
+  -DDEV_MODE=OFF \
+  -DWITH_UPDATER=OFF \
+  -DUSE_DEVICE_TREZOR=OFF \
+  -DQML_TESTS=OFF
+cmake --build build/release \
+  --target qwertycoin-gui simplewallet wallet_rpc_server --parallel 2
+tools/release/package_artifacts.sh \
+  build/release qwertycoin-gui-linux-x86_64-review dist
 ```
 
-5. Replace the `monerod` binary inside `monero-wallet-gui.app/Contents/MacOS/` with one built using deterministic builds / gitian.
+Run the package from an empty environment and verify the manifest before it is
+considered a candidate. Local review archives are unsigned.
 
-## Codesigning and notarizing
+## macOS Apple Silicon
 
-1. Save the following text as `entitlements.plist`
+Use a supported Qt 5.15 build containing the required Qt Quick, SVG and image
+plugins. Configure with `ARCH=armv8-a` and `BUILD_64=ON`, build the four required
+binaries, then run the CMake `deploy` target before the package-content check.
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-        <key>com.apple.security.cs.disable-executable-page-protection</key>
-        <true/>
-</dict>
-</plist>
-```
+Native launch, Retina scaling, file dialogs, menu/window controls, icon, daemon
+startup and wallet/EPoSe smokes are mandatory. Only after those gates may a
+separate release procedure perform hardened-runtime signing, notarization and
+stapling. An ad-hoc signature is test evidence only.
 
-2. `codesign --deep --force --verify --verbose --options runtime --timestamp --entitlements entitlements.plist --sign 'XXXXXXXXXX' monero-wallet-gui.app`
+## Windows x86_64
 
-You can check if this step worked by using `codesign -dvvv monero-wallet-gui.app`
+The disabled release template documents the MinGW Qt 5 build path. Run the
+CMake `deploy` target, verify all runtime DLLs/plugins/QML modules, and stage the
+result under `installers/windows/bin/` for `Qwertycoin.iss`.
 
-3. `hdiutil create -fs HFS+ -srcfolder monero-gui-v0.X.Y.Z -volname monero-wallet-gui monero-gui-mac-x64-v0.X.Y.Z.dmg`
+Native Windows launch, 100/125/150/200% DPI, file dialogs, taskbar/tray icons,
+daemon startup and wallet/EPoSe smokes are mandatory before signing. The
+installer template is not a release artifact on its own.
 
-4. `xcrun notarytool submit monero-gui-mac-x64-v0.X.Y.Z.dmg --apple-id email@address.org --team-id XXXXXXXXXX`
+## Current validation boundary
 
-5. `xcrun notarytool info aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeee --apple-id email@address.org --team-id XXXXXXXXXX`
+Linux x86_64 has local build, functional, visual and package evidence in
+`docs/GUI_REVIEW_EVIDENCE.md`. Native macOS Apple Silicon and Windows x86_64
+were not available during that review and remain explicit release blockers.
 
-6. `xcrun stapler staple -v monero-gui-mac-x64-v0.X.Y.Z.dmg`
-
-## Compile Qt for Apple Silicon
-
-Qt does not offer pre-built binaries for Apple Silicon, they have to be manually compiled.
-
-```bash
-git clone https://github.com/qt/qt5.git
-cd qt5
-git checkout v5.15.9-lts-lgpl
-./init-repository
-mkdir build
-cd build
-../configure -prefix /path/to/qt-build-dir/ -opensource -confirm-license -release -nomake examples -nomake tests -no-rpath -skip qtwebengine -skip qt3d -skip qtandroidextras -skip qtcanvas3d -skip qtcharts -skip qtconnectivity -skip qtdatavis3d -skip qtdoc -skip qtgamepad -skip qtlocation -skip qtnetworkauth -skip qtpurchasing -skip qtscript -skip qtscxml -skip qtsensors -skip qtserialbus -skip qtserialport -skip qtspeech -skip qttools -skip qtvirtualkeyboard -skip qtwayland -skip qtwebchannel -skip qtwebsockets -skip qtwebview -skip qtwinextras -skip qtx11extras -skip gamepad -skip serialbus -skip location -skip webengine
-make
-make install
-cd ../qttools/src/linguist/lrelease
-../../../../build/qtbase/bin/qmake
-make
-make install
-cd ../../../../qttools/src/macdeployqt/macdeployqt/
-../../../../build/qtbase/bin/qmake
-make
-make install
-```
-
-For compilation with Xcode 15 the following patch has to be applied: https://raw.githubusercontent.com/Homebrew/formula-patches/086e8cf/qt5/qt5-qmake-xcode15.patch
-
-The `CMAKE_PREFIX_PATH` has to be set to `/path/to/qt-build-dir/` during monero-gui compilation.
+Workflow templates stay in `.github/workflows-disabled/`. Do not move them or
+start GitHub-hosted jobs without a separate budget and release authorization.
