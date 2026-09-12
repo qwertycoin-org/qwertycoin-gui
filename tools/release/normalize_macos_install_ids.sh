@@ -22,6 +22,7 @@ done
 
 normalized_ids=0
 normalized_dependencies=0
+removed_rpaths=0
 while IFS= read -r -d '' mach_file; do
   [[ "$(file -Lb "$mach_file")" == Mach-O* ]] || continue
 
@@ -61,7 +62,21 @@ while IFS= read -r -d '' mach_file; do
         ;;
     esac
   done < <(otool -L "$mach_file" | tail -n +2 | sed -E 's/^[[:space:]]*([^[:space:]]+).*/\1/')
+
+  while IFS= read -r rpath; do
+    [[ -n "$rpath" ]] || continue
+    case "$rpath" in
+      /opt/homebrew/*|/usr/local/*|/Users/runner/*|/opt/hostedtoolcache/*)
+        install_name_tool -delete_rpath "$rpath" "$mach_file"
+        removed_rpaths=$((removed_rpaths + 1))
+        ;;
+    esac
+  done < <(
+    otool -l "$mach_file" |
+      awk '$1 == "cmd" && $2 == "LC_RPATH" { want_path = 1; next }
+           want_path && $1 == "path" { print $2; want_path = 0 }'
+  )
 done < <(find "$bundle" -type f -print0)
 
-printf 'Normalized %d runner-local Mach-O install IDs and %d dependencies\n' \
-  "$normalized_ids" "$normalized_dependencies"
+printf 'Normalized %d runner-local Mach-O install IDs and %d dependencies; removed %d runner-local rpaths\n' \
+  "$normalized_ids" "$normalized_dependencies" "$removed_rpaths"
