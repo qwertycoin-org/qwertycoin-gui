@@ -37,6 +37,7 @@ mkdir -p "$output_dir/$artifact_name"
 artifact_dir="$output_dir/$artifact_name"
 gui_binary=""
 platform=$(uname -s)
+linux_glibc_ceiling=${QWC_LINUX_GLIBC_CEILING:-2.35}
 
 copy_if_found() {
   local name=$1
@@ -115,6 +116,7 @@ if [[ "$platform" == "Linux" && -n "$gui_binary" ]]; then
 
   QWC_RUNTIME_LIBRARY_PATH="$qt_lib_dir${QWC_RUNTIME_LIBRARY_PATH:+:$QWC_RUNTIME_LIBRARY_PATH}" \
     "$(dirname "$0")/bundle_linux_runtime.sh" "$artifact_dir"
+  "$(dirname "$0")/verify_linux_abi.sh" "$artifact_dir" "$linux_glibc_ceiling"
 fi
 
 # windeployqt places these directories next to the GUI executable. Preserve
@@ -144,6 +146,9 @@ fi
 printf 'source_revision=%s\ncore_revision=%s\nrunner_os=%s\nrunner_arch=%s\nqt_version=%s\n' \
   "$source_revision" "$core_revision" "${RUNNER_OS:-$platform}" "${RUNNER_ARCH:-unknown}" "$qt_version" \
   >"$artifact_dir/BUILD-INFO.txt"
+if [[ "$platform" == "Linux" ]]; then
+  printf 'glibc_ceiling=%s\n' "$linux_glibc_ceiling" >>"$artifact_dir/BUILD-INFO.txt"
+fi
 
 require_file() {
   local description=$1

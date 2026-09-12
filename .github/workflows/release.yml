@@ -50,13 +50,14 @@ jobs:
     name: Linux x86_64
     needs: validate-inputs
     if: ${{ inputs.target == 'linux' }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 360
     env:
       DEBIAN_FRONTEND: noninteractive
       ARTIFACT_PREFIX: ${{ inputs.release_name }}
       EXPECTED_REVISION: ${{ inputs.expected_revision }}
       CCACHE_DIR: .ccache
+      QWC_LINUX_GLIBC_CEILING: "2.35"
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
