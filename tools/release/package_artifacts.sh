@@ -59,11 +59,17 @@ copy_bundle_if_found() {
   fi
 }
 
-copy_if_found qwertycoin-gui
-copy_if_found qwertycoind
-copy_if_found qwertycoin-wallet-cli
-copy_if_found qwertycoin-wallet-rpc
-copy_bundle_if_found
+if [[ "$platform" == "Darwin" ]]; then
+  # The macOS deploy target embeds the daemon and wallet command-line tools in
+  # the signed application bundle. Do not also ship unbundled Homebrew-linked
+  # copies beside it.
+  copy_bundle_if_found
+else
+  copy_if_found qwertycoin-gui
+  copy_if_found qwertycoind
+  copy_if_found qwertycoin-wallet-cli
+  copy_if_found qwertycoin-wallet-rpc
+fi
 
 cp README.md "$output_dir/$artifact_name/" 2>/dev/null || true
 cp LICENSE "$output_dir/$artifact_name/" 2>/dev/null || true
@@ -174,9 +180,11 @@ require_file() {
 }
 
 require_file "GUI binary or app bundle" qwertycoin-gui qwertycoin-gui.exe qwertycoin-gui.app "Qwertycoin GUI.app"
-require_file "qwertycoind" qwertycoind qwertycoind.exe
-require_file "wallet CLI" qwertycoin-wallet-cli qwertycoin-wallet-cli.exe
-require_file "wallet RPC" qwertycoin-wallet-rpc qwertycoin-wallet-rpc.exe
+if [[ "$platform" != "Darwin" ]]; then
+  require_file "qwertycoind" qwertycoind qwertycoind.exe
+  require_file "wallet CLI" qwertycoin-wallet-cli qwertycoin-wallet-cli.exe
+  require_file "wallet RPC" qwertycoin-wallet-rpc qwertycoin-wallet-rpc.exe
+fi
 require_file "Archivo display font" share/qwertycoin-gui/Archivo/Archivo-Black.otf
 require_file "Archivo license" share/qwertycoin-gui/Archivo/OFL.txt
 require_file "Inter regular font" share/qwertycoin-gui/Inter/Inter-Regular.otf
@@ -235,15 +243,29 @@ if [[ "$platform" == "Darwin" ]]; then
   require_file "macOS Qt Quick Controls 2 QML module" "$mac_bundle_relative/Contents/Resources/qml/QtQuick/Controls.2/qmldir"
   require_file "macOS Qt Quick Layouts QML module" "$mac_bundle_relative/Contents/Resources/qml/QtQuick/Layouts/qmldir"
   require_file "macOS Qt Labs Platform QML module" "$mac_bundle_relative/Contents/Resources/qml/Qt/labs/platform/qmldir"
+  require_file "embedded macOS qwertycoind" "$mac_bundle_relative/Contents/MacOS/qwertycoind"
+  require_file "embedded macOS wallet CLI" "$mac_bundle_relative/Contents/MacOS/qwertycoin-wallet-cli"
+  require_file "embedded macOS wallet RPC" "$mac_bundle_relative/Contents/MacOS/qwertycoin-wallet-rpc"
 
   codesign --verify --deep --strict "$mac_bundle"
+  mac_mach_count=0
   while IFS= read -r -d '' mach_file; do
     [[ "$(file -Lb "$mach_file")" == Mach-O* ]] || continue
+    mac_mach_count=$((mac_mach_count + 1))
+    if ! lipo -archs "$mach_file" | tr ' ' '\n' | grep -qx arm64; then
+      echo "macOS bundle contains a non-arm64 Mach-O file: $mach_file" >&2
+      exit 1
+    fi
     if otool -L "$mach_file" | tail -n +2 | grep -E '/opt/homebrew|/usr/local|/Users/runner|/opt/hostedtoolcache'; then
       echo "macOS bundle contains a non-portable dependency: $mach_file" >&2
       exit 1
     fi
   done < <(find "$mac_bundle" -type f -print0)
+  if (( mac_mach_count == 0 )); then
+    echo "macOS bundle contains no Mach-O files" >&2
+    exit 1
+  fi
+  printf 'macOS runtime verified: %d arm64 Mach-O files, no runner-local dependencies\n' "$mac_mach_count"
 fi
 
 (

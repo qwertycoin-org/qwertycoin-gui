@@ -5,9 +5,49 @@ if(APPLE OR (WIN32 AND NOT STATIC))
 
     if(APPLE AND NOT IOS)
         find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS "${_qt_bin_dir}")
+
+        # Keep all shipped Qwertycoin executables inside the application bundle
+        # so they share one self-contained Frameworks directory. Passing the
+        # helper executables explicitly makes macdeployqt rewrite their
+        # third-party install names as well as the GUI's Qt dependencies.
         add_custom_command(TARGET deploy
                            POST_BUILD
-                           COMMAND "${MACDEPLOYQT_EXECUTABLE}" "$<TARGET_FILE_DIR:qwertycoin-gui>/../.." -always-overwrite -qmldir="${CMAKE_SOURCE_DIR}"
+                           COMMAND ${CMAKE_COMMAND} -E copy
+                                   "$<TARGET_FILE:daemon>"
+                                   "$<TARGET_FILE_DIR:qwertycoin-gui>/qwertycoind"
+                           COMMAND ${CMAKE_COMMAND} -E copy
+                                   "$<TARGET_FILE:simplewallet>"
+                                   "$<TARGET_FILE_DIR:qwertycoin-gui>/qwertycoin-wallet-cli"
+                           COMMAND ${CMAKE_COMMAND} -E copy
+                                   "$<TARGET_FILE:wallet_rpc_server>"
+                                   "$<TARGET_FILE_DIR:qwertycoin-gui>/qwertycoin-wallet-rpc"
+                           COMMENT "Embedding Qwertycoin daemon and wallet tools..."
+        )
+
+        # Copy Boost dylibs that macdeployqt doesn't discover on its own. Do
+        # this before macdeployqt so their install names are normalized too.
+        find_package(Boost QUIET COMPONENTS atomic container date_time)
+        set(_boost_extras Boost::atomic Boost::container Boost::date_time)
+        foreach(_tgt IN LISTS _boost_extras)
+            if(TARGET ${_tgt})
+                add_custom_command(TARGET deploy POST_BUILD
+                                   COMMAND ${CMAKE_COMMAND} -E copy
+                                   "$<TARGET_FILE:${_tgt}>"
+                                   "$<TARGET_FILE_DIR:qwertycoin-gui>/../Frameworks/"
+                                   COMMENT "Copying $<TARGET_FILE_NAME:${_tgt}>"
+                )
+            endif()
+        endforeach()
+
+        add_custom_command(TARGET deploy
+                           POST_BUILD
+                           COMMAND "${MACDEPLOYQT_EXECUTABLE}"
+                                   "$<TARGET_FILE_DIR:qwertycoin-gui>/../.."
+                                   -always-overwrite
+                                   -qmldir="${CMAKE_SOURCE_DIR}"
+                                   -executable="$<TARGET_FILE_DIR:qwertycoin-gui>/qwertycoind"
+                                   -executable="$<TARGET_FILE_DIR:qwertycoin-gui>/qwertycoin-wallet-cli"
+                                   -executable="$<TARGET_FILE_DIR:qwertycoin-gui>/qwertycoin-wallet-rpc"
                            COMMENT "Running macdeployqt..."
         )
 
@@ -25,20 +65,6 @@ if(APPLE OR (WIN32 AND NOT STATIC))
 
             )
         endif()
-
-        # Copy Boost dylibs that macdeployqt doesn't pick up
-        find_package(Boost QUIET COMPONENTS atomic container date_time)
-        set(_boost_extras Boost::atomic Boost::container Boost::date_time)
-        foreach(_tgt IN LISTS _boost_extras)
-            if(TARGET ${_tgt})
-                add_custom_command(TARGET deploy POST_BUILD
-                                   COMMAND ${CMAKE_COMMAND} -E copy
-                                   "$<TARGET_FILE:${_tgt}>"
-                                   "$<TARGET_FILE_DIR:qwertycoin-gui>/../Frameworks/"
-                                   COMMENT "Copying $<TARGET_FILE_NAME:${_tgt}>"
-                )
-            endif()
-        endforeach()
 
         # Apple Silicon requires all binaries to be codesigned
         find_program(CODESIGN_EXECUTABLE NAMES codesign)
