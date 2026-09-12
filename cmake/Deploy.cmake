@@ -57,7 +57,7 @@ if(APPLE OR (WIN32 AND NOT STATIC))
             message(FATAL_ERROR "Deploy requires Qt 5 qmake and windeployqt in ${_qt_bin_dir}")
         endif()
         add_custom_command(TARGET deploy POST_BUILD
-                           COMMAND "${CMAKE_COMMAND}" -E env PATH="${_qt_bin_dir}" "${WINDEPLOYQT_EXECUTABLE}" "$<TARGET_FILE:qwertycoin-gui>" -no-translations -qmldir="${CMAKE_SOURCE_DIR}"
+                           COMMAND "${CMAKE_COMMAND}" -E env PATH="${_qt_bin_dir}" "${WINDEPLOYQT_EXECUTABLE}" "$<TARGET_FILE:qwertycoin-gui>" -no-translations -no-opengl-sw -qmldir="${CMAKE_SOURCE_DIR}"
                            COMMENT "Running windeployqt..."
         )
         set(WIN_DEPLOY_DLLS
