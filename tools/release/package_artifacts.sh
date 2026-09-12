@@ -260,6 +260,23 @@ if [[ "$platform" == "Darwin" ]]; then
       echo "macOS bundle contains a non-portable dependency: $mach_file" >&2
       exit 1
     fi
+    if otool -l "$mach_file" |
+      awk '
+        $1 == "cmd" && $2 == "LC_RPATH" { want_path = 1; next }
+        want_path && $1 == "path" {
+          want_path = 0
+          if ($2 ~ "^/opt/homebrew/" ||
+              $2 ~ "^/usr/local/" ||
+              $2 ~ "^/Users/runner/" ||
+              $2 ~ "^/opt/hostedtoolcache/") {
+            found = 1
+          }
+        }
+        END { exit found ? 0 : 1 }
+      '; then
+      echo "macOS bundle contains a non-portable runtime search path: $mach_file" >&2
+      exit 1
+    fi
   done < <(find "$mac_bundle" -type f -print0)
   if (( mac_mach_count == 0 )); then
     echo "macOS bundle contains no Mach-O files" >&2
