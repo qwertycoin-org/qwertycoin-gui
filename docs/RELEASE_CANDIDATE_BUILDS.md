@@ -17,7 +17,7 @@ Each invocation builds exactly one target:
 - `linux` — Linux x86_64 tarball built on Ubuntu 22.04 with a
   `GLIBC_2.35` compatibility ceiling;
 - `windows` — Windows x86_64 zip;
-- `macos` — macOS Apple Silicon tarball containing the `.app` bundle.
+- `macos` — macOS 15+ Apple Silicon tarball containing the `.app` bundle.
 
 The request must supply the exact 40-character GUI commit SHA and a restricted
 artifact prefix. Checkout and packaging fail unless the requested GUI revision,
@@ -61,12 +61,15 @@ It also validates the platform runtime:
   and requires the platform, SVG, Qt Quick and Qt Labs Platform QML modules;
 - macOS requires the Qt frameworks, Cocoa/SVG plugins, Qt Quick and Qt Labs
   Platform QML modules produced by `macdeployqt`, rejects Homebrew/runner
-  dependency paths and verifies the ad-hoc bundle signature.
+  dependency paths and runtime search paths, verifies every bundled Mach-O is
+  ARM64 with a deployment target no newer than macOS 15, and verifies the
+  ad-hoc bundle signature.
 
 Every package contains `BUILD-INFO.txt` with GUI/Core revisions, runner
-platform and Qt version. Linux also records the enforced glibc ceiling. The
-per-file SHA-256 manifest is verified before the archive is uploaded. Uploaded
-review artifacts expire after seven days.
+platform and Qt version. Linux also records the enforced glibc ceiling; macOS
+records its enforced minimum system version. The per-file SHA-256 manifest is
+verified before the archive is uploaded. Uploaded review artifacts expire after
+seven days.
 
 ## Signing and publication boundary
 
