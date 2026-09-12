@@ -88,6 +88,7 @@ jobs:
             qml-module-qtquick-controls2 qml-module-qtquick-layouts \
             qml-module-qtquick-dialogs qml-module-qtquick-window2 \
             qml-module-qtgraphicaleffects qml-module-qtmultimedia \
+            qml-module-qt-labs-platform \
             qttools5-dev-tools libqt5svg5-dev libqt5xmlpatterns5-dev
 
       - name: Restore compiler cache

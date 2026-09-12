@@ -53,12 +53,14 @@ It also validates the platform runtime:
 
 - Linux recursively bundles non-glibc ELF dependencies, assigns relative
   RPATHs, proves that no non-system library resolves outside the package and
-  rejects every ELF object that requires a glibc symbol newer than 2.35;
+  rejects every ELF object that requires a glibc symbol newer than 2.35. Its
+  required runtime set includes the Qt Labs Platform integration used by the
+  native menu and file-dialog components;
 - Windows preserves the top-level Qt/dependency DLLs produced by `windeployqt`
-  and requires the platform, SVG and QML modules;
-- macOS requires the Qt frameworks, Cocoa/SVG plugins and QML modules produced
-  by `macdeployqt`, rejects Homebrew/runner dependency paths and verifies the
-  ad-hoc bundle signature.
+  and requires the platform, SVG, Qt Quick and Qt Labs Platform QML modules;
+- macOS requires the Qt frameworks, Cocoa/SVG plugins, Qt Quick and Qt Labs
+  Platform QML modules produced by `macdeployqt`, rejects Homebrew/runner
+  dependency paths and verifies the ad-hoc bundle signature.
 
 Every package contains `BUILD-INFO.txt` with GUI/Core revisions, runner
 platform and Qt version. Linux also records the enforced glibc ceiling. The
