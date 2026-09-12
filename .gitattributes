@@ -6,4 +6,10 @@ translations/*.ts whitespace=-trailing-space
 # trailing whitespace in reviews.
 installers/windows/** text eol=crlf whitespace=cr-at-eol
 *.bat text eol=crlf whitespace=cr-at-eol
-fonts/LICENSE.txt text eol=crlf whitespace=cr-at-eol
+
+# These imported files are intentionally stored with CRLF bytes in Git. Treat
+# them as opaque text assets so a fresh checkout is not immediately dirty.
+# This also preserves the upstream license contents byte-for-byte.
+installers/windows/.gitignore -text -eol whitespace=cr-at-eol
+installers/windows/LICENSE -text -eol whitespace=cr-at-eol
+fonts/LICENSE.txt -text -eol whitespace=cr-at-eol

@@ -72,6 +72,7 @@ jobs:
           git submodule update --init --recursive
           test -f qwertycoin/.git
           tools/check_core_pin.sh
+          tools/check_source_tree_clean.sh
           test "$(git -C qwertycoin rev-parse HEAD)" = "$(git rev-parse HEAD:qwertycoin)"
 
       - name: Install dependencies
@@ -110,11 +111,10 @@ jobs:
       - name: Build
         run: cmake --build build/release --target qwertycoin-gui simplewallet wallet_rpc_server --parallel 2
 
-      - name: Verify build preserved the Core pin
+      - name: Verify build preserved source and Core pins
         run: |
           tools/check_core_pin.sh
-          test -z "$(git status --porcelain --untracked-files=no)"
-          test -z "$(git -C qwertycoin status --porcelain --untracked-files=no)"
+          tools/check_source_tree_clean.sh
 
       - name: Package and verify portable artifacts
         run: |
@@ -158,6 +158,7 @@ jobs:
           git submodule update --init --recursive
           test -f qwertycoin/.git
           tools/check_core_pin.sh
+          tools/check_source_tree_clean.sh
           test "$(git -C qwertycoin rev-parse HEAD)" = "$(git rev-parse HEAD:qwertycoin)"
 
       - name: Install dependencies
@@ -200,11 +201,10 @@ jobs:
           cmake --build build/release --target qwertycoin-gui simplewallet wallet_rpc_server --parallel 2
           cmake --build build/release --target deploy --parallel 1
 
-      - name: Verify build preserved the Core pin
+      - name: Verify build preserved source and Core pins
         run: |
           tools/check_core_pin.sh
-          test -z "$(git status --porcelain --untracked-files=no)"
-          test -z "$(git -C qwertycoin status --porcelain --untracked-files=no)"
+          tools/check_source_tree_clean.sh
 
       - name: Package and verify portable artifacts
         run: |
@@ -250,6 +250,7 @@ jobs:
           git submodule update --init --recursive
           test -f qwertycoin/.git
           tools/check_core_pin.sh
+          tools/check_source_tree_clean.sh
           test "$(git -C qwertycoin rev-parse HEAD)" = "$(git rev-parse HEAD:qwertycoin)"
 
       - name: Configure MSYS2
@@ -307,11 +308,10 @@ jobs:
           cmake --build build/release --target qwertycoin-gui simplewallet wallet_rpc_server --parallel 2
           cmake --build build/release --target deploy --parallel 1
 
-      - name: Verify build preserved the Core pin
+      - name: Verify build preserved source and Core pins
         run: |
           tools/check_core_pin.sh
-          test -z "$(git status --porcelain --untracked-files=no)"
-          test -z "$(git -C qwertycoin status --porcelain --untracked-files=no)"
+          tools/check_source_tree_clean.sh
 
       - name: Package and verify portable artifacts
         run: |
