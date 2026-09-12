@@ -26,6 +26,12 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#if defined(_WIN32)
+// Boost.Asio requires Winsock2 to be selected before Qt can transitively include
+// windows.h (and its legacy winsock.h) through QProcess/QApplication headers.
+#include <winsock2.h>
+#endif
+
 #include "DaemonManager.h"
 #include "common/util.h"
 #include "epose/resource_policy_v2.h"
