@@ -67,21 +67,15 @@ if(APPLE OR (WIN32 AND NOT STATIC))
             libboost_program_options-mt.dll
             libboost_serialization-mt.dll
             libboost_thread-mt.dll
-            libprotobuf.dll
             libbrotlicommon.dll
             libbrotlidec.dll
             libusb-1.0.dll
             zlib1.dll
             libzstd.dll
             libwinpthread-1.dll
-            libtiff-6.dll
             libstdc++-6.dll
             libpng16-16.dll
-            libpcre16-0.dll
-            libpcre-1.dll
-            libmng-2.dll
             liblzma-5.dll
-            liblcms2-2.dll
             libjpeg-8.dll
             libintl-8.dll
             libiconv-2.dll
