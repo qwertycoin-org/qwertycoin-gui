@@ -105,8 +105,10 @@ Before creating the draft, it verifies that every referenced run:
 
 It generates `SHA256SUMS` over the three outer release archives and creates a
 draft prerelease targeting the immutable candidate commit. Existing tags or
-releases are rejected. The draft remains private and cannot be mistaken for a
-signed stable release; publication is still a separate human decision.
+conflicting releases are rejected. A rerun may retain and fully re-verify an
+exact matching draft, including the GitHub-computed digest of every asset. The
+draft remains private and cannot be mistaken for a signed stable release;
+publication is still a separate human decision.
 
 Example for an already reviewed candidate set:
 

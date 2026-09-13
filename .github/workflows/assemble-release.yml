@@ -226,45 +226,81 @@ jobs:
           The Action creates this release as a **draft prerelease**. Publication remains a separate human decision after native installation and wallet smoke testing.
           EOF
 
-      - name: Refuse existing tag or release
+      - name: Detect an exact existing draft or refuse conflicts
         shell: bash
         run: |
           set -euo pipefail
-          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo "release already exists: $RELEASE_TAG" >&2
+          releases=$(gh api "repos/${GITHUB_REPOSITORY}/releases?per_page=100")
+          matching=$(jq --arg tag "$RELEASE_TAG" '[.[] | select(.tag_name == $tag)]' <<<"$releases")
+          count=$(jq 'length' <<<"$matching")
+          if [[ "$count" -gt 1 ]]; then
+            echo "multiple releases unexpectedly use tag $RELEASE_TAG" >&2
             exit 1
           fi
-          test -z "$(git ls-remote --tags origin "refs/tags/${RELEASE_TAG}")"
+          if [[ "$count" -eq 1 ]]; then
+            jq -e \
+              --arg revision "$EXPECTED_REVISION" \
+              '.[] | .draft == true and .prerelease == true and .target_commitish == $revision' \
+              <<<"$matching" >/dev/null
+            echo "RELEASE_EXISTS=true" >> "$GITHUB_ENV"
+            echo "DRAFT_RELEASE_ID=$(jq -r '.[0].id' <<<"$matching")" >> "$GITHUB_ENV"
+          else
+            test -z "$(git ls-remote --tags origin "refs/tags/${RELEASE_TAG}")"
+            echo "RELEASE_EXISTS=false" >> "$GITHUB_ENV"
+          fi
 
-      - name: Create private draft prerelease
+      - name: Create or retain private draft prerelease
         shell: bash
         run: |
           set -euo pipefail
-          gh release create "$RELEASE_TAG" \
-            release-assets/${ARTIFACT_PREFIX}-linux-x86_64.tar.gz \
-            release-assets/${ARTIFACT_PREFIX}-windows-x86_64.zip \
-            release-assets/${ARTIFACT_PREFIX}-macos-arm64.tar.gz \
-            release-assets/SHA256SUMS \
-            --repo "$GITHUB_REPOSITORY" \
-            --target "$EXPECTED_REVISION" \
-            --title "Qwertycoin GUI ${RELEASE_TAG#v} (unsigned test candidate)" \
-            --notes-file release-assets/RELEASE-NOTES.md \
-            --draft \
-            --prerelease
+          if [[ "$RELEASE_EXISTS" != true ]]; then
+            gh release create "$RELEASE_TAG" \
+              "release-assets/${ARTIFACT_PREFIX}-linux-x86_64.tar.gz" \
+              "release-assets/${ARTIFACT_PREFIX}-windows-x86_64.zip" \
+              "release-assets/${ARTIFACT_PREFIX}-macos-arm64.tar.gz" \
+              release-assets/SHA256SUMS \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$EXPECTED_REVISION" \
+              --title "Qwertycoin GUI ${RELEASE_TAG#v} (unsigned test candidate)" \
+              --notes-file release-assets/RELEASE-NOTES.md \
+              --draft \
+              --prerelease
+            releases=$(gh api "repos/${GITHUB_REPOSITORY}/releases?per_page=100")
+            draft_id=$(jq -er --arg tag "$RELEASE_TAG" \
+              '[.[] | select(.tag_name == $tag)] | if length == 1 then .[0].id else error("draft lookup failed") end' \
+              <<<"$releases")
+            echo "DRAFT_RELEASE_ID=$draft_id" >> "$GITHUB_ENV"
+          fi
 
       - name: Verify draft release metadata and assets
         shell: bash
         run: |
           set -euo pipefail
-          release=$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${RELEASE_TAG}")
+          [[ "$DRAFT_RELEASE_ID" =~ ^[1-9][0-9]*$ ]]
+          release=$(gh api "repos/${GITHUB_REPOSITORY}/releases/${DRAFT_RELEASE_ID}")
+          linux_digest="sha256:$(sha256sum "release-assets/${ARTIFACT_PREFIX}-linux-x86_64.tar.gz" | cut -d' ' -f1)"
+          windows_digest="sha256:$(sha256sum "release-assets/${ARTIFACT_PREFIX}-windows-x86_64.zip" | cut -d' ' -f1)"
+          macos_digest="sha256:$(sha256sum "release-assets/${ARTIFACT_PREFIX}-macos-arm64.tar.gz" | cut -d' ' -f1)"
+          sums_digest="sha256:$(sha256sum release-assets/SHA256SUMS | cut -d' ' -f1)"
           jq -e \
             --arg revision "$EXPECTED_REVISION" \
             --arg linux "${ARTIFACT_PREFIX}-linux-x86_64.tar.gz" \
             --arg windows "${ARTIFACT_PREFIX}-windows-x86_64.zip" \
             --arg macos "${ARTIFACT_PREFIX}-macos-arm64.tar.gz" \
-            '.draft == true
+            --arg linux_digest "$linux_digest" \
+            --arg windows_digest "$windows_digest" \
+            --arg macos_digest "$macos_digest" \
+            --arg sums_digest "$sums_digest" \
+            '.tag_name == env.RELEASE_TAG
+             and .name == ("Qwertycoin GUI " + (env.RELEASE_TAG | ltrimstr("v")) + " (unsigned test candidate)")
+             and .draft == true
              and .prerelease == true
              and .target_commitish == $revision
-             and ([.assets[].name] | sort) == (["SHA256SUMS", $linux, $macos, $windows] | sort)' \
+             and ([.assets[].name] | sort) == (["SHA256SUMS", $linux, $macos, $windows] | sort)
+             and any(.assets[]; .name == $linux and .state == "uploaded" and .digest == $linux_digest)
+             and any(.assets[]; .name == $windows and .state == "uploaded" and .digest == $windows_digest)
+             and any(.assets[]; .name == $macos and .state == "uploaded" and .digest == $macos_digest)
+             and any(.assets[]; .name == "SHA256SUMS" and .state == "uploaded" and .digest == $sums_digest)
+             and (.body | contains($revision))' \
             <<<"$release" >/dev/null
           echo "Draft prerelease ${RELEASE_TAG} contains the three verified native archives and SHA256SUMS"
