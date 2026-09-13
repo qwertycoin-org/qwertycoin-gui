@@ -1,14 +1,15 @@
-# Manual release-candidate builds
+# Manual native release builds
 
-The repository exposes one active GitHub Actions workflow:
+The repository exposes two active GitHub Actions workflows:
 
 ```text
 .github/workflows/release.yml
+.github/workflows/assemble-release.yml
 ```
 
-It has only a `workflow_dispatch` trigger. Pushes, pull requests, tags and
-GitHub releases do not start it. The normal build and Flatpak templates remain
-under `.github/workflows-disabled/`.
+Both have only a `workflow_dispatch` trigger. Pushes, pull requests, tags and
+GitHub releases do not start them. The normal build and Flatpak templates
+remain under `.github/workflows-disabled/`.
 
 ## Scope
 
@@ -73,51 +74,74 @@ seven days.
 
 ## Signing and publication boundary
 
-These jobs create **release candidates for review**, not public releases:
+These jobs create native artifacts for review. They do not publish a release:
 
 - Linux artifacts are unsigned;
 - Windows artifacts are unsigned;
 - macOS uses an ad-hoc signature only and is not notarized or stapled;
 - no tag, GitHub Release, update metadata or public download is created.
 
-Developer ID signing, Apple notarization/stapling, Windows Authenticode,
-release notes, final checksums and publication require a separate approved
-release step after native launch and wallet smoke tests on the downloaded
-artifacts.
+Developer ID signing, Apple notarization/stapling and Windows Authenticode are
+separate release capabilities. Release notes, final checksums and publication
+require a separate approved assembly step after inspection of the downloaded
+artifacts. A published unsigned release must state these signing limits
+prominently rather than implying publisher authentication.
 
-## Draft release assembly
+## Release assembly
 
 After all three downloaded candidates have been independently inspected, the
-manual-only `assemble-release.yml` workflow can assemble them into a private
-draft prerelease. The workflow does not rebuild or modify a candidate. It
-requires the exact candidate source revision, the three successful native run
-IDs and the literal confirmation `CREATE-DRAFT`.
+manual-only `assemble-release.yml` workflow can assemble them either into a
+private draft prerelease or, with a separate explicit confirmation, a stable
+public release. The workflow does not rebuild or modify a candidate. It
+requires the exact candidate source revision and the three successful native
+run IDs.
 
-Before creating the draft, it verifies that every referenced run:
+Before creating any release, it verifies that every referenced run:
 
 - is a successful first-attempt `workflow_dispatch` execution of
-  `release.yml` on `master` at the exact requested source revision;
+  `release.yml` on `master`, using the same reviewed workflow definition as the
+  assembler; the packaged `BUILD-INFO.txt` must independently bind the exact
+  requested source revision;
 - contains exactly one non-expired artifact with the expected platform name;
 - contains an archive with safe paths and links, no case-folding collisions,
   complete matching per-file SHA-256 coverage and exact GUI/Core build metadata;
 - contains the required GUI, daemon, wallet CLI/RPC and platform runtime entry
   points.
 
-It generates `SHA256SUMS` over the three outer release archives and creates a
-draft prerelease targeting the immutable candidate commit. Existing tags or
-conflicting releases are rejected. A rerun may retain and fully re-verify an
-exact matching draft, including the GitHub-computed digest of every asset. The
-draft remains private and cannot be mistaken for a signed stable release;
-publication is still a separate human decision.
+It derives the allowed tag from the source tree's major/minor/revision values,
+generates `SHA256SUMS` over the three outer release archives and targets the
+immutable candidate commit. Existing tags or conflicting releases are
+rejected. A rerun may retain and fully re-verify an exact matching release,
+including the GitHub-computed digest of every asset.
+
+`draft-prerelease` is the fail-safe default and requires `CREATE-DRAFT`. Stable
+publication accepts only the exact source version tag (for example `v2.0.0`),
+requires `release_kind=stable` and the literal `PUBLISH-STABLE` confirmation,
+and still records the unsigned/ad-hoc signing boundary in the public notes.
 
 Example for an already reviewed candidate set:
 
 ```sh
 gh workflow run assemble-release.yml --ref master \
   -f release_tag=v2.0.0-rc1 \
+  -f release_kind=draft-prerelease \
   -f expected_revision=<exact-40-character-gui-sha> \
   -f linux_run_id=<linux-run-id> \
   -f windows_run_id=<windows-run-id> \
   -f macos_run_id=<macos-run-id> \
   -f confirmation=CREATE-DRAFT
+```
+
+After the exact stable-labelled native archives have passed independent review,
+the corresponding stable publication uses:
+
+```sh
+gh workflow run assemble-release.yml --ref master \
+  -f release_tag=v2.0.0 \
+  -f release_kind=stable \
+  -f expected_revision=<exact-40-character-gui-sha> \
+  -f linux_run_id=<linux-run-id> \
+  -f windows_run_id=<windows-run-id> \
+  -f macos_run_id=<macos-run-id> \
+  -f confirmation=PUBLISH-STABLE
 ```

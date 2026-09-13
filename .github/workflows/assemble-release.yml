@@ -1,13 +1,21 @@
-name: qwc/gui-assemble-draft-release
+name: qwc/gui-assemble-release
 
 on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: "Release-candidate tag (for example v2.0.0-rc1)"
+        description: "Exact release tag (for example v2.0.0-rc1 or v2.0.0)"
         required: true
         default: "v2.0.0-rc1"
         type: string
+      release_kind:
+        description: "Keep a private draft prerelease or publish a stable release"
+        required: true
+        default: draft-prerelease
+        type: choice
+        options:
+          - draft-prerelease
+          - stable
       expected_revision:
         description: "Exact 40-character GUI source commit used by every native build"
         required: true
@@ -25,7 +33,7 @@ on:
         required: true
         type: string
       confirmation:
-        description: "Type CREATE-DRAFT to create a private draft prerelease"
+        description: "Type CREATE-DRAFT or PUBLISH-STABLE to confirm the selected release kind"
         required: true
         type: string
 
@@ -34,16 +42,17 @@ permissions:
   contents: write
 
 concurrency:
-  group: qwc-gui-draft-release-${{ inputs.release_tag }}
+  group: qwc-gui-release-${{ inputs.release_tag }}
   cancel-in-progress: false
 
 jobs:
-  assemble-draft:
-    name: Verify candidates and create draft release
+  assemble-release:
+    name: Verify candidates and assemble release
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
       RELEASE_TAG: ${{ inputs.release_tag }}
+      RELEASE_KIND: ${{ inputs.release_kind }}
       EXPECTED_REVISION: ${{ inputs.expected_revision }}
       LINUX_RUN_ID: ${{ inputs.linux_run_id }}
       WINDOWS_RUN_ID: ${{ inputs.windows_run_id }}
@@ -63,19 +72,48 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-rc[0-9]+$ ]]
           [[ "$EXPECTED_REVISION" =~ ^[0-9a-f]{40}$ ]]
           [[ "$LINUX_RUN_ID" =~ ^[1-9][0-9]*$ ]]
           [[ "$WINDOWS_RUN_ID" =~ ^[1-9][0-9]*$ ]]
           [[ "$MACOS_RUN_ID" =~ ^[1-9][0-9]*$ ]]
-          test "$CONFIRMATION" = CREATE-DRAFT
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           git cat-file -e "${EXPECTED_REVISION}^{commit}"
           git merge-base --is-ancestor "$EXPECTED_REVISION" "$GITHUB_SHA"
+          version_file=$(git show "${EXPECTED_REVISION}:CMakeLists.txt")
+          major=$(sed -nE 's/^set\(VERSION_MAJOR "([0-9]+)"\)$/\1/p' <<<"$version_file")
+          minor=$(sed -nE 's/^set\(VERSION_MINOR "([0-9]+)"\)$/\1/p' <<<"$version_file")
+          revision=$(sed -nE 's/^set\(VERSION_REVISION "([0-9]+)"\)$/\1/p' <<<"$version_file")
+          test -n "$major" && test -n "$minor" && test -n "$revision"
+          source_tag="v${major}.${minor}.${revision}"
+          case "$RELEASE_KIND" in
+            draft-prerelease)
+              rc_number=${RELEASE_TAG#"${source_tag}-rc"}
+              test "$RELEASE_TAG" = "${source_tag}-rc${rc_number}"
+              [[ "$rc_number" =~ ^[1-9][0-9]*$ ]]
+              test "$CONFIRMATION" = CREATE-DRAFT
+              expected_title="Qwertycoin GUI ${RELEASE_TAG#v} (unsigned test candidate)"
+              expected_draft=true
+              expected_prerelease=true
+              ;;
+            stable)
+              test "$RELEASE_TAG" = "$source_tag"
+              test "$CONFIRMATION" = PUBLISH-STABLE
+              expected_title="Qwertycoin GUI ${RELEASE_TAG#v}"
+              expected_draft=false
+              expected_prerelease=false
+              ;;
+            *)
+              echo "unsupported release kind: $RELEASE_KIND" >&2
+              exit 1
+              ;;
+          esac
           core_revision=$(git rev-parse "${EXPECTED_REVISION}:qwertycoin")
           [[ "$core_revision" =~ ^[0-9a-f]{40}$ ]]
           test "$ARTIFACT_PREFIX" = "qwertycoin-gui-${RELEASE_TAG}"
           echo "CORE_REVISION=$core_revision" >> "$GITHUB_ENV"
+          echo "EXPECTED_TITLE=$expected_title" >> "$GITHUB_ENV"
+          echo "EXPECTED_DRAFT=$expected_draft" >> "$GITHUB_ENV"
+          echo "EXPECTED_PRERELEASE=$expected_prerelease" >> "$GITHUB_ENV"
 
       - name: Validate native build runs and artifact identities
         shell: bash
@@ -84,16 +122,20 @@ jobs:
           validate_run() {
             local run_id=$1 artifact_name=$2 job_name=$3
             run=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}")
+            local run_head
+            run_head=$(jq -er '.head_sha' <<<"$run")
             jq -e \
-              --arg revision "$EXPECTED_REVISION" \
               '.name == "qwc/gui-release-candidate"
                and .path == ".github/workflows/release.yml"
                and .event == "workflow_dispatch"
                and .head_branch == "master"
-               and .head_sha == $revision
                and .status == "completed"
                and .conclusion == "success"
                and .run_attempt == 1' <<<"$run" >/dev/null
+            git cat-file -e "${run_head}^{commit}"
+            git merge-base --is-ancestor "$EXPECTED_REVISION" "$run_head"
+            test "$(git rev-parse "${run_head}:.github/workflows/release.yml")" = \
+              "$(git rev-parse "${GITHUB_SHA}:.github/workflows/release.yml")"
 
             jobs=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/jobs?per_page=100")
             jq -e --arg job "$job_name" \
@@ -196,14 +238,21 @@ jobs:
           cp "incoming/macos/${MACOS_ARTIFACT}.tar.gz" release-assets/
           (cd release-assets && sha256sum "${ARTIFACT_PREFIX}"-* > SHA256SUMS)
 
-      - name: Create immutable draft release notes
+      - name: Create immutable release notes
         shell: bash
         run: |
           set -euo pipefail
+          if [[ "$RELEASE_KIND" == stable ]]; then
+            release_description="This is the stable Qwertycoin GUI ${RELEASE_TAG#v} release assembled from three independently validated native GitHub Actions builds."
+            publication_note="This Action publishes the verified artifacts as the stable GitHub release for the exact source revision above."
+          else
+            release_description="This is an **unsigned test release candidate** assembled from three independently validated native GitHub Actions builds."
+            publication_note="The Action creates this release as a **draft prerelease**. Publication remains a separate human decision after native installation and wallet smoke testing."
+          fi
           cat > release-assets/RELEASE-NOTES.md <<EOF
           # Qwertycoin GUI ${RELEASE_TAG#v}
 
-          This is an **unsigned test release candidate** assembled from three independently validated native GitHub Actions builds.
+          ${release_description}
 
           - GUI source: \`${EXPECTED_REVISION}\`
           - Qwertycoin Core: \`${CORE_REVISION}\`
@@ -223,10 +272,10 @@ jobs:
           - macOS is ad-hoc signed, not Developer ID signed or notarized.
           - Verify every downloaded archive against \`SHA256SUMS\`.
 
-          The Action creates this release as a **draft prerelease**. Publication remains a separate human decision after native installation and wallet smoke testing.
+          ${publication_note}
           EOF
 
-      - name: Detect an exact existing draft or refuse conflicts
+      - name: Detect an exact existing release or refuse conflicts
         shell: bash
         run: |
           set -euo pipefail
@@ -240,44 +289,50 @@ jobs:
           if [[ "$count" -eq 1 ]]; then
             jq -e \
               --arg revision "$EXPECTED_REVISION" \
-              '.[] | .draft == true and .prerelease == true and .target_commitish == $revision' \
+              --argjson expected_draft "$EXPECTED_DRAFT" \
+              --argjson expected_prerelease "$EXPECTED_PRERELEASE" \
+              '.[] | .draft == $expected_draft and .prerelease == $expected_prerelease and .target_commitish == $revision' \
               <<<"$matching" >/dev/null
             echo "RELEASE_EXISTS=true" >> "$GITHUB_ENV"
-            echo "DRAFT_RELEASE_ID=$(jq -r '.[0].id' <<<"$matching")" >> "$GITHUB_ENV"
+            echo "RELEASE_ID=$(jq -r '.[0].id' <<<"$matching")" >> "$GITHUB_ENV"
           else
             test -z "$(git ls-remote --tags origin "refs/tags/${RELEASE_TAG}")"
             echo "RELEASE_EXISTS=false" >> "$GITHUB_ENV"
           fi
 
-      - name: Create or retain private draft prerelease
+      - name: Create or retain exact release
         shell: bash
         run: |
           set -euo pipefail
           if [[ "$RELEASE_EXISTS" != true ]]; then
-            gh release create "$RELEASE_TAG" \
-              "release-assets/${ARTIFACT_PREFIX}-linux-x86_64.tar.gz" \
-              "release-assets/${ARTIFACT_PREFIX}-windows-x86_64.zip" \
-              "release-assets/${ARTIFACT_PREFIX}-macos-arm64.tar.gz" \
-              release-assets/SHA256SUMS \
-              --repo "$GITHUB_REPOSITORY" \
-              --target "$EXPECTED_REVISION" \
-              --title "Qwertycoin GUI ${RELEASE_TAG#v} (unsigned test candidate)" \
-              --notes-file release-assets/RELEASE-NOTES.md \
-              --draft \
-              --prerelease
+            release_args=(
+              "$RELEASE_TAG"
+              "release-assets/${ARTIFACT_PREFIX}-linux-x86_64.tar.gz"
+              "release-assets/${ARTIFACT_PREFIX}-windows-x86_64.zip"
+              "release-assets/${ARTIFACT_PREFIX}-macos-arm64.tar.gz"
+              release-assets/SHA256SUMS
+              --repo "$GITHUB_REPOSITORY"
+              --target "$EXPECTED_REVISION"
+              --title "$EXPECTED_TITLE"
+              --notes-file release-assets/RELEASE-NOTES.md
+            )
+            if [[ "$RELEASE_KIND" == draft-prerelease ]]; then
+              release_args+=(--draft --prerelease)
+            fi
+            gh release create "${release_args[@]}"
             releases=$(gh api "repos/${GITHUB_REPOSITORY}/releases?per_page=100")
-            draft_id=$(jq -er --arg tag "$RELEASE_TAG" \
-              '[.[] | select(.tag_name == $tag)] | if length == 1 then .[0].id else error("draft lookup failed") end' \
+            release_id=$(jq -er --arg tag "$RELEASE_TAG" \
+              '[.[] | select(.tag_name == $tag)] | if length == 1 then .[0].id else error("release lookup failed") end' \
               <<<"$releases")
-            echo "DRAFT_RELEASE_ID=$draft_id" >> "$GITHUB_ENV"
+            echo "RELEASE_ID=$release_id" >> "$GITHUB_ENV"
           fi
 
-      - name: Verify draft release metadata and assets
+      - name: Verify release metadata and assets
         shell: bash
         run: |
           set -euo pipefail
-          [[ "$DRAFT_RELEASE_ID" =~ ^[1-9][0-9]*$ ]]
-          release=$(gh api "repos/${GITHUB_REPOSITORY}/releases/${DRAFT_RELEASE_ID}")
+          [[ "$RELEASE_ID" =~ ^[1-9][0-9]*$ ]]
+          release=$(gh api "repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}")
           linux_digest="sha256:$(sha256sum "release-assets/${ARTIFACT_PREFIX}-linux-x86_64.tar.gz" | cut -d' ' -f1)"
           windows_digest="sha256:$(sha256sum "release-assets/${ARTIFACT_PREFIX}-windows-x86_64.zip" | cut -d' ' -f1)"
           macos_digest="sha256:$(sha256sum "release-assets/${ARTIFACT_PREFIX}-macos-arm64.tar.gz" | cut -d' ' -f1)"
@@ -291,10 +346,13 @@ jobs:
             --arg windows_digest "$windows_digest" \
             --arg macos_digest "$macos_digest" \
             --arg sums_digest "$sums_digest" \
+            --arg title "$EXPECTED_TITLE" \
+            --argjson expected_draft "$EXPECTED_DRAFT" \
+            --argjson expected_prerelease "$EXPECTED_PRERELEASE" \
             '.tag_name == env.RELEASE_TAG
-             and .name == ("Qwertycoin GUI " + (env.RELEASE_TAG | ltrimstr("v")) + " (unsigned test candidate)")
-             and .draft == true
-             and .prerelease == true
+             and .name == $title
+             and .draft == $expected_draft
+             and .prerelease == $expected_prerelease
              and .target_commitish == $revision
              and ([.assets[].name] | sort) == (["SHA256SUMS", $linux, $macos, $windows] | sort)
              and any(.assets[]; .name == $linux and .state == "uploaded" and .digest == $linux_digest)
@@ -303,4 +361,4 @@ jobs:
              and any(.assets[]; .name == "SHA256SUMS" and .state == "uploaded" and .digest == $sums_digest)
              and (.body | contains($revision))' \
             <<<"$release" >/dev/null
-          echo "Draft prerelease ${RELEASE_TAG} contains the three verified native archives and SHA256SUMS"
+          echo "Release ${RELEASE_TAG} contains the three verified native archives and SHA256SUMS"
