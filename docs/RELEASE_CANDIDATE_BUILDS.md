@@ -84,3 +84,38 @@ Developer ID signing, Apple notarization/stapling, Windows Authenticode,
 release notes, final checksums and publication require a separate approved
 release step after native launch and wallet smoke tests on the downloaded
 artifacts.
+
+## Draft release assembly
+
+After all three downloaded candidates have been independently inspected, the
+manual-only `assemble-release.yml` workflow can assemble them into a private
+draft prerelease. The workflow does not rebuild or modify a candidate. It
+requires the exact candidate source revision, the three successful native run
+IDs and the literal confirmation `CREATE-DRAFT`.
+
+Before creating the draft, it verifies that every referenced run:
+
+- is a successful first-attempt `workflow_dispatch` execution of
+  `release.yml` on `master` at the exact requested source revision;
+- contains exactly one non-expired artifact with the expected platform name;
+- contains an archive with safe paths and links, no case-folding collisions,
+  complete matching per-file SHA-256 coverage and exact GUI/Core build metadata;
+- contains the required GUI, daemon, wallet CLI/RPC and platform runtime entry
+  points.
+
+It generates `SHA256SUMS` over the three outer release archives and creates a
+draft prerelease targeting the immutable candidate commit. Existing tags or
+releases are rejected. The draft remains private and cannot be mistaken for a
+signed stable release; publication is still a separate human decision.
+
+Example for an already reviewed candidate set:
+
+```sh
+gh workflow run assemble-release.yml --ref master \
+  -f release_tag=v2.0.0-rc1 \
+  -f expected_revision=<exact-40-character-gui-sha> \
+  -f linux_run_id=<linux-run-id> \
+  -f windows_run_id=<windows-run-id> \
+  -f macos_run_id=<macos-run-id> \
+  -f confirmation=CREATE-DRAFT
+```

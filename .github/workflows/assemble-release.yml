@@ -1,0 +1,270 @@
+name: qwc/gui-assemble-draft-release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Release-candidate tag (for example v2.0.0-rc1)"
+        required: true
+        default: "v2.0.0-rc1"
+        type: string
+      expected_revision:
+        description: "Exact 40-character GUI source commit used by every native build"
+        required: true
+        type: string
+      linux_run_id:
+        description: "Successful qwc/gui-release-candidate Linux run ID"
+        required: true
+        type: string
+      windows_run_id:
+        description: "Successful qwc/gui-release-candidate Windows run ID"
+        required: true
+        type: string
+      macos_run_id:
+        description: "Successful qwc/gui-release-candidate macOS run ID"
+        required: true
+        type: string
+      confirmation:
+        description: "Type CREATE-DRAFT to create a private draft prerelease"
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: qwc-gui-draft-release-${{ inputs.release_tag }}
+  cancel-in-progress: false
+
+jobs:
+  assemble-draft:
+    name: Verify candidates and create draft release
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      RELEASE_TAG: ${{ inputs.release_tag }}
+      EXPECTED_REVISION: ${{ inputs.expected_revision }}
+      LINUX_RUN_ID: ${{ inputs.linux_run_id }}
+      WINDOWS_RUN_ID: ${{ inputs.windows_run_id }}
+      MACOS_RUN_ID: ${{ inputs.macos_run_id }}
+      CONFIRMATION: ${{ inputs.confirmation }}
+      GH_TOKEN: ${{ github.token }}
+      ARTIFACT_PREFIX: qwertycoin-gui-${{ inputs.release_tag }}
+      LINUX_ARTIFACT: qwertycoin-gui-${{ inputs.release_tag }}-linux-x86_64
+      WINDOWS_ARTIFACT: qwertycoin-gui-${{ inputs.release_tag }}-windows-x86_64
+      MACOS_ARTIFACT: qwertycoin-gui-${{ inputs.release_tag }}-macos-arm64
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate immutable release request
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-rc[0-9]+$ ]]
+          [[ "$EXPECTED_REVISION" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$LINUX_RUN_ID" =~ ^[1-9][0-9]*$ ]]
+          [[ "$WINDOWS_RUN_ID" =~ ^[1-9][0-9]*$ ]]
+          [[ "$MACOS_RUN_ID" =~ ^[1-9][0-9]*$ ]]
+          test "$CONFIRMATION" = CREATE-DRAFT
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git cat-file -e "${EXPECTED_REVISION}^{commit}"
+          git merge-base --is-ancestor "$EXPECTED_REVISION" "$GITHUB_SHA"
+          core_revision=$(git rev-parse "${EXPECTED_REVISION}:qwertycoin")
+          [[ "$core_revision" =~ ^[0-9a-f]{40}$ ]]
+          test "$ARTIFACT_PREFIX" = "qwertycoin-gui-${RELEASE_TAG}"
+          echo "CORE_REVISION=$core_revision" >> "$GITHUB_ENV"
+
+      - name: Validate native build runs and artifact identities
+        shell: bash
+        run: |
+          set -euo pipefail
+          validate_run() {
+            local run_id=$1 artifact_name=$2 job_name=$3
+            run=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}")
+            jq -e \
+              --arg revision "$EXPECTED_REVISION" \
+              '.name == "qwc/gui-release-candidate"
+               and .path == ".github/workflows/release.yml"
+               and .event == "workflow_dispatch"
+               and .head_branch == "master"
+               and .head_sha == $revision
+               and .status == "completed"
+               and .conclusion == "success"
+               and .run_attempt == 1' <<<"$run" >/dev/null
+
+            jobs=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/jobs?per_page=100")
+            jq -e --arg job "$job_name" \
+              'any(.jobs[]; .name == $job and .status == "completed" and .conclusion == "success")' \
+              <<<"$jobs" >/dev/null
+
+            artifacts=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/artifacts?per_page=100")
+            jq -e --arg name "$artifact_name" \
+              '[.artifacts[] | select(.name == $name and .expired == false)] | length == 1' \
+              <<<"$artifacts" >/dev/null
+          }
+          validate_run "$LINUX_RUN_ID" "$LINUX_ARTIFACT" "Linux x86_64"
+          validate_run "$WINDOWS_RUN_ID" "$WINDOWS_ARTIFACT" "Windows x86_64"
+          validate_run "$MACOS_RUN_ID" "$MACOS_ARTIFACT" "macOS Apple Silicon"
+
+      - name: Self-test archive verifier
+        shell: bash
+        run: python3 -m unittest tools/release/tests/test_verify_candidate_archive.py
+
+      - name: Download Linux candidate
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: ${{ env.LINUX_ARTIFACT }}
+          path: incoming/linux
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.linux_run_id }}
+
+      - name: Download Windows candidate
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: ${{ env.WINDOWS_ARTIFACT }}
+          path: incoming/windows
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.windows_run_id }}
+
+      - name: Download macOS candidate
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: ${{ env.MACOS_ARTIFACT }}
+          path: incoming/macos
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.macos_run_id }}
+
+      - name: Safely verify and stage exact native archives
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir release-assets verified
+          test "$(find incoming/linux -maxdepth 1 -type f | wc -l)" -eq 2
+          test "$(find incoming/windows -maxdepth 1 -type f | wc -l)" -eq 2
+          test "$(find incoming/macos -maxdepth 1 -type f | wc -l)" -eq 2
+          test "$(find incoming/linux -mindepth 1 -maxdepth 1 | wc -l)" -eq 2
+          test "$(find incoming/windows -mindepth 1 -maxdepth 1 | wc -l)" -eq 2
+          test "$(find incoming/macos -mindepth 1 -maxdepth 1 | wc -l)" -eq 2
+          test -f "incoming/linux/${LINUX_ARTIFACT}.sha256"
+          test -f "incoming/windows/${WINDOWS_ARTIFACT}.sha256"
+          test -f "incoming/macos/${MACOS_ARTIFACT}.sha256"
+
+          tools/release/verify_candidate_archive.py \
+            --archive "incoming/linux/${LINUX_ARTIFACT}.tar.gz" \
+            --destination verified/linux \
+            --root-name "$LINUX_ARTIFACT" \
+            --platform linux \
+            --expected-source "$EXPECTED_REVISION" \
+            --expected-core "$CORE_REVISION" \
+            --expected-os Linux --expected-arch X64 --expected-qt 5.15.3 \
+            --expected-glibc-ceiling 2.35
+
+          tools/release/verify_candidate_archive.py \
+            --archive "incoming/windows/${WINDOWS_ARTIFACT}.zip" \
+            --destination verified/windows \
+            --root-name "$WINDOWS_ARTIFACT" \
+            --platform windows \
+            --expected-source "$EXPECTED_REVISION" \
+            --expected-core "$CORE_REVISION" \
+            --expected-os Windows --expected-arch X64 --expected-qt 5.15.19
+
+          tools/release/verify_candidate_archive.py \
+            --archive "incoming/macos/${MACOS_ARTIFACT}.tar.gz" \
+            --destination verified/macos \
+            --root-name "$MACOS_ARTIFACT" \
+            --platform macos \
+            --expected-source "$EXPECTED_REVISION" \
+            --expected-core "$CORE_REVISION" \
+            --expected-os macOS --expected-arch ARM64 --expected-qt 5.15.19 \
+            --expected-macos-min-version 15.0
+
+          cmp "incoming/linux/${LINUX_ARTIFACT}.sha256" \
+            "verified/linux/${LINUX_ARTIFACT}.sha256"
+          cmp "incoming/windows/${WINDOWS_ARTIFACT}.sha256" \
+            "verified/windows/${WINDOWS_ARTIFACT}.sha256"
+          cmp "incoming/macos/${MACOS_ARTIFACT}.sha256" \
+            "verified/macos/${MACOS_ARTIFACT}.sha256"
+
+          cp "incoming/linux/${LINUX_ARTIFACT}.tar.gz" release-assets/
+          cp "incoming/windows/${WINDOWS_ARTIFACT}.zip" release-assets/
+          cp "incoming/macos/${MACOS_ARTIFACT}.tar.gz" release-assets/
+          (cd release-assets && sha256sum "${ARTIFACT_PREFIX}"-* > SHA256SUMS)
+
+      - name: Create immutable draft release notes
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > release-assets/RELEASE-NOTES.md <<EOF
+          # Qwertycoin GUI ${RELEASE_TAG#v}
+
+          This is an **unsigned test release candidate** assembled from three independently validated native GitHub Actions builds.
+
+          - GUI source: \`${EXPECTED_REVISION}\`
+          - Qwertycoin Core: \`${CORE_REVISION}\`
+          - Linux x86_64 run: https://github.com/${GITHUB_REPOSITORY}/actions/runs/${LINUX_RUN_ID}
+          - Windows x86_64 run: https://github.com/${GITHUB_REPOSITORY}/actions/runs/${WINDOWS_RUN_ID}
+          - macOS Apple Silicon run: https://github.com/${GITHUB_REPOSITORY}/actions/runs/${MACOS_RUN_ID}
+
+          Compatibility targets:
+
+          - Linux x86_64: GLIBC 2.35 ceiling
+          - Windows x86_64: portable Qt 5 runtime
+          - macOS Apple Silicon: macOS 15 or newer
+
+          Signing boundary:
+
+          - Linux and Windows are unsigned.
+          - macOS is ad-hoc signed, not Developer ID signed or notarized.
+          - Verify every downloaded archive against \`SHA256SUMS\`.
+
+          The Action creates this release as a **draft prerelease**. Publication remains a separate human decision after native installation and wallet smoke testing.
+          EOF
+
+      - name: Refuse existing tag or release
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "release already exists: $RELEASE_TAG" >&2
+            exit 1
+          fi
+          test -z "$(git ls-remote --tags origin "refs/tags/${RELEASE_TAG}")"
+
+      - name: Create private draft prerelease
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release create "$RELEASE_TAG" \
+            release-assets/${ARTIFACT_PREFIX}-linux-x86_64.tar.gz \
+            release-assets/${ARTIFACT_PREFIX}-windows-x86_64.zip \
+            release-assets/${ARTIFACT_PREFIX}-macos-arm64.tar.gz \
+            release-assets/SHA256SUMS \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$EXPECTED_REVISION" \
+            --title "Qwertycoin GUI ${RELEASE_TAG#v} (unsigned test candidate)" \
+            --notes-file release-assets/RELEASE-NOTES.md \
+            --draft \
+            --prerelease
+
+      - name: Verify draft release metadata and assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          release=$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${RELEASE_TAG}")
+          jq -e \
+            --arg revision "$EXPECTED_REVISION" \
+            --arg linux "${ARTIFACT_PREFIX}-linux-x86_64.tar.gz" \
+            --arg windows "${ARTIFACT_PREFIX}-windows-x86_64.zip" \
+            --arg macos "${ARTIFACT_PREFIX}-macos-arm64.tar.gz" \
+            '.draft == true
+             and .prerelease == true
+             and .target_commitish == $revision
+             and ([.assets[].name] | sort) == (["SHA256SUMS", $linux, $macos, $windows] | sort)' \
+            <<<"$release" >/dev/null
+          echo "Draft prerelease ${RELEASE_TAG} contains the three verified native archives and SHA256SUMS"
