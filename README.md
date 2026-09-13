@@ -8,9 +8,9 @@ attribution are retained. User-visible product language, network defaults and
 release metadata are Qwertycoin-specific; compatible internal wrapper names
 such as `Monero::` and `moneroComponents` intentionally remain unchanged.
 
-## Current branch status
+## Current release line
 
-This branch is a locally tested GUI modernization, not a signed release:
+The Qwertycoin GUI 2.0.0 release line provides:
 
 - light and dark Qwertycoin design system using locally bundled Inter and
   Archivo fonts plus the approved Q mark and wordmark;
@@ -35,15 +35,15 @@ The Core is tracked as a submodule at `qwertycoin/` with remote:
 https://github.com/qwertycoin-org/qwertycoin.git
 ```
 
-This branch pins reviewed Core commit
-`09086f7dbaaf1a4ff16bddeaa1d729f9ff65eca6`. It contains the final QWC v2
-mainnet state from `e6e0b46b6603bc5c1402df63696b514ba735f8ee` plus the
-out-of-tree GUI CMake integration correction tracked by Core PR #185.
+This release line pins reviewed Reset-1 Core commit
+`1e7de336faeff8f1dc6604fe75d038dc3568d7fa`. It contains the current QWC v2
+mainnet genesis and network identity.
 
 | Binding | Value |
 | --- | --- |
-| Mainnet genesis | `906629482787e94cb00463696a0e95ec75a480da09257c6270c65ba1a74a76b0` |
-| EPoSe parameter hash | `e5654b4f5fa27faa51a80ca1e93bb877c3bd3345d0a803b6e7ab55c05189c20d` |
+| Mainnet genesis | `4f95857586e2c66063c277370eda99cd75897d773af09f0c3cd1e22f7e87db39` |
+| Mainnet network ID | `515743324d41494e3230323652303102` |
+| EPoSe parameter hash | `2c26755094535871dd3ede7bd1b50aba82a9fb6831f0a17f32968eb0385145c6` |
 | P2P | 8196 |
 | Daemon RPC | 8197 |
 | Wallet RPC | 8198 |

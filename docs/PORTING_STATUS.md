@@ -5,8 +5,8 @@
 | Component | Revision | Role |
 | --- | --- | --- |
 | GUI baseline | `25719fb7ab08af5465b1ce4d7a51208bcf9a1e8b` | Qwertycoin GUI baseline derived from Monero GUI `v0.18.5.2` |
-| Qwertycoin Core | `09086f7dbaaf1a4ff16bddeaa1d729f9ff65eca6` | Final QWC v2 Core plus out-of-tree GUI CMake integration fix |
-| Core mainnet merge | `e6e0b46b6603bc5c1402df63696b514ba735f8ee` | Final consensus/network baseline contained by the pinned Core revision |
+| Qwertycoin Core | `1e7de336faeff8f1dc6604fe75d038dc3568d7fa` | Reset-1 QWC v2 Core and release workflow line |
+| Core Reset-1 merge | `9953ea40a92a71fbfccc57ffe38e868ddfa9e00a` | Current consensus/network baseline contained by the pinned Core revision |
 
 The Core is a Git submodule at `qwertycoin/`, not `monero/`. Its remote is
 `https://github.com/qwertycoin-org/qwertycoin.git`. Builds with
@@ -15,8 +15,9 @@ discard another Core revision.
 
 Mainnet binding:
 
-- genesis: `906629482787e94cb00463696a0e95ec75a480da09257c6270c65ba1a74a76b0`;
-- EPoSe parameter hash: `e5654b4f5fa27faa51a80ca1e93bb877c3bd3345d0a803b6e7ab55c05189c20d`;
+- genesis: `4f95857586e2c66063c277370eda99cd75897d773af09f0c3cd1e22f7e87db39`;
+- network ID: `515743324d41494e3230323652303102`;
+- EPoSe parameter hash: `2c26755094535871dd3ede7bd1b50aba82a9fb6831f0a17f32968eb0385145c6`;
 - P2P/RPC/wallet-RPC/ZMQ ports: 8196/8197/8198/8199;
 - URI scheme: `qwertycoin:`.
 

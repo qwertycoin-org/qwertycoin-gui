@@ -6,6 +6,11 @@ This document records local review evidence for the GUI modernization branch.
 It is not a release attestation. No GitHub-hosted workflows, release tags,
 codesigning, notarization or public packages were used.
 
+> Historical evidence: this review predates the Reset-1 network identity. The
+> current release source/Core/network binding is recorded in `README.md` and in
+> each candidate's `BUILD-INFO.txt`; do not use the values below for a current
+> mainnet checkout.
+
 ## Source and network binding
 
 | Item | Reviewed value |
