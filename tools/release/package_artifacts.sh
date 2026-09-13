@@ -26,6 +26,23 @@ if [[ -n "${EXPECTED_REVISION:-}" && "$source_revision" != "$EXPECTED_REVISION" 
   exit 1
 fi
 
+core_revision=$(git rev-parse HEAD:qwertycoin)
+parameter_manifest=qwertycoin/docs/epose/PARAMETER_MANIFEST_V2.json
+core_genesis=$(sed -n 's/.*"genesis_hash": "\([0-9a-f]\{64\}\)".*/\1/p' "$parameter_manifest" | head -n 1)
+core_network_id=$(sed -n 's/.*"network_id": "\([0-9a-f]\{32\}\)".*/\1/p' "$parameter_manifest" | head -n 1)
+core_parameter_hash=$(sed -n 's/.*"parameter_set_sha256": "\([0-9a-f]\{64\}\)".*/\1/p' "$parameter_manifest" | head -n 1)
+if [[ ! "$core_revision" =~ ^[0-9a-f]{40}$ || ! "$core_genesis" =~ ^[0-9a-f]{64}$ \
+      || ! "$core_network_id" =~ ^[0-9a-f]{32}$ || ! "$core_parameter_hash" =~ ^[0-9a-f]{64}$ ]]; then
+  echo "unable to derive the packaged Core/network identity" >&2
+  exit 1
+fi
+for release_binding in "$core_revision" "$core_genesis" "$core_network_id" "$core_parameter_hash"; do
+  if ! grep -Fq "$release_binding" README.md; then
+    echo "README.md does not describe the Core/network identity being packaged: $release_binding" >&2
+    exit 1
+  fi
+done
+
 if [[ -e "$output_dir/$artifact_name" || -e "$output_dir/$artifact_name.sha256" \
       || -e "$output_dir/$artifact_name.tar.gz" || -e "$output_dir/$artifact_name.zip" ]]; then
   echo "refusing to reuse an existing artifact path: $output_dir/$artifact_name" >&2
@@ -152,7 +169,6 @@ if [[ -n "$gui_binary" ]]; then
   fi
 fi
 
-core_revision=$(git rev-parse HEAD:qwertycoin)
 qt_version=unknown
 if command -v qmake >/dev/null 2>&1; then
   qt_version=$(qmake -query QT_VERSION)

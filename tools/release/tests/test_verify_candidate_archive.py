@@ -2,6 +2,7 @@
 
 from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
+import tempfile
 import unittest
 
 
@@ -40,6 +41,18 @@ class ArchivePathTests(unittest.TestCase):
         digest = "a" * 64
         self.assertIsNotNone(VERIFY.SHA256_LINE.fullmatch(f"{digest}  release/file"))
         self.assertIsNotNone(VERIFY.SHA256_LINE.fullmatch(f"{digest} *release/file"))
+
+    def test_release_readme_must_match_packaged_core(self) -> None:
+        expected_core = "1" * 40
+        with tempfile.TemporaryDirectory() as directory:
+            readme = Path(directory) / "README.md"
+            readme.write_text(f"Core revision: {expected_core}\n", encoding="utf-8")
+            VERIFY.verify_release_readme(readme, expected_core)
+
+            readme.write_text(f"Core revision: {'2' * 40}\n", encoding="utf-8")
+            self.assert_rejected(
+                lambda: VERIFY.verify_release_readme(readme, expected_core)
+            )
 
 
 if __name__ == "__main__":

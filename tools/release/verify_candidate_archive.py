@@ -167,6 +167,13 @@ def parse_build_info(path: Path) -> dict[str, str]:
     return values
 
 
+def verify_release_readme(path: Path, expected_core: str) -> None:
+    if not path.is_file() or path.is_symlink():
+        fail("README.md is missing or not a regular file")
+    if expected_core not in path.read_text(encoding="utf-8"):
+        fail("README.md does not describe the packaged Core revision")
+
+
 def require_payload(root: Path, platform: str) -> None:
     if platform == "linux":
         required = ["qwertycoin-gui", "qwertycoind", "qwertycoin-wallet-cli", "qwertycoin-wallet-rpc"]
@@ -240,6 +247,7 @@ def main() -> None:
             if info.get(key) != value:
                 fail(f"BUILD-INFO mismatch for {key}: expected {value!r}, got {info.get(key)!r}")
 
+        verify_release_readme(root / "README.md", args.expected_core)
         require_payload(root, args.platform)
         print(f"Verified {args.platform} candidate: {file_count} files, exact source/Core metadata")
     except BaseException:
