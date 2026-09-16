@@ -38,7 +38,7 @@ macOS:
 revision=$(git rev-parse HEAD)
 
 gh workflow run release.yml --ref master \
-  -f release_name=qwertycoin-gui-v2.0.0-rc1 \
+  -f release_name=qwertycoin-gui-v2.0.1 \
   -f expected_revision="$revision" \
   -f target=linux
 ```
@@ -115,7 +115,7 @@ rejected. A rerun may retain and fully re-verify an exact matching release,
 including the GitHub-computed digest of every asset.
 
 `draft-prerelease` is the fail-safe default and requires `CREATE-DRAFT`. Stable
-publication accepts only the exact source version tag (for example `v2.0.0`),
+publication accepts only the exact source version tag (for example `v2.0.1`),
 requires `release_kind=stable` and the literal `PUBLISH-STABLE` confirmation,
 and still records the unsigned/ad-hoc signing boundary in the public notes.
 
@@ -123,7 +123,7 @@ Example for an already reviewed candidate set:
 
 ```sh
 gh workflow run assemble-release.yml --ref master \
-  -f release_tag=v2.0.0-rc1 \
+  -f release_tag=v2.0.2-rc1 \
   -f release_kind=draft-prerelease \
   -f expected_revision=<exact-40-character-gui-sha> \
   -f linux_run_id=<linux-run-id> \
@@ -137,7 +137,7 @@ the corresponding stable publication uses:
 
 ```sh
 gh workflow run assemble-release.yml --ref master \
-  -f release_tag=v2.0.0 \
+  -f release_tag=v2.0.1 \
   -f release_kind=stable \
   -f expected_revision=<exact-40-character-gui-sha> \
   -f linux_run_id=<linux-run-id> \
