@@ -10,7 +10,7 @@ such as `Monero::` and `moneroComponents` intentionally remain unchanged.
 
 ## Current release line
 
-The Qwertycoin GUI 2.0.0 release line provides:
+The Qwertycoin GUI 2.0.1 release line provides:
 
 - light and dark Qwertycoin design system using locally bundled Inter and
   Archivo fonts plus the approved Q mark and wordmark;
@@ -35,8 +35,8 @@ The Core is tracked as a submodule at `qwertycoin/` with remote:
 https://github.com/qwertycoin-org/qwertycoin.git
 ```
 
-This release line pins reviewed Reset-1 Core commit
-`1e7de336faeff8f1dc6604fe75d038dc3568d7fa`. It contains the current QWC v2
+This release line pins reviewed Core commit
+`24d66aab67c96fb46806818bf26cc3615e8d507a`. It contains the current QWC v2
 mainnet genesis and network identity.
 
 | Binding | Value |
