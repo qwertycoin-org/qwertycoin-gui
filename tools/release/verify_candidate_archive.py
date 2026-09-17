@@ -187,6 +187,7 @@ def require_payload(root: Path, platform: str) -> None:
             "imageformats/qsvg.dll",
             "QtQuick/Controls/qtquickcontrolsplugin.dll",
             "QtQuick/Controls.2/qtquickcontrols2plugin.dll",
+            "QtGraphicalEffects/qmldir",
             "Qt/labs/platform/qtlabsplatformplugin.dll",
         ]
     else:

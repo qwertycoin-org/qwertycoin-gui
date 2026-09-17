@@ -54,6 +54,34 @@ class ArchivePathTests(unittest.TestCase):
                 lambda: VERIFY.verify_release_readme(readme, expected_core)
             )
 
+    def test_windows_payload_requires_graphical_effects(self) -> None:
+        required = (
+            "qwertycoin-gui.exe",
+            "qwertycoind.exe",
+            "qwertycoin-wallet-cli.exe",
+            "qwertycoin-wallet-rpc.exe",
+            "platforms/qwindows.dll",
+            "imageformats/qsvg.dll",
+            "QtQuick/Controls/qtquickcontrolsplugin.dll",
+            "QtQuick/Controls.2/qtquickcontrols2plugin.dll",
+            "Qt/labs/platform/qtlabsplatformplugin.dll",
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for relative in required:
+                candidate = root / relative
+                candidate.parent.mkdir(parents=True, exist_ok=True)
+                candidate.write_bytes(b"fixture")
+
+            self.assert_rejected(lambda: VERIFY.require_payload(root, "windows"))
+
+            graphical_effects = root / "QtGraphicalEffects/qmldir"
+            graphical_effects.parent.mkdir(parents=True)
+            graphical_effects.write_text(
+                "module QtGraphicalEffects\n", encoding="utf-8"
+            )
+            VERIFY.require_payload(root, "windows")
+
 
 if __name__ == "__main__":
     unittest.main()

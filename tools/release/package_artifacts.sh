@@ -260,6 +260,7 @@ if [[ "${RUNNER_OS:-}" == "Windows" ]]; then
   # writes the standard import roots directly into the application folder.
   require_file "Qt Quick Controls 2 QML module" QtQuick/Controls.2/qmldir qml/QtQuick/Controls.2/qmldir
   require_file "Qt Quick Layouts QML module" QtQuick/Layouts/qmldir qml/QtQuick/Layouts/qmldir
+  require_file "Qt Graphical Effects QML module" QtGraphicalEffects/qmldir qml/QtGraphicalEffects/qmldir
   require_file "Qt Labs Platform QML module" Qt/labs/platform/qmldir qml/Qt/labs/platform/qmldir
   "$(dirname "$0")/verify_windows_runtime.sh" "$artifact_dir"
 fi
