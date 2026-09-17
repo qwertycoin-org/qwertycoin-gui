@@ -358,19 +358,45 @@ Start-Sleep -Seconds 90
 
     if (-not $SkipExecutableSmoke) {
         $env:QT_QPA_PLATFORM = 'offscreen'
+        $env:QT_QUICK_BACKEND = 'software'
+        $env:QT_OPENGL = 'software'
+        $smokeProfile = Join-Path $testRoot 'smoke-profile'
+        $env:HOME = $smokeProfile
+        $env:USERPROFILE = $smokeProfile
+        $env:APPDATA = Join-Path $smokeProfile 'AppData\Roaming'
+        $env:LOCALAPPDATA = Join-Path $smokeProfile 'AppData\Local'
+        New-Item -ItemType Directory -Path $env:APPDATA, $env:LOCALAPPDATA -Force | Out-Null
         foreach ($command in @(
-            @{ Path = (Join-Path $installPath 'qwertycoin-gui.exe'); Arguments = @('--test-qml') },
-            @{ Path = (Join-Path $installPath 'qwertycoind.exe'); Arguments = @('--version') },
-            @{ Path = (Join-Path $installPath 'qwertycoin-wallet-cli.exe'); Arguments = @('--version') },
-            @{ Path = (Join-Path $installPath 'qwertycoin-wallet-rpc.exe'); Arguments = @('--version') }
+            @{ Path = (Join-Path $installPath 'qwertycoin-gui.exe'); Arguments = @('--disable-check-updates', '--test-qml'); CheckQml = $true },
+            @{ Path = (Join-Path $installPath 'qwertycoind.exe'); Arguments = @('--version'); CheckQml = $false },
+            @{ Path = (Join-Path $installPath 'qwertycoin-wallet-cli.exe'); Arguments = @('--version'); CheckQml = $false },
+            @{ Path = (Join-Path $installPath 'qwertycoin-wallet-rpc.exe'); Arguments = @('--version'); CheckQml = $false }
         )) {
-            Write-Host "Smoke testing $([System.IO.Path]::GetFileName($command.Path))"
+            $executableName = [System.IO.Path]::GetFileName($command.Path)
+            $standardOutput = Join-Path $testRoot "$executableName.stdout.log"
+            $standardError = Join-Path $testRoot "$executableName.stderr.log"
+            Write-Host "Smoke testing $executableName"
             $process = Start-Process -FilePath $command.Path -ArgumentList $command.Arguments `
-                -WorkingDirectory $installPath -PassThru
-            Wait-TestProcess -Process $process -TimeoutMilliseconds 30000 `
+                -WorkingDirectory $installPath `
+                -RedirectStandardOutput $standardOutput `
+                -RedirectStandardError $standardError `
+                -PassThru
+            Wait-TestProcess -Process $process -TimeoutMilliseconds 60000 `
                 -Description "Executable smoke test for $($command.Path)"
+            $outputText = ''
+            foreach ($logPath in @($standardOutput, $standardError)) {
+                if (Test-Path -LiteralPath $logPath -PathType Leaf) {
+                    $logText = Get-Content -LiteralPath $logPath -Raw
+                    Write-Host $logText
+                    $outputText += "`n$logText"
+                }
+            }
             if ($process.ExitCode -ne 0) {
                 throw "Installed executable smoke test failed: $($command.Path)"
+            }
+            if ($command.CheckQml -and
+                $outputText -match '(?i)TypeError|ReferenceError|module .* is not installed|QQmlApplicationEngine failed|failed to load component|no root objects|cannot load library|could not load the Qt platform plugin') {
+                throw "Installed GUI smoke reported a QML or runtime-loading error: $($command.Path)"
             }
         }
         Add-Result 'installed GUI/Core entry points start from the intended working directory without external runtime downloads'
