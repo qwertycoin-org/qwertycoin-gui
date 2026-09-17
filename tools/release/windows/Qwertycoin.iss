@@ -32,7 +32,7 @@
   #error RepositoryRoot is required
 #endif
 
-#define AppIdValue "{BEBB425B-5F3A-4F6C-AC09-DE09BE430880}"
+#define AppIdValue "{{BEBB425B-5F3A-4F6C-AC09-DE09BE430880}"
 #define InstallerRegistryKey "Software\Qwertycoin\Installer"
 #define InstalledManifestName "program-files-v1.sha256"
 
