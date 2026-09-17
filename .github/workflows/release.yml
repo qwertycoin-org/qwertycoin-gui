@@ -395,7 +395,7 @@ jobs:
           }
           "INNO_ISCC=$iscc" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-      - name: Compile installer contract before the native build
+      - name: Verify installer contract before the native build
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
@@ -409,6 +409,8 @@ jobs:
             'qwertycoind.exe',
             'qwertycoin-wallet-cli.exe',
             'qwertycoin-wallet-rpc.exe',
+            'Qt5Core.dll',
+            'Qt5Svg.dll',
             'platforms\qwindows.dll'
           )) {
             [System.IO.File]::WriteAllText((Join-Path $package $file), "contract fixture $file")
@@ -436,6 +438,14 @@ jobs:
           if (-not (Test-Path -LiteralPath (Join-Path $output "$artifact-setup.exe") -PathType Leaf)) {
             throw 'Installer contract did not produce an executable'
           }
+          tools/release/windows/test_windows_installer.ps1 `
+            -PackageDir $package `
+            -ArtifactName $artifact `
+            -Version $env:QWC_GUI_VERSION `
+            -SetupPath (Join-Path $output "$artifact-setup.exe") `
+            -IsccPath $env:INNO_ISCC `
+            -ReportPath (Join-Path $fixtureRoot 'contract-test-report.md') `
+            -SkipExecutableSmoke
           Remove-Item -LiteralPath $fixtureRoot -Recurse -Force
 
       - name: Restore compiler cache

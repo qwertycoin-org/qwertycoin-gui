@@ -16,7 +16,9 @@ param(
     [string]$IsccPath,
 
     [Parameter(Mandatory = $true)]
-    [string]$ReportPath
+    [string]$ReportPath,
+
+    [switch]$SkipExecutableSmoke
 )
 
 $ErrorActionPreference = 'Stop'
@@ -119,24 +121,31 @@ function Assert-Shortcut {
 }
 
 function Find-UninstallEntries {
+    # Inno Setup derives the uninstall key from the stable AppId and appends
+    # _is1.  Query that exact key instead of guessing from optional ARP values
+    # or scanning unrelated software entries.
+    $uninstallSubkey = '{BEBB425B-5F3A-4F6C-AC09-DE09BE430880}_is1'
     $roots = @(
         'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall',
         'HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall'
     )
     $entries = @()
     foreach ($root in $roots) {
-        if (Test-Path -LiteralPath $root) {
-            $entries += Get-ChildItem -LiteralPath $root | ForEach-Object {
-                Get-ItemProperty -LiteralPath $_.PSPath
-            } | Where-Object {
-                $displayName = $_.PSObject.Properties['DisplayName']
-                $installLocation = $_.PSObject.Properties['InstallLocation']
-                $null -ne $displayName -and
-                $displayName.Value -eq 'Qwertycoin' -and
-                $null -ne $installLocation -and
-                $installLocation.Value -and
-                ([System.IO.Path]::GetFullPath($installLocation.Value) -eq [System.IO.Path]::GetFullPath($installPath))
+        $entryPath = Join-Path $root $uninstallSubkey
+        if (Test-Path -LiteralPath $entryPath) {
+            $entry = Get-ItemProperty -LiteralPath $entryPath
+            $displayName = $entry.PSObject.Properties['DisplayName']
+            $appPath = $entry.PSObject.Properties['Inno Setup: App Path']
+            if ($null -eq $displayName -or $displayName.Value -ne 'Qwertycoin') {
+                throw "Installed-app entry has an unexpected DisplayName: $entryPath"
             }
+            if ($null -eq $appPath -or -not $appPath.Value) {
+                throw "Installed-app entry is missing Inno Setup: App Path: $entryPath"
+            }
+            if ([System.IO.Path]::GetFullPath($appPath.Value) -ne [System.IO.Path]::GetFullPath($installPath)) {
+                throw "Installed-app entry points to an unexpected directory: $entryPath"
+            }
+            $entries += $entry
         }
     }
     return @($entries)
@@ -323,20 +332,22 @@ Start-Sleep -Seconds 90
         $lockProcess.WaitForExit()
     }
 
-    $env:QT_QPA_PLATFORM = 'offscreen'
-    foreach ($command in @(
-        @{ Path = (Join-Path $installPath 'qwertycoin-gui.exe'); Arguments = @('--help') },
-        @{ Path = (Join-Path $installPath 'qwertycoind.exe'); Arguments = @('--version') },
-        @{ Path = (Join-Path $installPath 'qwertycoin-wallet-cli.exe'); Arguments = @('--version') },
-        @{ Path = (Join-Path $installPath 'qwertycoin-wallet-rpc.exe'); Arguments = @('--version') }
-    )) {
-        $process = Start-Process -FilePath $command.Path -ArgumentList $command.Arguments `
-            -WorkingDirectory $installPath -Wait -PassThru
-        if ($process.ExitCode -ne 0) {
-            throw "Installed executable smoke test failed: $($command.Path)"
+    if (-not $SkipExecutableSmoke) {
+        $env:QT_QPA_PLATFORM = 'offscreen'
+        foreach ($command in @(
+            @{ Path = (Join-Path $installPath 'qwertycoin-gui.exe'); Arguments = @('--help') },
+            @{ Path = (Join-Path $installPath 'qwertycoind.exe'); Arguments = @('--version') },
+            @{ Path = (Join-Path $installPath 'qwertycoin-wallet-cli.exe'); Arguments = @('--version') },
+            @{ Path = (Join-Path $installPath 'qwertycoin-wallet-rpc.exe'); Arguments = @('--version') }
+        )) {
+            $process = Start-Process -FilePath $command.Path -ArgumentList $command.Arguments `
+                -WorkingDirectory $installPath -Wait -PassThru
+            if ($process.ExitCode -ne 0) {
+                throw "Installed executable smoke test failed: $($command.Path)"
+            }
         }
+        Add-Result 'installed GUI/Core entry points start from the intended working directory without external runtime downloads'
     }
-    Add-Result 'installed GUI/Core entry points start from the intended working directory without external runtime downloads'
 
     Remove-TestInstallation
     Assert-UserDataDigests -Expected $userDigests
