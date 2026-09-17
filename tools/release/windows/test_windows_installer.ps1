@@ -129,9 +129,13 @@ function Find-UninstallEntries {
             $entries += Get-ChildItem -LiteralPath $root | ForEach-Object {
                 Get-ItemProperty -LiteralPath $_.PSPath
             } | Where-Object {
-                $_.DisplayName -eq 'Qwertycoin' -and
-                $_.InstallLocation -and
-                ([System.IO.Path]::GetFullPath($_.InstallLocation) -eq [System.IO.Path]::GetFullPath($installPath))
+                $displayName = $_.PSObject.Properties['DisplayName']
+                $installLocation = $_.PSObject.Properties['InstallLocation']
+                $null -ne $displayName -and
+                $displayName.Value -eq 'Qwertycoin' -and
+                $null -ne $installLocation -and
+                $installLocation.Value -and
+                ([System.IO.Path]::GetFullPath($installLocation.Value) -eq [System.IO.Path]::GetFullPath($installPath))
             }
         }
     }
