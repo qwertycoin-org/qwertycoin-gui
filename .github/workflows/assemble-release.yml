@@ -153,7 +153,11 @@ jobs:
 
       - name: Self-test archive verifier
         shell: bash
-        run: python3 -m unittest tools/release/tests/test_verify_candidate_archive.py
+        run: |
+          python3 -m unittest \
+            tools/release/tests/test_compare_bundle_trees.py \
+            tools/release/tests/test_verify_candidate_archive.py \
+            tools/release/tests/test_validate_candidate_files.py
 
       - name: Download Linux candidate
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
@@ -187,15 +191,22 @@ jobs:
         run: |
           set -euo pipefail
           mkdir release-assets verified
-          test "$(find incoming/linux -maxdepth 1 -type f | wc -l)" -eq 2
-          test "$(find incoming/windows -maxdepth 1 -type f | wc -l)" -eq 2
-          test "$(find incoming/macos -maxdepth 1 -type f | wc -l)" -eq 2
-          test "$(find incoming/linux -mindepth 1 -maxdepth 1 | wc -l)" -eq 2
-          test "$(find incoming/windows -mindepth 1 -maxdepth 1 | wc -l)" -eq 2
-          test "$(find incoming/macos -mindepth 1 -maxdepth 1 | wc -l)" -eq 2
-          test -f "incoming/linux/${LINUX_ARTIFACT}.sha256"
-          test -f "incoming/windows/${WINDOWS_ARTIFACT}.sha256"
-          test -f "incoming/macos/${MACOS_ARTIFACT}.sha256"
+          tools/release/validate_candidate_files.py \
+            --directory incoming/linux \
+            --expected "${LINUX_ARTIFACT}.tar.gz" \
+            --expected "${LINUX_ARTIFACT}.sha256"
+          tools/release/validate_candidate_files.py \
+            --directory incoming/windows \
+            --expected "${WINDOWS_ARTIFACT}.zip" \
+            --expected "${WINDOWS_ARTIFACT}.sha256"
+          tools/release/validate_candidate_files.py \
+            --directory incoming/macos \
+            --expected "${MACOS_ARTIFACT}.tar.gz" \
+            --expected "${MACOS_ARTIFACT}.sha256" \
+            --expected "${MACOS_ARTIFACT}.dmg" \
+            --expected "${MACOS_ARTIFACT}.dmg.sha256" \
+            --checksum-file "${MACOS_ARTIFACT}.dmg.sha256" \
+            --checksum-target "${MACOS_ARTIFACT}.dmg"
 
           tools/release/verify_candidate_archive.py \
             --archive "incoming/linux/${LINUX_ARTIFACT}.tar.gz" \
@@ -236,6 +247,7 @@ jobs:
           cp "incoming/linux/${LINUX_ARTIFACT}.tar.gz" release-assets/
           cp "incoming/windows/${WINDOWS_ARTIFACT}.zip" release-assets/
           cp "incoming/macos/${MACOS_ARTIFACT}.tar.gz" release-assets/
+          cp "incoming/macos/${MACOS_ARTIFACT}.dmg" release-assets/
           (cd release-assets && sha256sum "${ARTIFACT_PREFIX}"-* > SHA256SUMS)
 
       - name: Create immutable release notes
@@ -265,6 +277,12 @@ jobs:
           - Linux x86_64: GLIBC 2.35 ceiling
           - Windows x86_64: portable Qt 5 runtime
           - macOS Apple Silicon: macOS 15 or newer
+
+          macOS installation:
+
+          - Prefer the `${MACOS_ARTIFACT}.dmg` download.
+          - Open the DMG and drag Qwertycoin to Applications. The tarball remains available as an alternative format.
+          - Because the app is currently ad-hoc signed and not notarized, macOS may require **System Settings → Privacy & Security → Open Anyway** after the first launch attempt.
 
           Signing boundary:
 
@@ -310,6 +328,7 @@ jobs:
               "release-assets/${ARTIFACT_PREFIX}-linux-x86_64.tar.gz"
               "release-assets/${ARTIFACT_PREFIX}-windows-x86_64.zip"
               "release-assets/${ARTIFACT_PREFIX}-macos-arm64.tar.gz"
+              "release-assets/${ARTIFACT_PREFIX}-macos-arm64.dmg"
               release-assets/SHA256SUMS
               --repo "$GITHUB_REPOSITORY"
               --target "$EXPECTED_REVISION"
@@ -335,16 +354,19 @@ jobs:
           release=$(gh api "repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}")
           linux_digest="sha256:$(sha256sum "release-assets/${ARTIFACT_PREFIX}-linux-x86_64.tar.gz" | cut -d' ' -f1)"
           windows_digest="sha256:$(sha256sum "release-assets/${ARTIFACT_PREFIX}-windows-x86_64.zip" | cut -d' ' -f1)"
-          macos_digest="sha256:$(sha256sum "release-assets/${ARTIFACT_PREFIX}-macos-arm64.tar.gz" | cut -d' ' -f1)"
+          macos_tar_digest="sha256:$(sha256sum "release-assets/${ARTIFACT_PREFIX}-macos-arm64.tar.gz" | cut -d' ' -f1)"
+          macos_dmg_digest="sha256:$(sha256sum "release-assets/${ARTIFACT_PREFIX}-macos-arm64.dmg" | cut -d' ' -f1)"
           sums_digest="sha256:$(sha256sum release-assets/SHA256SUMS | cut -d' ' -f1)"
           jq -e \
             --arg revision "$EXPECTED_REVISION" \
             --arg linux "${ARTIFACT_PREFIX}-linux-x86_64.tar.gz" \
             --arg windows "${ARTIFACT_PREFIX}-windows-x86_64.zip" \
-            --arg macos "${ARTIFACT_PREFIX}-macos-arm64.tar.gz" \
+            --arg macos_tar "${ARTIFACT_PREFIX}-macos-arm64.tar.gz" \
+            --arg macos_dmg "${ARTIFACT_PREFIX}-macos-arm64.dmg" \
             --arg linux_digest "$linux_digest" \
             --arg windows_digest "$windows_digest" \
-            --arg macos_digest "$macos_digest" \
+            --arg macos_tar_digest "$macos_tar_digest" \
+            --arg macos_dmg_digest "$macos_dmg_digest" \
             --arg sums_digest "$sums_digest" \
             --arg title "$EXPECTED_TITLE" \
             --argjson expected_draft "$EXPECTED_DRAFT" \
@@ -354,11 +376,12 @@ jobs:
              and .draft == $expected_draft
              and .prerelease == $expected_prerelease
              and .target_commitish == $revision
-             and ([.assets[].name] | sort) == (["SHA256SUMS", $linux, $macos, $windows] | sort)
+             and ([.assets[].name] | sort) == (["SHA256SUMS", $linux, $macos_tar, $macos_dmg, $windows] | sort)
              and any(.assets[]; .name == $linux and .state == "uploaded" and .digest == $linux_digest)
              and any(.assets[]; .name == $windows and .state == "uploaded" and .digest == $windows_digest)
-             and any(.assets[]; .name == $macos and .state == "uploaded" and .digest == $macos_digest)
+             and any(.assets[]; .name == $macos_tar and .state == "uploaded" and .digest == $macos_tar_digest)
+             and any(.assets[]; .name == $macos_dmg and .state == "uploaded" and .digest == $macos_dmg_digest)
              and any(.assets[]; .name == "SHA256SUMS" and .state == "uploaded" and .digest == $sums_digest)
              and (.body | contains($revision))' \
             <<<"$release" >/dev/null
-          echo "Release ${RELEASE_TAG} contains the three verified native archives and SHA256SUMS"
+          echo "Release ${RELEASE_TAG} contains four verified native packages and SHA256SUMS"

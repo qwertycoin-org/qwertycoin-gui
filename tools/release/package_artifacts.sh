@@ -44,7 +44,8 @@ for release_binding in "$core_revision" "$core_genesis" "$core_network_id" "$cor
 done
 
 if [[ -e "$output_dir/$artifact_name" || -e "$output_dir/$artifact_name.sha256" \
-      || -e "$output_dir/$artifact_name.tar.gz" || -e "$output_dir/$artifact_name.zip" ]]; then
+      || -e "$output_dir/$artifact_name.tar.gz" || -e "$output_dir/$artifact_name.zip" \
+      || -e "$output_dir/$artifact_name.dmg" || -e "$output_dir/$artifact_name.dmg.sha256" ]]; then
   echo "refusing to reuse an existing artifact path: $output_dir/$artifact_name" >&2
   exit 1
 fi

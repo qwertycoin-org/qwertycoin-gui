@@ -134,6 +134,14 @@ tools/release/package_artifacts.sh \
   build/gui-review qwertycoin-gui-linux-x86_64-review dist
 ```
 
+The macOS release job keeps that verified tarball and additionally creates a
+compressed, read-only drag-and-drop DMG from the same packaged app bundle. The
+DMG presents **Qwertycoin.app** beside an **Applications** link and retains
+build metadata and licenses under **Documentation**. No second compile is
+performed. For local packaging from an existing verified macOS package, use
+`tools/release/create_macos_dmg.sh`; see the
+[native release guide](docs/RELEASE_CANDIDATE_BUILDS.md#create-a-dmg-from-an-existing-verified-package).
+
 One manual release-candidate workflow is available at
 `.github/workflows/release.yml`. It accepts only an explicit 40-character GUI
 commit SHA and builds one selected platform per invocation; pushes, pull
@@ -141,7 +149,9 @@ requests and tags do not start it. The normal build and Flatpak templates remain
 disabled. See [manual release-candidate builds](docs/RELEASE_CANDIDATE_BUILDS.md)
 for the review sequence and artifact checks. Windows code signing, macOS
 Developer ID signing/notarization and publication remain separate release
-tasks.
+tasks. The current ad-hoc-signed macOS build may require **System Settings →
+Privacy & Security → Open Anyway** after the first launch attempt; the release
+process never removes quarantine metadata or disables Gatekeeper.
 
 ## Deliberately unavailable
 
