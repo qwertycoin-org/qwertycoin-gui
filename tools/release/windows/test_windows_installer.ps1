@@ -40,6 +40,26 @@ function Add-Result {
     $results.Add("- PASS: $Text")
 }
 
+function Wait-TestProcess {
+    param(
+        [System.Diagnostics.Process]$Process,
+        [int]$TimeoutMilliseconds,
+        [string]$Description
+    )
+    if (-not $Process.WaitForExit($TimeoutMilliseconds)) {
+        try {
+            Stop-Process -Id $Process.Id -Force -ErrorAction Stop
+            $Process.WaitForExit()
+        }
+        catch {
+            Write-Warning "Could not stop timed-out process $($Process.Id): $($_.Exception.Message)"
+        }
+        throw "$Description timed out after $TimeoutMilliseconds ms"
+    }
+    # Ensure redirected/native process state, including ExitCode, is complete.
+    $Process.WaitForExit()
+}
+
 function Invoke-Setup {
     param(
         [string]$Executable,
@@ -55,7 +75,9 @@ function Invoke-Setup {
         "/DIR=`"$Destination`"",
         "/LOG=`"$logPath`""
     )
-    $process = Start-Process -FilePath $Executable -ArgumentList $arguments -Wait -PassThru
+    Write-Host "Running setup: $([System.IO.Path]::GetFileName($Executable)); expected failure: $ExpectFailure"
+    $process = Start-Process -FilePath $Executable -ArgumentList $arguments -PassThru
+    Wait-TestProcess -Process $process -TimeoutMilliseconds 300000 -Description 'Setup'
     if ($ExpectFailure) {
         if ($process.ExitCode -eq 0) {
             throw "Setup unexpectedly succeeded; log: $logPath"
@@ -154,9 +176,11 @@ function Find-UninstallEntries {
 function Remove-TestInstallation {
     $uninstaller = Join-Path $installPath '.qwertycoin-installer\uninstall\unins000.exe'
     if (Test-Path -LiteralPath $uninstaller -PathType Leaf) {
+        Write-Host 'Running test uninstaller'
         $process = Start-Process -FilePath $uninstaller -ArgumentList @(
             '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART'
-        ) -Wait -PassThru
+        ) -PassThru
+        Wait-TestProcess -Process $process -TimeoutMilliseconds 180000 -Description 'Uninstaller'
         if ($process.ExitCode -ne 0) {
             throw "Uninstaller failed with exit code $($process.ExitCode)"
         }
@@ -340,8 +364,11 @@ Start-Sleep -Seconds 90
             @{ Path = (Join-Path $installPath 'qwertycoin-wallet-cli.exe'); Arguments = @('--version') },
             @{ Path = (Join-Path $installPath 'qwertycoin-wallet-rpc.exe'); Arguments = @('--version') }
         )) {
+            Write-Host "Smoke testing $([System.IO.Path]::GetFileName($command.Path))"
             $process = Start-Process -FilePath $command.Path -ArgumentList $command.Arguments `
-                -WorkingDirectory $installPath -Wait -PassThru
+                -WorkingDirectory $installPath -PassThru
+            Wait-TestProcess -Process $process -TimeoutMilliseconds 30000 `
+                -Description "Executable smoke test for $($command.Path)"
             if ($process.ExitCode -ne 0) {
                 throw "Installed executable smoke test failed: $($command.Path)"
             }
