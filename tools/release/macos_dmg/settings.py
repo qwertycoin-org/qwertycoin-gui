@@ -28,7 +28,7 @@ symlinks = {"Applications": "/Applications"}
 icon = volume_icon_path
 background = background_path
 
-window_rect = ((120, 120), (700, 420))
+window_rect = ((120, 120), (700, 448))
 default_view = "icon-view"
 show_icon_preview = False
 show_status_bar = False
@@ -48,5 +48,5 @@ icon_size = 110
 icon_locations = {
     "Qwertycoin.app": (150, 210),
     "Applications": (550, 210),
-    "Documentation": (350, 345),
+    "Documentation": (350, 310),
 }
