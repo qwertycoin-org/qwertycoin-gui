@@ -54,7 +54,6 @@ UsePreviousGroup=yes
 UsePreviousLanguage=yes
 UsePreviousTasks=yes
 PrivilegesRequired=admin
-PrivilegesRequiredOverridesAllowed=none
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 CloseApplications=yes
