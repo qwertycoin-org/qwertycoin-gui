@@ -114,7 +114,7 @@ Name: "{app}\.qwertycoin-installer"
 ; Every program file is generated from the already verified Windows package.
 ; ignoreversion is intentionally limited to these private application files so
 ; repair and upgrade always replace the complete package-owned program set.
-#include "{#ProgramFileList}"
+#include ProgramFileList
 Source: "{#ProgramManifest}"; Flags: dontcopy
 Source: "{#ProgramManifest}"; DestDir: "{app}\.qwertycoin-installer"; DestName: "{#InstalledManifestName}"; Flags: ignoreversion
 
