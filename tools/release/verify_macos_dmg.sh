@@ -87,7 +87,7 @@ if [[ ! -L "$mount_dir/Applications" || "$(readlink "$mount_dir/Applications")" 
   exit 65
 fi
 for required_path in \
-  "$mount_dir/.background/background.png" \
+  "$mount_dir/.background.png" \
   "$mount_dir/Documentation/README.md" \
   "$mount_dir/Documentation/LICENSE" \
   "$mount_dir/Documentation/BUILD-INFO.txt" \

@@ -27,7 +27,6 @@ symlinks = {"Applications": "/Applications"}
 
 icon = volume_icon_path
 background = background_path
-background_color = "#f7f0dd"
 
 window_rect = ((120, 120), (700, 420))
 default_view = "icon-view"
