@@ -655,8 +655,7 @@ begin
        'Version', RegisteredVersion) then
       RaiseException(MessageWithPath('TamperedInstallation', AppDirectory));
     if CompareVersions(RegisteredVersion, CurrentVersion) > 0 then
-      RaiseException(FmtMessage(ExpandConstant('{cm:DowngradeBlocked}'),
-        [RegisteredVersion, CurrentVersion]));
+      RaiseException(FmtMessage(ExpandConstant('{cm:DowngradeBlocked}'), [RegisteredVersion, CurrentVersion]));
   end
   else
   begin
