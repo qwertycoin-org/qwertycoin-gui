@@ -222,7 +222,7 @@ try {
     Assert-Shortcut -ShortcutPath $startMenuLink `
         -ExpectedTarget (Join-Path $installPath 'qwertycoin-gui.exe') `
         -ExpectedWorkingDirectory $installPath
-    if ((Find-UninstallEntries).Count -ne 1) {
+    if (@(Find-UninstallEntries).Count -ne 1) {
         throw 'Fresh installation did not create exactly one installed-app entry'
     }
     Add-Result 'fresh all-users installation, desktop/start-menu shortcuts and installed-app entry'
@@ -252,7 +252,7 @@ try {
     if (Test-Path -LiteralPath (Join-Path $installPath 'obsolete-runtime.dll')) {
         throw 'Upgrade retained a package-owned obsolete file'
     }
-    if ((Find-UninstallEntries).Count -ne 1) {
+    if (@(Find-UninstallEntries).Count -ne 1) {
         throw 'Upgrade did not retain exactly one installed-app entry'
     }
     Assert-Shortcut -ShortcutPath $desktopLink `
@@ -346,7 +346,7 @@ Start-Sleep -Seconds 90
             throw "Uninstall retained an installer-owned program file: $relative"
         }
     }
-    if ((Find-UninstallEntries).Count -ne 0) {
+    if (@(Find-UninstallEntries).Count -ne 0) {
         throw 'Uninstall retained the installed-app entry'
     }
     if ((Test-Path -LiteralPath $desktopLink) -or (Test-Path -LiteralPath $startMenuLink)) {
