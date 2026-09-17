@@ -58,7 +58,6 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 CloseApplications=yes
 CloseApplicationsFilter=qwertycoin-gui.exe,qwertycoind.exe,qwertycoin-wallet-cli.exe,qwertycoin-wallet-rpc.exe
-ForceCloseApplications=no
 RestartApplications=no
 RestartIfNeededByRun=no
 SetupLogging=yes
