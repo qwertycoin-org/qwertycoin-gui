@@ -121,7 +121,7 @@ set +e
 env \
   HOME="$smoke_home" \
   TMPDIR="$smoke_tmp" \
-  QT_QPA_PLATFORM=offscreen \
+  QT_QPA_PLATFORM=cocoa \
   QT_QUICK_BACKEND=software \
   "$copied_app/Contents/MacOS/qwertycoin-gui" \
     --disable-check-updates --test-qml >"$smoke_log" 2>&1
