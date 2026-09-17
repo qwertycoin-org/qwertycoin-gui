@@ -15,6 +15,10 @@ monero-wallet-gui_qml_plugin_import.cpp
 *.jsc
 qml_qmlcache.qrc
 
+### Python tooling ###
+__pycache__/
+*.py[cod]
+
 ### macOS metadata ###
 .DS_Store
 .AppleDouble

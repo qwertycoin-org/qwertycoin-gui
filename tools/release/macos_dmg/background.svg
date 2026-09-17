@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="420" viewBox="0 0 700 420">
+  <rect width="700" height="420" fill="#f7f0dd"/>
+  <rect width="700" height="12" fill="#e5ab2d"/>
+  <rect x="18" y="18" width="664" height="384" rx="8" fill="none" stroke="#181818" stroke-width="2"/>
+  <rect x="25" y="25" width="650" height="370" rx="5" fill="none" stroke="#e5ab2d" stroke-width="1"/>
+
+  <text x="350" y="63" text-anchor="middle" fill="#181818"
+        font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="800"
+        letter-spacing="0.8">DRAG QWERTYCOIN TO APPLICATIONS</text>
+  <text x="350" y="88" text-anchor="middle" fill="#5a554b"
+        font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="500"
+        letter-spacing="0.3">Install the wallet with one drag-and-drop</text>
+
+  <path d="M262 191 H409 V174 L451 210 L409 246 V229 H262 Z"
+        fill="#e5ab2d" stroke="#181818" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M281 210 H414" fill="none" stroke="#181818" stroke-width="3"
+        stroke-linecap="round"/>
+
+</svg>

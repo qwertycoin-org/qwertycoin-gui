@@ -220,13 +220,65 @@ jobs:
           cd dist
           shasum -a 256 -c "${ARTIFACT_PREFIX}-macos-arm64.sha256"
 
+      - name: Install pinned DMG packager
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m venv "$RUNNER_TEMP/dmgbuild-venv"
+          "$RUNNER_TEMP/dmgbuild-venv/bin/pip" install \
+            --require-hashes -r tools/release/dmgbuild-requirements.txt
+          echo "DMGBUILD_BIN=$RUNNER_TEMP/dmgbuild-venv/bin/dmgbuild" >> "$GITHUB_ENV"
+
+      - name: Create and verify read-only drag-and-drop DMG
+        shell: bash
+        run: |
+          set -euo pipefail
+          artifact="${ARTIFACT_PREFIX}-macos-arm64"
+          tools/release/create_macos_dmg.sh "dist/$artifact" "$artifact" dist
+          tools/release/verify_macos_dmg.sh "dist/$artifact.dmg" "dist/$artifact"
+
+          mkdir macos-candidate
+          cp \
+            "dist/$artifact.tar.gz" \
+            "dist/$artifact.sha256" \
+            "dist/$artifact.dmg" \
+            "dist/$artifact.dmg.sha256" \
+            macos-candidate/
+          tools/release/validate_candidate_files.py \
+            --directory macos-candidate \
+            --expected "$artifact.tar.gz" \
+            --expected "$artifact.sha256" \
+            --expected "$artifact.dmg" \
+            --expected "$artifact.dmg.sha256" \
+            --checksum-file "$artifact.dmg.sha256" \
+            --checksum-target "$artifact.dmg"
+
+      - name: Capture Finder layout for native review
+        shell: bash
+        run: |
+          set -euo pipefail
+          artifact="${ARTIFACT_PREFIX}-macos-arm64"
+          mkdir finder-review
+          tools/release/capture_macos_dmg_layout.sh \
+            "dist/$artifact.dmg" "finder-review/$artifact-finder.png"
+
       - name: Upload review artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: ${{ env.ARTIFACT_PREFIX }}-macos-arm64
           path: |
-            dist/${{ env.ARTIFACT_PREFIX }}-macos-arm64.tar.gz
-            dist/${{ env.ARTIFACT_PREFIX }}-macos-arm64.sha256
+            macos-candidate/${{ env.ARTIFACT_PREFIX }}-macos-arm64.tar.gz
+            macos-candidate/${{ env.ARTIFACT_PREFIX }}-macos-arm64.sha256
+            macos-candidate/${{ env.ARTIFACT_PREFIX }}-macos-arm64.dmg
+            macos-candidate/${{ env.ARTIFACT_PREFIX }}-macos-arm64.dmg.sha256
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload Finder review artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ${{ env.ARTIFACT_PREFIX }}-macos-arm64-finder-layout
+          path: finder-review/${{ env.ARTIFACT_PREFIX }}-macos-arm64-finder.png
           if-no-files-found: error
           retention-days: 7
 
