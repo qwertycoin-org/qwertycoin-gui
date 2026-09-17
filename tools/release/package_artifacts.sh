@@ -246,6 +246,7 @@ if [[ "${RUNNER_OS:-}" == "Windows" ]]; then
   require_file "Qt GUI DLL" Qt5Gui.dll
   require_file "Qt QML DLL" Qt5Qml.dll
   require_file "Qt Quick DLL" Qt5Quick.dll
+  require_file "Qt Multimedia DLL" Qt5Multimedia.dll
   require_file "ANGLE EGL runtime" libEGL.dll
   require_file "ANGLE OpenGL ES runtime" libGLESv2.dll
   require_file "Unbound runtime" libunbound-8.dll
@@ -261,6 +262,9 @@ if [[ "${RUNNER_OS:-}" == "Windows" ]]; then
   require_file "Qt Quick Controls 2 QML module" QtQuick/Controls.2/qmldir qml/QtQuick/Controls.2/qmldir
   require_file "Qt Quick Layouts QML module" QtQuick/Layouts/qmldir qml/QtQuick/Layouts/qmldir
   require_file "Qt Graphical Effects QML module" QtGraphicalEffects/qmldir qml/QtGraphicalEffects/qmldir
+  require_file "Qt Multimedia QML module" QtMultimedia/qmldir qml/QtMultimedia/qmldir
+  require_file "Qt Multimedia QML plugin" QtMultimedia/declarative_multimedia.dll qml/QtMultimedia/declarative_multimedia.dll
+  require_file "Qt Windows multimedia service" mediaservice/wmfengine.dll mediaservice/dsengine.dll
   require_file "Qt Labs Platform QML module" Qt/labs/platform/qmldir qml/Qt/labs/platform/qmldir
   "$(dirname "$0")/verify_windows_runtime.sh" "$artifact_dir"
 fi

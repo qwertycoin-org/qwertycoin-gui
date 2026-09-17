@@ -183,11 +183,14 @@ def require_payload(root: Path, platform: str) -> None:
             "qwertycoind.exe",
             "qwertycoin-wallet-cli.exe",
             "qwertycoin-wallet-rpc.exe",
+            "Qt5Multimedia.dll",
             "platforms/qwindows.dll",
             "imageformats/qsvg.dll",
             "QtQuick/Controls/qtquickcontrolsplugin.dll",
             "QtQuick/Controls.2/qtquickcontrols2plugin.dll",
             "QtGraphicalEffects/qmldir",
+            "QtMultimedia/qmldir",
+            "QtMultimedia/declarative_multimedia.dll",
             "Qt/labs/platform/qtlabsplatformplugin.dll",
         ]
     else:

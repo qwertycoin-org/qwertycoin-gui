@@ -335,6 +335,7 @@ jobs:
             mingw-w64-x86_64-qt5-base
             mingw-w64-x86_64-qt5-declarative
             mingw-w64-x86_64-qt5-graphicaleffects
+            mingw-w64-x86_64-qt5-multimedia
             mingw-w64-x86_64-qt5-quickcontrols
             mingw-w64-x86_64-qt5-quickcontrols2
             mingw-w64-x86_64-qt5-svg

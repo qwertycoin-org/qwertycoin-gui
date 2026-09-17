@@ -54,7 +54,7 @@ class ArchivePathTests(unittest.TestCase):
                 lambda: VERIFY.verify_release_readme(readme, expected_core)
             )
 
-    def test_windows_payload_requires_graphical_effects(self) -> None:
+    def test_windows_payload_requires_all_runtime_qml_modules(self) -> None:
         required = (
             "qwertycoin-gui.exe",
             "qwertycoind.exe",
@@ -80,6 +80,17 @@ class ArchivePathTests(unittest.TestCase):
             graphical_effects.write_text(
                 "module QtGraphicalEffects\n", encoding="utf-8"
             )
+
+            self.assert_rejected(lambda: VERIFY.require_payload(root, "windows"))
+
+            for relative in (
+                "Qt5Multimedia.dll",
+                "QtMultimedia/qmldir",
+                "QtMultimedia/declarative_multimedia.dll",
+            ):
+                candidate = root / relative
+                candidate.parent.mkdir(parents=True, exist_ok=True)
+                candidate.write_bytes(b"fixture")
             VERIFY.require_payload(root, "windows")
 
 
