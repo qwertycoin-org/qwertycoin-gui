@@ -65,7 +65,10 @@ It also validates the platform runtime:
   Platform QML modules produced by `macdeployqt`, rejects Homebrew/runner
   dependency paths and runtime search paths, verifies every bundled Mach-O is
   ARM64 with a deployment target no newer than macOS 15, and verifies the
-  ad-hoc bundle signature. After that package check, the workflow uses the
+  ad-hoc bundle signature. The deploy step also closes third-party transitive
+  dylib dependencies inside `Contents/Frameworks`, and package verification
+  rejects every remaining non-system dependency that cannot resolve inside the
+  app. After that package check, the workflow uses the
   already packaged app bundle to create the DMG; it does not compile the wallet
   a second time.
 

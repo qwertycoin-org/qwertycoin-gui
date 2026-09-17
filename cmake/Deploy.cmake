@@ -68,6 +68,22 @@ if(APPLE OR (WIN32 AND NOT STATIC))
             )
         endif()
 
+        # macdeployqt does not always follow third-party transitive dylib
+        # dependencies (notably newer Boost and WebP releases). Complete and
+        # verify the runtime closure before install-name normalization and the
+        # final ad-hoc signature.
+        get_filename_component(_qt_prefix "${_qt_bin_dir}" DIRECTORY)
+        get_filename_component(_package_opt_dir "${_qt_prefix}" DIRECTORY)
+        get_filename_component(_package_prefix "${_package_opt_dir}" DIRECTORY)
+        add_custom_command(TARGET deploy
+                           POST_BUILD
+                           COMMAND "${CMAKE_SOURCE_DIR}/tools/release/complete_macos_runtime.sh"
+                                   "$<TARGET_FILE_DIR:qwertycoin-gui>/../.."
+                                   "${_package_prefix}/lib"
+                                   "${_qt_prefix}/lib"
+                           COMMENT "Completing macOS transitive runtime dependencies..."
+        )
+
         add_custom_command(TARGET deploy
                            POST_BUILD
                            COMMAND "${CMAKE_SOURCE_DIR}/tools/release/normalize_macos_install_ids.sh"

@@ -304,6 +304,7 @@ if [[ "$platform" == "Darwin" ]]; then
     exit 1
   fi
 
+  "$(dirname "$0")/complete_macos_runtime.sh" --verify-only "$mac_bundle"
   codesign --verify --deep --strict "$mac_bundle"
   mac_mach_count=0
   while IFS= read -r -d '' mach_file; do
