@@ -357,7 +357,10 @@ Start-Sleep -Seconds 90
     Add-Result 'a still-locked program file aborts without a mixed install or user-data changes'
 
     if (-not $SkipExecutableSmoke) {
-        $env:QT_QPA_PLATFORM = 'offscreen'
+        # The deployed runtime contains qwindows.dll, not the optional offscreen
+        # platform plugin.  Keep that real platform while forcing software Qt
+        # Quick/OpenGL backends for the headless release smoke.
+        $env:QT_QPA_PLATFORM = 'windows'
         $env:QT_QUICK_BACKEND = 'software'
         $env:QT_OPENGL = 'software'
         $smokeProfile = Join-Path $testRoot 'smoke-profile'
@@ -381,8 +384,14 @@ Start-Sleep -Seconds 90
                 -RedirectStandardOutput $standardOutput `
                 -RedirectStandardError $standardError `
                 -PassThru
-            Wait-TestProcess -Process $process -TimeoutMilliseconds 60000 `
-                -Description "Executable smoke test for $($command.Path)"
+            $processFailure = $null
+            try {
+                Wait-TestProcess -Process $process -TimeoutMilliseconds 60000 `
+                    -Description "Executable smoke test for $($command.Path)"
+            }
+            catch {
+                $processFailure = $_
+            }
             $outputText = ''
             foreach ($logPath in @($standardOutput, $standardError)) {
                 if (Test-Path -LiteralPath $logPath -PathType Leaf) {
@@ -390,6 +399,9 @@ Start-Sleep -Seconds 90
                     Write-Host $logText
                     $outputText += "`n$logText"
                 }
+            }
+            if ($null -ne $processFailure) {
+                throw $processFailure
             }
             if ($process.ExitCode -ne 0) {
                 throw "Installed executable smoke test failed: $($command.Path)"
