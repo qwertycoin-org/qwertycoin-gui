@@ -76,90 +76,6 @@ jobs:
           tools/check_source_tree_clean.sh
           test "$(git -C qwertycoin rev-parse HEAD)" = "$(git rev-parse HEAD:qwertycoin)"
 
-          version_major=$(sed -nE 's/^set\(VERSION_MAJOR "([0-9]+)"\)$/\1/p' CMakeLists.txt)
-          version_minor=$(sed -nE 's/^set\(VERSION_MINOR "([0-9]+)"\)$/\1/p' CMakeLists.txt)
-          version_revision=$(sed -nE 's/^set\(VERSION_REVISION "([0-9]+)"\)$/\1/p' CMakeLists.txt)
-          test -n "$version_major" && test -n "$version_minor" && test -n "$version_revision"
-          echo "QWC_GUI_VERSION=${version_major}.${version_minor}.${version_revision}" >> "$GITHUB_ENV"
-
-      - name: Install pinned Inno Setup compiler
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
-          $version = '7.1.0'
-          $asset = "innosetup-$version-x64.exe"
-          $assetPath = Join-Path $env:RUNNER_TEMP $asset
-          $expectedHash = '0362a383ed217d4c4239b5933866dd96d3eb2102737da92f80f6057a4b40df2f'
-          Invoke-WebRequest `
-            -Uri "https://github.com/jrsoftware/issrc/releases/download/is-7_1_0/$asset" `
-            -OutFile $assetPath
-          $actualHash = (Get-FileHash -LiteralPath $assetPath -Algorithm SHA256).Hash.ToLowerInvariant()
-          if ($actualHash -ne $expectedHash) {
-            throw "Inno Setup digest mismatch: $actualHash"
-          }
-          $signature = Get-AuthenticodeSignature -LiteralPath $assetPath
-          if ($signature.Status -ne 'Valid') {
-            throw "Inno Setup Authenticode verification failed: $($signature.Status)"
-          }
-          $installRoot = Join-Path $env:RUNNER_TEMP "inno-$version"
-          $process = Start-Process -FilePath $assetPath -ArgumentList @(
-            '/VERYSILENT',
-            '/SUPPRESSMSGBOXES',
-            '/NORESTART',
-            "/DIR=`"$installRoot`""
-          ) -Wait -PassThru
-          if ($process.ExitCode -ne 0) {
-            throw "Inno Setup installation failed: $($process.ExitCode)"
-          }
-          $iscc = Join-Path $installRoot 'ISCC.exe'
-          if (-not (Test-Path -LiteralPath $iscc -PathType Leaf)) {
-            throw 'Pinned Inno Setup compiler was not installed'
-          }
-          "INNO_ISCC=$iscc" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-
-      - name: Compile installer contract before the native build
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
-          $fixtureRoot = Join-Path $env:RUNNER_TEMP 'qwertycoin-installer-contract'
-          $artifact = "qwertycoin-gui-v$env:QWC_GUI_VERSION-windows-x86_64"
-          $package = Join-Path $fixtureRoot $artifact
-          $output = Join-Path $fixtureRoot 'output'
-          New-Item -ItemType Directory -Path (Join-Path $package 'platforms') -Force | Out-Null
-          foreach ($file in @(
-            'qwertycoin-gui.exe',
-            'qwertycoind.exe',
-            'qwertycoin-wallet-cli.exe',
-            'qwertycoin-wallet-rpc.exe',
-            'platforms\qwindows.dll'
-          )) {
-            [System.IO.File]::WriteAllText((Join-Path $package $file), "contract fixture $file")
-          }
-          Copy-Item -LiteralPath LICENSE, README.md -Destination $package
-          $coreRevision = (git rev-parse HEAD:qwertycoin).Trim()
-          [System.IO.File]::WriteAllLines(
-            (Join-Path $package 'BUILD-INFO.txt'),
-            @(
-              "source_revision=$env:EXPECTED_REVISION",
-              "core_revision=$coreRevision",
-              "app_version=$env:QWC_GUI_VERSION",
-              'runner_os=Windows',
-              'runner_arch=X64',
-              'qt_version=contract-fixture'
-            ),
-            [System.Text.UTF8Encoding]::new($false)
-          )
-          tools/release/windows/create_windows_installer.ps1 `
-            -PackageDir $package `
-            -ArtifactName $artifact `
-            -Version $env:QWC_GUI_VERSION `
-            -OutputDir $output `
-            -IsccPath $env:INNO_ISCC
-          if (-not (Test-Path -LiteralPath (Join-Path $output "$artifact-setup.exe") -PathType Leaf)) {
-            throw 'Installer contract did not produce an executable'
-          }
-          Remove-Item -LiteralPath $fixtureRoot -Recurse -Force
-
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -437,6 +353,90 @@ jobs:
           tools/check_core_pin.sh
           tools/check_source_tree_clean.sh
           test "$(git -C qwertycoin rev-parse HEAD)" = "$(git rev-parse HEAD:qwertycoin)"
+
+          version_major=$(sed -nE 's/^set\(VERSION_MAJOR "([0-9]+)"\)$/\1/p' CMakeLists.txt)
+          version_minor=$(sed -nE 's/^set\(VERSION_MINOR "([0-9]+)"\)$/\1/p' CMakeLists.txt)
+          version_revision=$(sed -nE 's/^set\(VERSION_REVISION "([0-9]+)"\)$/\1/p' CMakeLists.txt)
+          test -n "$version_major" && test -n "$version_minor" && test -n "$version_revision"
+          echo "QWC_GUI_VERSION=${version_major}.${version_minor}.${version_revision}" >> "$GITHUB_ENV"
+
+      - name: Install pinned Inno Setup compiler
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $version = '7.1.0'
+          $asset = "innosetup-$version-x64.exe"
+          $assetPath = Join-Path $env:RUNNER_TEMP $asset
+          $expectedHash = '0362a383ed217d4c4239b5933866dd96d3eb2102737da92f80f6057a4b40df2f'
+          Invoke-WebRequest `
+            -Uri "https://github.com/jrsoftware/issrc/releases/download/is-7_1_0/$asset" `
+            -OutFile $assetPath
+          $actualHash = (Get-FileHash -LiteralPath $assetPath -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($actualHash -ne $expectedHash) {
+            throw "Inno Setup digest mismatch: $actualHash"
+          }
+          $signature = Get-AuthenticodeSignature -LiteralPath $assetPath
+          if ($signature.Status -ne 'Valid') {
+            throw "Inno Setup Authenticode verification failed: $($signature.Status)"
+          }
+          $installRoot = Join-Path $env:RUNNER_TEMP "inno-$version"
+          $process = Start-Process -FilePath $assetPath -ArgumentList @(
+            '/VERYSILENT',
+            '/SUPPRESSMSGBOXES',
+            '/NORESTART',
+            "/DIR=`"$installRoot`""
+          ) -Wait -PassThru
+          if ($process.ExitCode -ne 0) {
+            throw "Inno Setup installation failed: $($process.ExitCode)"
+          }
+          $iscc = Join-Path $installRoot 'ISCC.exe'
+          if (-not (Test-Path -LiteralPath $iscc -PathType Leaf)) {
+            throw 'Pinned Inno Setup compiler was not installed'
+          }
+          "INNO_ISCC=$iscc" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Compile installer contract before the native build
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $fixtureRoot = Join-Path $env:RUNNER_TEMP 'qwertycoin-installer-contract'
+          $artifact = "qwertycoin-gui-v$env:QWC_GUI_VERSION-windows-x86_64"
+          $package = Join-Path $fixtureRoot $artifact
+          $output = Join-Path $fixtureRoot 'output'
+          New-Item -ItemType Directory -Path (Join-Path $package 'platforms') -Force | Out-Null
+          foreach ($file in @(
+            'qwertycoin-gui.exe',
+            'qwertycoind.exe',
+            'qwertycoin-wallet-cli.exe',
+            'qwertycoin-wallet-rpc.exe',
+            'platforms\qwindows.dll'
+          )) {
+            [System.IO.File]::WriteAllText((Join-Path $package $file), "contract fixture $file")
+          }
+          Copy-Item -LiteralPath LICENSE, README.md -Destination $package
+          $coreRevision = (git rev-parse HEAD:qwertycoin).Trim()
+          [System.IO.File]::WriteAllLines(
+            (Join-Path $package 'BUILD-INFO.txt'),
+            @(
+              "source_revision=$env:EXPECTED_REVISION",
+              "core_revision=$coreRevision",
+              "app_version=$env:QWC_GUI_VERSION",
+              'runner_os=Windows',
+              'runner_arch=X64',
+              'qt_version=contract-fixture'
+            ),
+            [System.Text.UTF8Encoding]::new($false)
+          )
+          tools/release/windows/create_windows_installer.ps1 `
+            -PackageDir $package `
+            -ArtifactName $artifact `
+            -Version $env:QWC_GUI_VERSION `
+            -OutputDir $output `
+            -IsccPath $env:INNO_ISCC
+          if (-not (Test-Path -LiteralPath (Join-Path $output "$artifact-setup.exe") -PathType Leaf)) {
+            throw 'Installer contract did not produce an executable'
+          }
+          Remove-Item -LiteralPath $fixtureRoot -Recurse -Force
 
       - name: Restore compiler cache
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
