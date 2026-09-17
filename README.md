@@ -142,6 +142,14 @@ performed. For local packaging from an existing verified macOS package, use
 `tools/release/create_macos_dmg.sh`; see the
 [native release guide](docs/RELEASE_CANDIDATE_BUILDS.md#create-a-dmg-from-an-existing-verified-package).
 
+The Windows job keeps the same verified portable ZIP and additionally creates
+an all-users Inno Setup installer from that exact package, without a second
+compile. Its stable AppId supports upgrade and same-version repair while an
+authenticated program-file manifest limits replacement and obsolete-file
+cleanup to installer-owned files. Wallets, settings, blockchain data, EPoSE
+keystores and unknown files are retained by updates and uninstall. See the
+[Windows installer data boundary](docs/WINDOWS_INSTALLER.md).
+
 One manual release-candidate workflow is available at
 `.github/workflows/release.yml`. It accepts only an explicit 40-character GUI
 commit SHA and builds one selected platform per invocation; pushes, pull
