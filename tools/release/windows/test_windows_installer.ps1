@@ -359,7 +359,7 @@ Start-Sleep -Seconds 90
     if (-not $SkipExecutableSmoke) {
         $env:QT_QPA_PLATFORM = 'offscreen'
         foreach ($command in @(
-            @{ Path = (Join-Path $installPath 'qwertycoin-gui.exe'); Arguments = @('--help') },
+            @{ Path = (Join-Path $installPath 'qwertycoin-gui.exe'); Arguments = @('--test-qml') },
             @{ Path = (Join-Path $installPath 'qwertycoind.exe'); Arguments = @('--version') },
             @{ Path = (Join-Path $installPath 'qwertycoin-wallet-cli.exe'); Arguments = @('--version') },
             @{ Path = (Join-Path $installPath 'qwertycoin-wallet-rpc.exe'); Arguments = @('--version') }
