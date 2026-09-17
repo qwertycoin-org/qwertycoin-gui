@@ -319,11 +319,6 @@ Start-Sleep -Seconds 90
             Start-Sleep -Milliseconds 100
         }
         Invoke-Setup -Executable $currentSetupPath -Destination $installPath -ExpectFailure | Out-Null
-        if ((Get-FileHash -LiteralPath (Join-Path $installPath 'Qt5Core.dll') -Algorithm SHA256).Hash -ne $oldQtHash) {
-            throw 'Locked-file failure changed the locked program file'
-        }
-        Assert-UserDataDigests -Expected $userDigests
-        Add-Result 'a still-locked program file aborts without a mixed install or user-data changes'
     }
     finally {
         if (-not $lockProcess.HasExited) {
@@ -331,6 +326,11 @@ Start-Sleep -Seconds 90
         }
         $lockProcess.WaitForExit()
     }
+    if ((Get-FileHash -LiteralPath (Join-Path $installPath 'Qt5Core.dll') -Algorithm SHA256).Hash -ne $oldQtHash) {
+        throw 'Locked-file failure changed the locked program file'
+    }
+    Assert-UserDataDigests -Expected $userDigests
+    Add-Result 'a still-locked program file aborts without a mixed install or user-data changes'
 
     if (-not $SkipExecutableSmoke) {
         $env:QT_QPA_PLATFORM = 'offscreen'
