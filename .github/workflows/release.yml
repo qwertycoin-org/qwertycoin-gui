@@ -6,7 +6,7 @@ on:
       release_name:
         description: "Safe artifact prefix (letters, numbers, dot, underscore, hyphen)"
         required: true
-        default: "qwertycoin-gui-v2.0.1"
+        default: "qwertycoin-gui-v2.0.2"
         type: string
       expected_revision:
         description: "Exact 40-character GUI commit SHA to build"
