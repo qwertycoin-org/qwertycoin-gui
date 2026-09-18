@@ -128,6 +128,43 @@ find_dependency_source() {
   return 1
 }
 
+framework_root_from_path() {
+  local path=$1 current
+  current=$path
+  while [[ "$current" != / && "$current" != . ]]; do
+    if [[ "$(basename "$current")" == *.framework ]]; then
+      printf '%s\n' "$current"
+      return 0
+    fi
+    current=$(dirname "$current")
+  done
+  return 1
+}
+
+find_framework_source() {
+  local dependency=$1 framework_name direct_root root found
+  direct_root=$(framework_root_from_path "$dependency" || true)
+  if [[ -n "$direct_root" && -d "$direct_root" ]]; then
+    printf '%s\n' "$direct_root"
+    return 0
+  fi
+
+  framework_name=$(printf '%s\n' "$dependency" | sed -nE 's#.*\/([^/]+\.framework)\/.*#\1#p')
+  [[ -n "$framework_name" ]] || return 1
+  for root in "${search_roots[@]}"; do
+    if [[ -d "$root/$framework_name" ]]; then
+      printf '%s\n' "$root/$framework_name"
+      return 0
+    fi
+    found=$(find -L "$root" -maxdepth 5 -type d -name "$framework_name" -print -quit 2>/dev/null || true)
+    if [[ -n "$found" ]]; then
+      printf '%s\n' "$found"
+      return 0
+    fi
+  done
+  return 1
+}
+
 copied_total=0
 rewritten_total=0
 iteration=0
@@ -152,6 +189,36 @@ while :; do
       if [[ "$verify_only" == true ]]; then
         echo "unresolved bundled dependency: $dependency ($mach_file)" >&2
         unresolved_this_pass=$((unresolved_this_pass + 1))
+        continue
+      fi
+
+      if [[ "$dependency" =~ /([^/]+\.framework)/(.+)$ ]]; then
+        framework_name=${BASH_REMATCH[1]}
+        framework_suffix=${BASH_REMATCH[2]}
+        source_framework=$(find_framework_source "$dependency" || true)
+        if [[ -z "$source_framework" ]]; then
+          echo "unable to locate framework in approved search roots: $dependency ($mach_file)" >&2
+          exit 66
+        fi
+        destination_framework="$frameworks/$framework_name"
+        if [[ ! -e "$destination_framework" ]]; then
+          cp -R "$source_framework" "$destination_framework"
+          chmod -R u+w "$destination_framework"
+          copied_this_pass=$((copied_this_pass + 1))
+          copied_total=$((copied_total + 1))
+          echo "Bundled transitive framework: $framework_name"
+        fi
+        if [[ ! -e "$destination_framework/$framework_suffix" ]]; then
+          echo "bundled framework is missing requested binary: $framework_name/$framework_suffix" >&2
+          exit 66
+        fi
+
+        replacement="@executable_path/../Frameworks/$framework_name/$framework_suffix"
+        if [[ "$dependency" != "$replacement" ]]; then
+          install_name_tool -change "$dependency" "$replacement" "$mach_file"
+          rewritten_this_pass=$((rewritten_this_pass + 1))
+          rewritten_total=$((rewritten_total + 1))
+        fi
         continue
       fi
 
