@@ -107,8 +107,33 @@ if(APPLE OR (WIN32 AND NOT STATIC))
         if(NOT QMAKE_EXECUTABLE OR NOT WINDEPLOYQT_EXECUTABLE)
             message(FATAL_ERROR "Deploy requires Qt 5 qmake and windeployqt in ${_qt_bin_dir}")
         endif()
+        execute_process(
+            COMMAND "${QMAKE_EXECUTABLE}" -query QT_INSTALL_QML
+            RESULT_VARIABLE _qt_qml_query_result
+            OUTPUT_VARIABLE _qt_qml_dir
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+        if(NOT _qt_qml_query_result EQUAL 0)
+            message(FATAL_ERROR "Unable to query QT_INSTALL_QML with ${QMAKE_EXECUTABLE}")
+        endif()
+        foreach(_qt_required_qml_module IN ITEMS QtGraphicalEffects QtMultimedia)
+            if(NOT EXISTS "${_qt_qml_dir}/${_qt_required_qml_module}/qmldir")
+                message(FATAL_ERROR
+                        "Deploy requires ${_qt_required_qml_module} below QT_INSTALL_QML: ${_qt_qml_dir}")
+            endif()
+        endforeach()
         add_custom_command(TARGET deploy POST_BUILD
                            COMMAND "${CMAKE_COMMAND}" -E env PATH="${_qt_bin_dir}" "${WINDEPLOYQT_EXECUTABLE}" "$<TARGET_FILE:qwertycoin-gui>" -no-translations -no-opengl-sw -qmldir="${CMAKE_SOURCE_DIR}"
+                           # qmlimportscanner can omit this pure-QML module in
+                           # some MSYS2 Qt builds. Copy the complete module from
+                           # qmake's authoritative QML root so the packaged GUI
+                           # cannot pass deployment with an unusable main.qml.
+                           COMMAND "${CMAKE_COMMAND}" -E copy_directory
+                                   "${_qt_qml_dir}/QtGraphicalEffects"
+                                   "$<TARGET_FILE_DIR:qwertycoin-gui>/QtGraphicalEffects"
+                           COMMAND "${CMAKE_COMMAND}" -E copy_directory
+                                   "${_qt_qml_dir}/QtMultimedia"
+                                   "$<TARGET_FILE_DIR:qwertycoin-gui>/QtMultimedia"
                            COMMENT "Running windeployqt..."
         )
         set(WIN_DEPLOY_DLLS

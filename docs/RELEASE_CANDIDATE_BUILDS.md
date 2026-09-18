@@ -17,7 +17,8 @@ Each invocation builds exactly one target:
 
 - `linux` — Linux x86_64 tarball built on Ubuntu 22.04 with a
   `GLIBC_2.35` compatibility ceiling;
-- `windows` — Windows x86_64 zip;
+- `windows` — Windows x86_64 portable ZIP plus an all-users Inno Setup
+  installer, both from the same verified package;
 - `macos` — macOS 15+ Apple Silicon tarball plus a drag-and-drop DMG,
   both containing the same verified `.app` bundle.
 
@@ -60,7 +61,9 @@ It also validates the platform runtime:
   native menu and file-dialog components. The packaged GUI must also load its
   complete QML root cleanly with the offscreen software renderer;
 - Windows preserves the top-level Qt/dependency DLLs produced by `windeployqt`
-  and requires the platform, SVG, Qt Quick and Qt Labs Platform QML modules;
+  and requires the platform, SVG, Qt Quick and Qt Labs Platform QML modules.
+  After that package check, the workflow creates the installer from the
+  packaged tree; it does not compile the wallet a second time;
 - macOS requires the Qt frameworks, Cocoa/SVG plugins, Qt Quick and Qt Labs
   Platform QML modules produced by `macdeployqt`, rejects Homebrew/runner
   dependency paths and runtime search paths, verifies every bundled Mach-O is
@@ -72,11 +75,29 @@ It also validates the platform runtime:
   already packaged app bundle to create the DMG; it does not compile the wallet
   a second time.
 
-Every package contains `BUILD-INFO.txt` with GUI/Core revisions, runner
-platform and Qt version. Linux also records the enforced glibc ceiling; macOS
-records its enforced minimum system version. The per-file SHA-256 manifest is
-verified before the archive is uploaded. Uploaded review artifacts expire after
-seven days.
+Every package contains `BUILD-INFO.txt` with GUI/Core revisions, application
+version, runner platform and Qt version. Linux also records the enforced glibc
+ceiling; macOS records its enforced minimum system version. The per-file
+SHA-256 manifest is verified before the archive is uploaded. Uploaded review
+artifacts expire after seven days.
+
+The Windows review artifact contains exactly:
+
+```text
+<prefix>-windows-x86_64.zip
+<prefix>-windows-x86_64.sha256
+<prefix>-windows-x86_64-setup.exe
+<prefix>-windows-x86_64-setup.exe.sha256
+```
+
+The plain `.sha256` file remains the per-file manifest inside the ZIP. The
+`.setup.exe.sha256` file is a separate one-line checksum bound to the exact
+setup filename. The Windows job uses pinned Inno Setup 7.1.0, validates its
+published SHA-256 and Authenticode signature, then installs and exercises an
+older fixture installer, the current update, same-version repair, downgrade
+rejection, path-collision/reparse/locked-file failures and uninstall. Tests use
+isolated dummy wallet/settings/chain/EPoSE files only. Their digest preservation
+report is uploaded separately from the exact four-file release candidate.
 
 The macOS review artifact contains exactly:
 
@@ -120,6 +141,25 @@ by `dmgbuild`. The volume is named **Qwertycoin Wallet** and contains
 `Qwertycoin.app`, an `/Applications` link and a `Documentation` folder with the
 original build identity, release notes, licenses and packaged brand sources.
 
+### Create a Windows installer from an existing verified package
+
+On Windows, an already extracted and independently verified package can be used
+without CMake or a compiler rebuild:
+
+```powershell
+$artifact = 'qwertycoin-gui-v2.0.2-windows-x86_64'
+tools/release/windows/create_windows_installer.ps1 `
+  -PackageDir "dist/$artifact" `
+  -ArtifactName $artifact `
+  -Version '2.0.2' `
+  -OutputDir dist `
+  -IsccPath 'C:\Program Files\Inno Setup 7\ISCC.exe'
+```
+
+The output path must be unused. The fixed AppId, exact manifest checks, upgrade,
+repair, uninstall and real application data locations are documented in
+[WINDOWS_INSTALLER.md](WINDOWS_INSTALLER.md).
+
 For a visual native review, capture the Finder window after verification:
 
 ```sh
@@ -132,7 +172,7 @@ tools/release/capture_macos_dmg_layout.sh \
 These jobs create native artifacts for review. They do not publish a release:
 
 - Linux artifacts are unsigned;
-- Windows artifacts are unsigned;
+- Windows ZIP and setup artifacts are unsigned;
 - macOS uses an ad-hoc signature only and is not notarized or stapled;
 - no tag, GitHub Release, update metadata or public download is created.
 
@@ -166,19 +206,25 @@ Before creating any release, it verifies that every referenced run:
   complete matching per-file SHA-256 coverage and exact GUI/Core build metadata;
 - contains the required GUI, daemon, wallet CLI/RPC and platform runtime entry
   points;
+- contains the exact four-file Windows candidate set above and a valid one-line
+  checksum bound specifically to the expected setup filename. Unexpected files,
+  a missing setup and mismatched digests are rejected;
 - contains the exact four-file macOS candidate set above and a valid one-line
   checksum bound specifically to the expected DMG filename. Unexpected files,
   a missing DMG and mismatched digests are rejected.
 
 It derives the allowed tag from the source tree's major/minor/revision values,
-generates `SHA256SUMS` over the Linux tarball, Windows zip, macOS tarball and
-macOS DMG, and targets the
+generates `SHA256SUMS` over the Linux tarball, Windows ZIP, Windows setup, macOS
+tarball and macOS DMG, and targets the
 immutable candidate commit. Existing tags or conflicting releases are
 rejected. A rerun may retain and fully re-verify an exact matching release,
 including the GitHub-computed digest of every asset.
 
 The DMG is the preferred macOS download. Open it and drag **Qwertycoin** to
 **Applications**. The macOS tarball remains available as an alternative.
+
+The setup executable is the preferred Windows download for a normal installed
+wallet. The portable ZIP remains available as an alternative.
 
 `draft-prerelease` is the fail-safe default and requires `CREATE-DRAFT`. Stable
 publication accepts only the exact source version tag (for example `v2.0.1`),

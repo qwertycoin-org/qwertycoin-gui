@@ -196,9 +196,12 @@ Item {
             rowSpacing: MoneroComponents.Style.spaceLg
 
             MoneroComponents.BrandCard {
+                objectName: "currentEpochCard"
                 Layout.fillWidth: true
-                Layout.preferredHeight: 220
+                Layout.fillHeight: true
+                Layout.minimumHeight: Math.max(220, implicitHeight)
                 ColumnLayout {
+                    objectName: "currentEpochCardContent"
                     anchors.fill: parent
                     spacing: MoneroComponents.Style.spaceMd
                     MoneroComponents.TextPlain { Layout.fillWidth: true; text: root.localized(qsTr("Current epoch")); color: MoneroComponents.Style.defaultFontColor; font.family: MoneroComponents.Style.fontDisplay.name; font.pixelSize: 20; font.bold: true }
@@ -215,16 +218,18 @@ Item {
             }
 
             MoneroComponents.BrandCard {
+                objectName: "networkViewCard"
                 Layout.fillWidth: true
-                Layout.preferredHeight: 220
+                Layout.fillHeight: true
+                Layout.minimumHeight: Math.max(220, implicitHeight)
                 ColumnLayout {
+                    objectName: "networkViewCardContent"
                     anchors.fill: parent
                     spacing: MoneroComponents.Style.spaceMd
                     MoneroComponents.TextPlain { Layout.fillWidth: true; text: root.localized(qsTr("Network view")); color: MoneroComponents.Style.defaultFontColor; font.family: MoneroComponents.Style.fontDisplay.name; font.pixelSize: 20; font.bold: true }
                     MoneroComponents.StatusChip { text: root.value(eposeManager.info, "enabled", false) ? root.localized(qsTr("EPoSe enabled")) : root.localized(qsTr("EPoSe not active")); tone: root.value(eposeManager.info, "enabled", false) ? "success" : "neutral" }
                     MoneroComponents.TextPlain { Layout.fillWidth: true; text: root.localized(qsTr("Protocol %1 · Reward %2 bps")).arg(root.value(eposeManager.info, "protocolVersion", "—")).arg(root.value(eposeManager.info, "serviceRewardBps", "—")); color: MoneroComponents.Style.textSecondaryColor; font.family: MoneroComponents.Style.fontMonoRegular.name; font.pixelSize: 14 }
                     MoneroComponents.TextPlain { Layout.fillWidth: true; text: root.localized(qsTr("%1 service nodes · %2 attestations")).arg(root.value(eposeManager.info, "serviceNodeCount", "—")).arg(root.value(eposeManager.info, "attestationCount", "—")); color: MoneroComponents.Style.defaultFontColor; font.pixelSize: 15 }
-                    MoneroComponents.WarningBox { Layout.fillWidth: true; text: root.localized(qsTr("Reward preview is not available in this Core version. This does not mean EPoSe or actual service rewards are disabled.")); visible: eposeManager.rewardPreview.previewAvailable === false }
                     MoneroComponents.TextPlain { Layout.fillWidth: true; text: root.localized(qsTr("Sources are queried separately; values are not presented as one atomic block snapshot.")); color: MoneroComponents.Style.textSecondaryColor; font.pixelSize: 13; wrapMode: Text.Wrap }
                     Item { Layout.fillHeight: true }
                 }
@@ -232,9 +237,11 @@ Item {
         }
 
         MoneroComponents.BrandCard {
+            objectName: "observationSourcesCard"
             Layout.fillWidth: true
-            Layout.preferredHeight: sourceList.implicitHeight + MoneroComponents.Style.space2Xl
+            Layout.minimumHeight: implicitHeight
             ColumnLayout {
+                objectName: "observationSourcesCardContent"
                 anchors.fill: parent
                 spacing: MoneroComponents.Style.spaceMd
                 MoneroComponents.TextPlain {
@@ -262,7 +269,6 @@ Item {
                             { "key": "epoch", "label": root.localized(qsTr("Current epoch")) },
                             { "key": "serviceNodes", "label": root.localized(qsTr("Service-node list")) },
                             { "key": "localServiceNode", "label": root.localized(qsTr("Connected daemon service entry")) },
-                            { "key": "rewardPreview", "label": root.localized(qsTr("Reward preview")) },
                             { "key": "legacyRegistration", "label": root.localized(qsTr("Legacy registration path")) }
                         ]
                         delegate: RowLayout {
@@ -296,9 +302,11 @@ Item {
         }
 
         MoneroComponents.BrandCard {
+            objectName: "connectedDaemonCard"
             Layout.fillWidth: true
-            Layout.preferredHeight: 320
+            Layout.minimumHeight: Math.max(320, implicitHeight)
             ColumnLayout {
+                objectName: "connectedDaemonCardContent"
                 anchors.fill: parent
                 spacing: MoneroComponents.Style.spaceMd
                 RowLayout {
@@ -337,10 +345,12 @@ Item {
         }
 
         MoneroComponents.BrandCard {
+            objectName: "localProducerCard"
             Layout.fillWidth: true
-            Layout.preferredHeight: 520
+            Layout.minimumHeight: Math.max(520, implicitHeight)
             visible: root.locallyConfigurable
             ColumnLayout {
+                objectName: "localProducerCardContent"
                 anchors.fill: parent
                 spacing: MoneroComponents.Style.spaceMd
                 RowLayout {
@@ -375,9 +385,11 @@ Item {
         }
 
         MoneroComponents.BrandCard {
+            objectName: "serviceNodeViewCard"
             Layout.fillWidth: true
-            Layout.preferredHeight: Math.max(130, serviceList.implicitHeight + MoneroComponents.Style.space2Xl)
+            Layout.minimumHeight: Math.max(130, implicitHeight)
             ColumnLayout {
+                objectName: "serviceNodeViewCardContent"
                 anchors.fill: parent
                 spacing: MoneroComponents.Style.spaceMd
                 RowLayout {
@@ -394,12 +406,13 @@ Item {
                         model: eposeManager.serviceNodes
                         delegate: Rectangle {
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 58
+                            Layout.preferredHeight: Math.max(58, serviceNodeRow.implicitHeight + MoneroComponents.Style.spaceMd * 2)
                             radius: MoneroComponents.Style.radiusSm
                             color: MoneroComponents.Style.raisedColor
                             border.width: 1
                             border.color: MoneroComponents.Style.borderSubtleColor
                             RowLayout {
+                                id: serviceNodeRow
                                 anchors.fill: parent
                                 anchors.margins: MoneroComponents.Style.spaceMd
                                 spacing: MoneroComponents.Style.spaceMd

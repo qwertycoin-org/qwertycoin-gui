@@ -482,6 +482,7 @@ Rectangle {
             // ------------- EPoSe tab ---------------
             MoneroComponents.MenuButton {
                 id: eposeButton
+                objectName: "eposeMenuButton"
                 visible: appWindow.walletMode >= 2
                 anchors.left: parent.left
                 anchors.right: parent.right

@@ -61,5 +61,16 @@ Item {
             compare(currency.text, "QWC")
             verify(currency.x >= fraction.x + fraction.width)
         }
+
+        function test_epose_navigation_is_advanced_mode_only() {
+            var eposeButton = findChild(panel, "eposeMenuButton")
+            verify(eposeButton !== null)
+
+            appWindow.walletMode = 1
+            compare(eposeButton.visible, false)
+
+            appWindow.walletMode = 2
+            compare(eposeButton.visible, true)
+        }
     }
 }

@@ -26,6 +26,15 @@ if [[ -n "${EXPECTED_REVISION:-}" && "$source_revision" != "$EXPECTED_REVISION" 
   exit 1
 fi
 
+version_major=$(sed -nE 's/^set\(VERSION_MAJOR "([0-9]+)"\)$/\1/p' CMakeLists.txt)
+version_minor=$(sed -nE 's/^set\(VERSION_MINOR "([0-9]+)"\)$/\1/p' CMakeLists.txt)
+version_revision=$(sed -nE 's/^set\(VERSION_REVISION "([0-9]+)"\)$/\1/p' CMakeLists.txt)
+if [[ -z "$version_major" || -z "$version_minor" || -z "$version_revision" ]]; then
+  echo "unable to derive the application version from CMakeLists.txt" >&2
+  exit 1
+fi
+application_version="${version_major}.${version_minor}.${version_revision}"
+
 core_revision=$(git rev-parse HEAD:qwertycoin)
 parameter_manifest=qwertycoin/docs/epose/PARAMETER_MANIFEST_V2.json
 core_genesis=$(sed -n 's/.*"genesis_hash": "\([0-9a-f]\{64\}\)".*/\1/p' "$parameter_manifest" | head -n 1)
@@ -45,7 +54,9 @@ done
 
 if [[ -e "$output_dir/$artifact_name" || -e "$output_dir/$artifact_name.sha256" \
       || -e "$output_dir/$artifact_name.tar.gz" || -e "$output_dir/$artifact_name.zip" \
-      || -e "$output_dir/$artifact_name.dmg" || -e "$output_dir/$artifact_name.dmg.sha256" ]]; then
+      || -e "$output_dir/$artifact_name.dmg" || -e "$output_dir/$artifact_name.dmg.sha256" \
+      || -e "$output_dir/$artifact_name-setup.exe" \
+      || -e "$output_dir/$artifact_name-setup.exe.sha256" ]]; then
   echo "refusing to reuse an existing artifact path: $output_dir/$artifact_name" >&2
   exit 1
 fi
@@ -176,8 +187,9 @@ if command -v qmake >/dev/null 2>&1; then
 elif command -v qmake-qt5 >/dev/null 2>&1; then
   qt_version=$(qmake-qt5 -query QT_VERSION)
 fi
-printf 'source_revision=%s\ncore_revision=%s\nrunner_os=%s\nrunner_arch=%s\nqt_version=%s\n' \
-  "$source_revision" "$core_revision" "${RUNNER_OS:-$platform}" "${RUNNER_ARCH:-unknown}" "$qt_version" \
+printf 'source_revision=%s\ncore_revision=%s\napp_version=%s\nrunner_os=%s\nrunner_arch=%s\nqt_version=%s\n' \
+  "$source_revision" "$core_revision" "$application_version" \
+  "${RUNNER_OS:-$platform}" "${RUNNER_ARCH:-unknown}" "$qt_version" \
   >"$artifact_dir/BUILD-INFO.txt"
 if [[ "$platform" == "Linux" ]]; then
   printf 'glibc_ceiling=%s\n' "$linux_glibc_ceiling" >>"$artifact_dir/BUILD-INFO.txt"
@@ -234,6 +246,7 @@ if [[ "${RUNNER_OS:-}" == "Windows" ]]; then
   require_file "Qt GUI DLL" Qt5Gui.dll
   require_file "Qt QML DLL" Qt5Qml.dll
   require_file "Qt Quick DLL" Qt5Quick.dll
+  require_file "Qt Multimedia DLL" Qt5Multimedia.dll
   require_file "ANGLE EGL runtime" libEGL.dll
   require_file "ANGLE OpenGL ES runtime" libGLESv2.dll
   require_file "Unbound runtime" libunbound-8.dll
@@ -248,6 +261,10 @@ if [[ "${RUNNER_OS:-}" == "Windows" ]]; then
   # writes the standard import roots directly into the application folder.
   require_file "Qt Quick Controls 2 QML module" QtQuick/Controls.2/qmldir qml/QtQuick/Controls.2/qmldir
   require_file "Qt Quick Layouts QML module" QtQuick/Layouts/qmldir qml/QtQuick/Layouts/qmldir
+  require_file "Qt Graphical Effects QML module" QtGraphicalEffects/qmldir qml/QtGraphicalEffects/qmldir
+  require_file "Qt Multimedia QML module" QtMultimedia/qmldir qml/QtMultimedia/qmldir
+  require_file "Qt Multimedia QML plugin" QtMultimedia/declarative_multimedia.dll qml/QtMultimedia/declarative_multimedia.dll
+  require_file "Qt Windows multimedia service" mediaservice/wmfengine.dll mediaservice/dsengine.dll
   require_file "Qt Labs Platform QML module" Qt/labs/platform/qmldir qml/Qt/labs/platform/qmldir
   "$(dirname "$0")/verify_windows_runtime.sh" "$artifact_dir"
 fi

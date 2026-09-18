@@ -334,6 +334,8 @@ jobs:
             mingw-w64-x86_64-libusb
             mingw-w64-x86_64-qt5-base
             mingw-w64-x86_64-qt5-declarative
+            mingw-w64-x86_64-qt5-graphicaleffects
+            mingw-w64-x86_64-qt5-multimedia
             mingw-w64-x86_64-qt5-quickcontrols
             mingw-w64-x86_64-qt5-quickcontrols2
             mingw-w64-x86_64-qt5-svg
@@ -353,6 +355,100 @@ jobs:
           tools/check_core_pin.sh
           tools/check_source_tree_clean.sh
           test "$(git -C qwertycoin rev-parse HEAD)" = "$(git rev-parse HEAD:qwertycoin)"
+
+          version_major=$(sed -nE 's/^set\(VERSION_MAJOR "([0-9]+)"\)$/\1/p' CMakeLists.txt)
+          version_minor=$(sed -nE 's/^set\(VERSION_MINOR "([0-9]+)"\)$/\1/p' CMakeLists.txt)
+          version_revision=$(sed -nE 's/^set\(VERSION_REVISION "([0-9]+)"\)$/\1/p' CMakeLists.txt)
+          test -n "$version_major" && test -n "$version_minor" && test -n "$version_revision"
+          echo "QWC_GUI_VERSION=${version_major}.${version_minor}.${version_revision}" >> "$GITHUB_ENV"
+
+      - name: Install pinned Inno Setup compiler
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $version = '7.1.0'
+          $asset = "innosetup-$version-x64.exe"
+          $assetPath = Join-Path $env:RUNNER_TEMP $asset
+          $expectedHash = '0362a383ed217d4c4239b5933866dd96d3eb2102737da92f80f6057a4b40df2f'
+          Invoke-WebRequest `
+            -Uri "https://github.com/jrsoftware/issrc/releases/download/is-7_1_0/$asset" `
+            -OutFile $assetPath
+          $actualHash = (Get-FileHash -LiteralPath $assetPath -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($actualHash -ne $expectedHash) {
+            throw "Inno Setup digest mismatch: $actualHash"
+          }
+          $signature = Get-AuthenticodeSignature -LiteralPath $assetPath
+          if ($signature.Status -ne 'Valid') {
+            throw "Inno Setup Authenticode verification failed: $($signature.Status)"
+          }
+          $installRoot = Join-Path $env:RUNNER_TEMP "inno-$version"
+          $process = Start-Process -FilePath $assetPath -ArgumentList @(
+            '/VERYSILENT',
+            '/SUPPRESSMSGBOXES',
+            '/NORESTART',
+            "/DIR=`"$installRoot`""
+          ) -Wait -PassThru
+          if ($process.ExitCode -ne 0) {
+            throw "Inno Setup installation failed: $($process.ExitCode)"
+          }
+          $iscc = Join-Path $installRoot 'ISCC.exe'
+          if (-not (Test-Path -LiteralPath $iscc -PathType Leaf)) {
+            throw 'Pinned Inno Setup compiler was not installed'
+          }
+          "INNO_ISCC=$iscc" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Verify installer contract before the native build
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $fixtureRoot = Join-Path $env:RUNNER_TEMP 'qwertycoin-installer-contract'
+          $artifact = "$env:ARTIFACT_PREFIX-windows-x86_64"
+          $package = Join-Path $fixtureRoot $artifact
+          $output = Join-Path $fixtureRoot 'output'
+          New-Item -ItemType Directory -Path (Join-Path $package 'platforms') -Force | Out-Null
+          foreach ($file in @(
+            'qwertycoin-gui.exe',
+            'qwertycoind.exe',
+            'qwertycoin-wallet-cli.exe',
+            'qwertycoin-wallet-rpc.exe',
+            'Qt5Core.dll',
+            'Qt5Svg.dll',
+            'platforms\qwindows.dll'
+          )) {
+            [System.IO.File]::WriteAllText((Join-Path $package $file), "contract fixture $file")
+          }
+          Copy-Item -LiteralPath LICENSE, README.md -Destination $package
+          $coreRevision = (git rev-parse HEAD:qwertycoin).Trim()
+          [System.IO.File]::WriteAllLines(
+            (Join-Path $package 'BUILD-INFO.txt'),
+            @(
+              "source_revision=$env:EXPECTED_REVISION",
+              "core_revision=$coreRevision",
+              "app_version=$env:QWC_GUI_VERSION",
+              'runner_os=Windows',
+              'runner_arch=X64',
+              'qt_version=contract-fixture'
+            ),
+            [System.Text.UTF8Encoding]::new($false)
+          )
+          tools/release/windows/create_windows_installer.ps1 `
+            -PackageDir $package `
+            -ArtifactName $artifact `
+            -Version $env:QWC_GUI_VERSION `
+            -OutputDir $output `
+            -IsccPath $env:INNO_ISCC
+          if (-not (Test-Path -LiteralPath (Join-Path $output "$artifact-setup.exe") -PathType Leaf)) {
+            throw 'Installer contract did not produce an executable'
+          }
+          tools/release/windows/test_windows_installer.ps1 `
+            -PackageDir $package `
+            -ArtifactName $artifact `
+            -Version $env:QWC_GUI_VERSION `
+            -SetupPath (Join-Path $output "$artifact-setup.exe") `
+            -IsccPath $env:INNO_ISCC `
+            -ReportPath (Join-Path $fixtureRoot 'contract-test-report.md') `
+            -SkipExecutableSmoke
+          Remove-Item -LiteralPath $fixtureRoot -Recurse -Force
 
       - name: Restore compiler cache
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
@@ -391,12 +487,62 @@ jobs:
           cd dist
           sha256sum -c "${ARTIFACT_PREFIX}-windows-x86_64.sha256"
 
+      - name: Create and natively verify secure Windows installer
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $artifact = "$env:ARTIFACT_PREFIX-windows-x86_64"
+          tools/release/windows/create_windows_installer.ps1 `
+            -PackageDir "dist/$artifact" `
+            -ArtifactName $artifact `
+            -Version $env:QWC_GUI_VERSION `
+            -OutputDir dist `
+            -IsccPath $env:INNO_ISCC
+          New-Item -ItemType Directory -Path windows-installer-review | Out-Null
+          tools/release/windows/test_windows_installer.ps1 `
+            -PackageDir "dist/$artifact" `
+            -ArtifactName $artifact `
+            -Version $env:QWC_GUI_VERSION `
+            -SetupPath "dist/$artifact-setup.exe" `
+            -IsccPath $env:INNO_ISCC `
+            -ReportPath "windows-installer-review/$artifact-installer-test-report.md"
+
+      - name: Validate exact Windows candidate set
+        run: |
+          set -euo pipefail
+          artifact="${ARTIFACT_PREFIX}-windows-x86_64"
+          mkdir windows-candidate
+          cp \
+            "dist/$artifact.zip" \
+            "dist/$artifact.sha256" \
+            "dist/$artifact-setup.exe" \
+            "dist/$artifact-setup.exe.sha256" \
+            windows-candidate/
+          tools/release/validate_candidate_files.py \
+            --directory windows-candidate \
+            --expected "$artifact.zip" \
+            --expected "$artifact.sha256" \
+            --expected "$artifact-setup.exe" \
+            --expected "$artifact-setup.exe.sha256" \
+            --checksum-file "$artifact-setup.exe.sha256" \
+            --checksum-target "$artifact-setup.exe"
+
       - name: Upload review artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: ${{ env.ARTIFACT_PREFIX }}-windows-x86_64
           path: |
-            dist/${{ env.ARTIFACT_PREFIX }}-windows-x86_64.zip
-            dist/${{ env.ARTIFACT_PREFIX }}-windows-x86_64.sha256
+            windows-candidate/${{ env.ARTIFACT_PREFIX }}-windows-x86_64.zip
+            windows-candidate/${{ env.ARTIFACT_PREFIX }}-windows-x86_64.sha256
+            windows-candidate/${{ env.ARTIFACT_PREFIX }}-windows-x86_64-setup.exe
+            windows-candidate/${{ env.ARTIFACT_PREFIX }}-windows-x86_64-setup.exe.sha256
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload native installer test report
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ${{ env.ARTIFACT_PREFIX }}-windows-x86_64-installer-test-report
+          path: windows-installer-review/${{ env.ARTIFACT_PREFIX }}-windows-x86_64-installer-test-report.md
           if-no-files-found: error
           retention-days: 7

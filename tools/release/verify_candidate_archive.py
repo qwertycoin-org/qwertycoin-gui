@@ -183,10 +183,14 @@ def require_payload(root: Path, platform: str) -> None:
             "qwertycoind.exe",
             "qwertycoin-wallet-cli.exe",
             "qwertycoin-wallet-rpc.exe",
+            "Qt5Multimedia.dll",
             "platforms/qwindows.dll",
             "imageformats/qsvg.dll",
             "QtQuick/Controls/qtquickcontrolsplugin.dll",
             "QtQuick/Controls.2/qtquickcontrols2plugin.dll",
+            "QtGraphicalEffects/qmldir",
+            "QtMultimedia/qmldir",
+            "QtMultimedia/declarative_multimedia.dll",
             "Qt/labs/platform/qtlabsplatformplugin.dll",
         ]
     else:
@@ -211,6 +215,7 @@ def main() -> None:
     parser.add_argument("--platform", choices=("linux", "windows", "macos"), required=True)
     parser.add_argument("--expected-source", required=True)
     parser.add_argument("--expected-core", required=True)
+    parser.add_argument("--expected-version")
     parser.add_argument("--expected-os", required=True)
     parser.add_argument("--expected-arch", required=True)
     parser.add_argument("--expected-qt", required=True)
@@ -239,6 +244,8 @@ def main() -> None:
             "runner_arch": args.expected_arch,
             "qt_version": args.expected_qt,
         }
+        if args.expected_version:
+            expected["app_version"] = args.expected_version
         if args.expected_glibc_ceiling:
             expected["glibc_ceiling"] = args.expected_glibc_ceiling
         if args.expected_macos_min_version:
