@@ -45,6 +45,13 @@ jobs:
           [[ "$ARTIFACT_PREFIX" =~ ^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$ ]]
           [[ "$EXPECTED_REVISION" =~ ^[0-9a-f]{40}$ ]]
           [[ "$TARGET" =~ ^(linux|windows|macos)$ ]]
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ inputs.expected_revision }}
+          submodules: false
+          persist-credentials: false
+      - name: Verify updater release contract
+        run: python3 tools/release/tests/test_updater_contract.py
 
   linux-x86_64:
     name: Linux x86_64
@@ -106,7 +113,8 @@ jobs:
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DMANUAL_SUBMODULES=1 \
             -DDEV_MODE=OFF \
-            -DWITH_UPDATER=OFF \
+            -DWITH_UPDATER=ON \
+            -DBUILD_TAG=linux-x64 \
             -DUSE_DEVICE_TREZOR=OFF \
             -DQML_TESTS=OFF
 
@@ -200,7 +208,8 @@ jobs:
             -DCMAKE_OSX_DEPLOYMENT_TARGET="${QWC_MACOS_MIN_VERSION}" \
             -DMANUAL_SUBMODULES=1 \
             -DDEV_MODE=OFF \
-            -DWITH_UPDATER=OFF \
+            -DWITH_UPDATER=ON \
+            -DBUILD_TAG=mac-armv8 \
             -DUSE_DEVICE_TREZOR=OFF \
             -DQML_TESTS=OFF
 
@@ -467,7 +476,8 @@ jobs:
             -DSTATIC=OFF \
             -DMANUAL_SUBMODULES=1 \
             -DDEV_MODE=OFF \
-            -DWITH_UPDATER=OFF \
+            -DWITH_UPDATER=ON \
+            -DBUILD_TAG=win-x64 \
             -DUSE_DEVICE_TREZOR=OFF \
             -DQML_TESTS=OFF
 

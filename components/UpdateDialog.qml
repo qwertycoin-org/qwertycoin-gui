@@ -104,7 +104,7 @@ Popup {
                         + translationManager.emptyString;
                 }
                 if (updateDialog.valid) {
-                    return qsTr("Update downloaded, signature verified") + translationManager.emptyString;
+                    return qsTr("Update downloaded, SHA-256 verified against DNSSEC metadata") + translationManager.emptyString;
                 }
                 return qsTr("Do you want to download and verify new version?") + translationManager.emptyString;
             }

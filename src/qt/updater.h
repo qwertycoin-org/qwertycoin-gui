@@ -28,37 +28,10 @@
 
 #pragma once
 
-#include <QPair>
-
-#include <openpgp/openpgp.h>
+#include <QByteArray>
 
 class Updater
 {
 public:
-    Updater();
-
-    QByteArray fetchSignedHash(
-        const QString &binaryFilename,
-        const QByteArray &hashFromDns,
-        QPair<QString, QString> &signers) const;
     QByteArray getHash(const void *data, size_t size) const;
-    QPair<QString, QString> verifySignaturesAndHashSum(
-        const QByteArray &armoredSignedHashes,
-        const QByteArray &secondDetachedSignature,
-        const QString &binaryFilename,
-        const void *binaryData,
-        size_t binarySize) const;
-
-private:
-    QByteArray verifyParseSignedHahes(
-        const QByteArray &armoredSignedHashes,
-        const QByteArray &secondDetachedSignature,
-        const QString &binaryFilename,
-        QPair<QString, QString> &signers) const;
-    QString verifySignature(const QByteArray &armoredSignedMessage, QString &signer) const;
-    QString verifySignature(const epee::span<const uint8_t> data, const openpgp::signature_rsa &signature) const;
-    QByteArray parseShasumOutput(const QString &message, const QString &filename) const;
-
-private:
-    std::vector<openpgp::public_key_block> m_maintainers;
 };

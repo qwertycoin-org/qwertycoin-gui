@@ -62,10 +62,10 @@ Rectangle {
 
         MoneroComponents.CheckBox {
             id: checkForUpdatesCheckBox
-            enabled: false
-            checked: false
-            onClicked: persistentSettings.checkForUpdates = false
-            text: qsTr("Check for updates periodically (not configured for Qwertycoin yet)") + translationManager.emptyString
+            enabled: !disableCheckUpdatesFlag
+            checked: persistentSettings.qwcCheckForUpdates && !disableCheckUpdatesFlag
+            onClicked: persistentSettings.qwcCheckForUpdates = !persistentSettings.qwcCheckForUpdates
+            text: qsTr("Check for updates periodically") + translationManager.emptyString
         }
 
         MoneroComponents.CheckBox {

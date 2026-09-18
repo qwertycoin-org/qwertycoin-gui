@@ -10,7 +10,8 @@ release, tag, signature, notarization or publication.
    `git submodule update --init --recursive`.
 3. Run `tools/check_core_pin.sh` before and after the build.
 4. Configure every candidate with `MANUAL_SUBMODULES=1`, `DEV_MODE=OFF`,
-   `WITH_UPDATER=OFF` and unvalidated device support disabled.
+   `WITH_UPDATER=ON`, the exact platform `BUILD_TAG`, and unvalidated device
+   support disabled.
 5. Build `qwertycoin-gui`, `qwertycoind`, `qwertycoin-wallet-cli` and
    `qwertycoin-wallet-rpc` from the same checkout.
 6. Verify the package contains the Qt platform/SVG plugins, required QML import
@@ -27,7 +28,8 @@ cmake -S . -B build/release -G Ninja \
   -DSTATIC=OFF \
   -DMANUAL_SUBMODULES=1 \
   -DDEV_MODE=OFF \
-  -DWITH_UPDATER=OFF \
+  -DWITH_UPDATER=ON \
+  -DBUILD_TAG=linux-x64 \
   -DUSE_DEVICE_TREZOR=OFF \
   -DQML_TESTS=OFF
 cmake --build build/release \

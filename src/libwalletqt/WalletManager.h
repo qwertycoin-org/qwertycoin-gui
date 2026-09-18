@@ -187,7 +187,6 @@ public:
         const QString &subdir,
         const QString &buildTag,
         const QString &version);
-    Q_INVOKABLE QString checkUpdates(const QString &software, const QString &subdir) const;
 
     // clear/rename wallet cache
     Q_INVOKABLE bool clearWalletCache(const QString &fileName) const;
@@ -208,9 +207,7 @@ signals:
     void checkUpdatesComplete(
         const QString &version,
         const QString &downloadUrl,
-        const QString &hash,
-        const QString &firstSigner,
-        const QString &secondSigner) const;
+        const QString &hash) const;
     void miningStatus(bool isMining) const;
     void proxyAddressChanged() const;
 

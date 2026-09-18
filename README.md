@@ -8,9 +8,9 @@ attribution are retained. User-visible product language, network defaults and
 release metadata are Qwertycoin-specific; compatible internal wrapper names
 such as `Monero::` and `moneroComponents` intentionally remain unchanged.
 
-## Current release line
+## Current source line
 
-The Qwertycoin GUI 2.0.1 release line provides:
+The current Qwertycoin GUI source line provides:
 
 - light and dark Qwertycoin design system using locally bundled Inter and
   Archivo fonts plus the approved Q mark and wordmark;
@@ -21,8 +21,9 @@ The Qwertycoin GUI 2.0.1 release line provides:
 - typed asynchronous EPoSe observer and a dedicated EPoSe page;
 - explicit local EPoSe producer setup through the supported Core flags;
 - QWC 8-decimal amounts and `qwertycoin:` URI handling;
-- update checks, unvalidated hardware wallets, inherited P2Pool launching and
-  fiat feeds kept fail-closed.
+- DNSSEC-validated update checks with fixed QWC GitHub release targets;
+- unvalidated hardware wallets, inherited P2Pool launching and fiat feeds kept
+  fail-closed.
 
 EPoSe service operation is opt-in. RandomX remains responsible for block
 production and chain selection.
@@ -72,7 +73,8 @@ cmake -S . -B build/gui-review -G Ninja \
   -DSTATIC=OFF \
   -DMANUAL_SUBMODULES=1 \
   -DDEV_MODE=OFF \
-  -DWITH_UPDATER=OFF \
+  -DWITH_UPDATER=ON \
+  -DBUILD_TAG=linux-x64 \
   -DUSE_DEVICE_TREZOR=OFF \
   -DQML_TESTS=ON
 cmake --build build/gui-review \
@@ -84,6 +86,37 @@ tools/check_core_pin.sh
 
 `DEV_MODE=OFF` is mandatory for review and release candidates. Normal Makefile
 targets also respect the recorded Gitlink.
+
+## Update metadata and trust boundary
+
+Desktop release builds periodically query the DNS TXT records at
+`updates.qwertycoin.org`. Metadata is accepted only when DNSSEC is available
+and validates successfully. A matching record must use exactly:
+
+```text
+qwertycoin-gui:<build-tag>:<three-part-version>:<lowercase-sha256>
+```
+
+The software name, build tag, version grammar, GitHub repository and release
+asset filename are fixed in the application. Conflicting hashes or malformed
+matching records fail closed. The downloaded file is exposed to the user only
+after its SHA-256 matches the DNSSEC-authenticated metadata; the GUI never
+executes an update automatically.
+
+The local daemon launched by the GUI continues to use
+`--check-updates disabled`; the GUI owns the package-level notification and
+verification flow, so one application does not present competing Core and GUI
+update prompts.
+
+Supported build tags are `linux-x64`, `mac-armv8`, `install-win-x64` and
+`win-x64`. Flatpak builds keep this updater disabled because updates are owned
+by the package manager. Users can opt out in Settings or start the GUI with
+`--disable-check-updates`.
+
+The placeholder TXT record `qwc:update-metadata-not-yet-published`, an unsigned
+zone or any DNSSEC validation failure means "no update available". Existing
+v2.0.1 installations do not contain this QWC updater and therefore require a
+manual upgrade to the first release that enables it.
 
 ## Local verification
 

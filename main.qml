@@ -1452,7 +1452,9 @@ ApplicationWindow {
         property int walletMode: 2
         property int lockOnUserInActivityInterval: 10  // minutes
         property bool blackTheme: MoneroComponents.Style.blackTheme
-        property bool checkForUpdates: false
+        // A QWC-specific key prevents the disabled inherited updater setting
+        // from silently keeping update checks off after the migration.
+        property bool qwcCheckForUpdates: true
         property bool autosave: true
         property int autosaveMinutes: 10
         property bool pruneBlockchain: false
@@ -2215,7 +2217,7 @@ ApplicationWindow {
         });
     }
 
-    function onWalletCheckUpdatesComplete(version, downloadUrl, hash, firstSigner, secondSigner) {
+    function onWalletCheckUpdatesComplete(version, downloadUrl, hash) {
         const alreadyAsked = updateDialog.url == downloadUrl && updateDialog.hash == hash;
         if (!alreadyAsked)
         {
@@ -2237,14 +2239,17 @@ ApplicationWindow {
     }
 
     function checkUpdates() {
-        console.log("Qwertycoin GUI update checks are disabled until QWC release infrastructure is configured");
+        if (isMac || isWindows || isLinux) {
+            walletManager.checkUpdatesAsync(
+                "qwertycoin-gui", "gui", getBuildTag(), Version.GUI_VERSION_NUMBER);
+        }
     }
 
     Timer {
         id: updatesTimer
         interval: 3600 * 1000
         repeat: true
-        running: !disableCheckUpdatesFlag && persistentSettings.checkForUpdates
+        running: !disableCheckUpdatesFlag && persistentSettings.qwcCheckForUpdates
         triggeredOnStart: true
         onTriggered: checkUpdates()
     }
