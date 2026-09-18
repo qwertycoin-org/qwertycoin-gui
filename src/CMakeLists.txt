@@ -93,6 +93,11 @@ message(STATUS "OpenGL: libraries at ${OPENGL_LIBRARIES}")
 
 target_include_directories(qwertycoin-gui PUBLIC ${Qt5Gui_PRIVATE_INCLUDE_DIRS})
 
+# Core discovers Boost in its own CMake directory. Propagate that exact header
+# path to GUI sources that include Core headers instead of relying on a global
+# system include path (Homebrew Boost is not guaranteed to be linked there).
+target_include_directories(qwertycoin-gui SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
+
 target_include_directories(qwertycoin-gui PUBLIC
 	${CMAKE_SOURCE_DIR}/qwertycoin/include
     ${CMAKE_SOURCE_DIR}/qwertycoin/src
@@ -187,6 +192,7 @@ if(QML_TESTS)
         "${CMAKE_SOURCE_DIR}/qwertycoin/contrib/epee/include"
         "${CMAKE_SOURCE_DIR}/qwertycoin/external/easylogging++"
     )
+    target_include_directories(qwertycoin-gui-epose-tests SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
     target_link_libraries(qwertycoin-gui-epose-tests
         epee
         common
@@ -217,6 +223,7 @@ if(QML_TESTS)
         "${CMAKE_SOURCE_DIR}/qwertycoin/contrib/epee/include"
         "${CMAKE_SOURCE_DIR}/qwertycoin/external/easylogging++"
     )
+    target_include_directories(qwertycoin-gui-updater-tests SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
     target_link_libraries(qwertycoin-gui-updater-tests
         common
         epee

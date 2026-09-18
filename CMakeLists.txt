@@ -71,6 +71,11 @@ set(CMAKE_AUTOUIC ON)
 
 get_directory_property(ARCH_WIDTH DIRECTORY "qwertycoin" DEFINITION ARCH_WIDTH)
 get_directory_property(Boost_VERSION_STRING DIRECTORY "qwertycoin" DEFINITION Boost_VERSION_STRING)
+get_directory_property(Boost_INCLUDE_DIRS DIRECTORY "qwertycoin" DEFINITION Boost_INCLUDE_DIRS)
+
+if(NOT Boost_INCLUDE_DIRS)
+  message(FATAL_ERROR "Core configured without exporting its required Boost header path")
+endif()
 
 if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
   add_definitions(-DQT_NO_DEBUG)
