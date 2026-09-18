@@ -40,7 +40,7 @@ macOS:
 revision=$(git rev-parse HEAD)
 
 gh workflow run release.yml --ref master \
-  -f release_name=qwertycoin-gui-v2.0.1 \
+  -f release_name=qwertycoin-gui-v2.0.2 \
   -f expected_revision="$revision" \
   -f target=linux
 ```
@@ -227,7 +227,7 @@ The setup executable is the preferred Windows download for a normal installed
 wallet. The portable ZIP remains available as an alternative.
 
 `draft-prerelease` is the fail-safe default and requires `CREATE-DRAFT`. Stable
-publication accepts only the exact source version tag (for example `v2.0.1`),
+publication accepts only the exact source version tag (for example `v2.0.2`),
 requires `release_kind=stable` and the literal `PUBLISH-STABLE` confirmation,
 and still records the unsigned/ad-hoc signing boundary in the public notes.
 
@@ -249,7 +249,7 @@ the corresponding stable publication uses:
 
 ```sh
 gh workflow run assemble-release.yml --ref master \
-  -f release_tag=v2.0.1 \
+  -f release_tag=v2.0.2 \
   -f release_kind=stable \
   -f expected_revision=<exact-40-character-gui-sha> \
   -f linux_run_id=<linux-run-id> \
