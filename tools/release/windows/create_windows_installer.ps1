@@ -32,11 +32,12 @@ if ($ArtifactName -notmatch '^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$') {
 if ($Version -notmatch '^[0-9]+\.[0-9]+\.[0-9]+$') {
     throw 'Version must contain exactly three numeric components'
 }
-$artifactPattern = '^qwertycoin-gui-v(?<display>[0-9]+\.[0-9]+\.[0-9]+(?:-rc[1-9][0-9]*)?)-windows-x86_64$'
+$artifactPattern = '^qwertycoin-gui-v(?<display>[0-9]+\.[0-9]+\.[0-9]+(?:-rc[1-9][0-9]*)?)(?:-review-(?<review>[0-9a-f]{7,40}))?-windows-x86_64$'
 if ($ArtifactName -notmatch $artifactPattern) {
-    throw 'ArtifactName must follow qwertycoin-gui-v<VERSION>[-rcN]-windows-x86_64'
+    throw 'ArtifactName must follow qwertycoin-gui-v<VERSION>[-rcN][-review-<COMMIT>]-windows-x86_64'
 }
 $displayVersion = $Matches.display
+$reviewRevision = if ($Matches.ContainsKey('review')) { $Matches.review } else { '' }
 if (($displayVersion -ne $Version) -and (-not $displayVersion.StartsWith("$Version-rc"))) {
     throw "ArtifactName version $displayVersion does not match source version $Version"
 }
@@ -99,6 +100,9 @@ foreach ($key in @('source_revision', 'core_revision', 'app_version', 'runner_os
 if ($buildInfo.source_revision -notmatch '^[0-9a-f]{40}$' -or
     $buildInfo.core_revision -notmatch '^[0-9a-f]{40}$') {
     throw 'BUILD-INFO.txt contains invalid source revisions'
+}
+if ($reviewRevision -ne '' -and -not $buildInfo.source_revision.StartsWith($reviewRevision)) {
+    throw "Review artifact revision $reviewRevision does not match package source revision $($buildInfo.source_revision)"
 }
 if ($buildInfo.runner_os -ne 'Windows' -or $buildInfo.runner_arch -ne 'X64') {
     throw 'Package is not the expected Windows X64 build'

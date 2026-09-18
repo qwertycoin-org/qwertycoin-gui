@@ -402,7 +402,7 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $fixtureRoot = Join-Path $env:RUNNER_TEMP 'qwertycoin-installer-contract'
-          $artifact = "qwertycoin-gui-v$env:QWC_GUI_VERSION-windows-x86_64"
+          $artifact = "$env:ARTIFACT_PREFIX-windows-x86_64"
           $package = Join-Path $fixtureRoot $artifact
           $output = Join-Path $fixtureRoot 'output'
           New-Item -ItemType Directory -Path (Join-Path $package 'platforms') -Force | Out-Null
