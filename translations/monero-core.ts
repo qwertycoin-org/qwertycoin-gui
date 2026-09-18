@@ -522,11 +522,6 @@ The public restricted-RPC probe endpoint will be %2. No wallet private key is us
     </message>
     <message>
         <location line="+1"/>
-        <source>Reward preview is not available in this Core version. This does not mean EPoSe or actual service rewards are disabled.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
         <source>Sources are queried separately; values are not presented as one atomic block snapshot.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -553,11 +548,6 @@ The public restricted-RPC probe endpoint will be %2. No wallet private key is us
     <message>
         <location line="+1"/>
         <source>Connected daemon service entry</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Reward preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

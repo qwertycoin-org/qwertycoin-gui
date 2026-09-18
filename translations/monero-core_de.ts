@@ -527,11 +527,6 @@ Der öffentliche eingeschränkte RPC-Prüfendpunkt ist %2. Es wird kein privater
     </message>
     <message>
         <location line="+1"/>
-        <source>Reward preview is not available in this Core version. This does not mean EPoSe or actual service rewards are disabled.</source>
-        <translation>Die Reward-Vorschau ist in dieser Core-Version nicht verfügbar. Das bedeutet nicht, dass EPoSe oder tatsächliche Service-Rewards deaktiviert sind.</translation>
-    </message>
-    <message>
-        <location line="+1"/>
         <source>Sources are queried separately; values are not presented as one atomic block snapshot.</source>
         <translation>Quellen werden getrennt abgefragt; die Werte werden nicht als gemeinsamer atomarer Block-Snapshot dargestellt.</translation>
     </message>
@@ -559,11 +554,6 @@ Der öffentliche eingeschränkte RPC-Prüfendpunkt ist %2. Es wird kein privater
         <location line="+1"/>
         <source>Connected daemon service entry</source>
         <translation>Diensteintrag des verbundenen Daemons</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Reward preview</source>
-        <translation>Reward-Vorschau</translation>
     </message>
     <message>
         <location line="+1"/>

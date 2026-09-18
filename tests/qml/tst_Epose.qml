@@ -118,6 +118,42 @@ Item {
             tryCompare(appWindow, "observationRefreshes", 1)
         }
 
+        function verifyCardContainsContent(cardName, contentName) {
+            var card = findChild(page, cardName)
+            var content = findChild(page, contentName)
+            verify(card !== null, "Missing card: " + cardName)
+            verify(content !== null, "Missing card content: " + contentName)
+            verify(card.height + 0.5 >= content.implicitHeight + card.contentPadding * 2,
+                   cardName + " clips its content")
+        }
+
+        function test_cards_expand_to_content_at_supported_sizes() {
+            var sizes = [
+                { "width": 1000, "height": 900 },
+                { "width": 720, "height": 640 },
+                { "width": 1180, "height": 700 }
+            ]
+            var cards = [
+                ["currentEpochCard", "currentEpochCardContent"],
+                ["networkViewCard", "networkViewCardContent"],
+                ["observationSourcesCard", "observationSourcesCardContent"],
+                ["connectedDaemonCard", "connectedDaemonCardContent"],
+                ["localProducerCard", "localProducerCardContent"],
+                ["serviceNodeViewCard", "serviceNodeViewCardContent"]
+            ]
+
+            for (var sizeIndex = 0; sizeIndex < sizes.length; ++sizeIndex) {
+                appWindow.width = sizes[sizeIndex].width
+                appWindow.height = sizes[sizeIndex].height
+                wait(0)
+                for (var cardIndex = 0; cardIndex < cards.length; ++cardIndex)
+                    verifyCardContainsContent(cards[cardIndex][0], cards[cardIndex][1])
+            }
+
+            appWindow.width = 1000
+            appWindow.height = 900
+        }
+
         function test_remote_daemon_is_observation_only() {
             persistentSettings.useRemoteNode = true
             compare(page.locallyConfigurable, false)

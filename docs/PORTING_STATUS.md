@@ -34,7 +34,7 @@ Mainnet binding:
   requests, exact integer transport and stale-response rejection after daemon
   or network changes.
 - Dedicated EPoSe view separating observed network state, local producer
-  process state, registration, effectiveness, qualification and reward preview.
+  process state, registration, effectiveness and qualification.
 - Explicit local producer configuration using the current Core flags and a
   public primary QWC reward address. The GUI never asks for wallet private view
   or spend keys.
@@ -50,8 +50,9 @@ Mainnet binding:
 - Legacy `get_service_node_registration_payload` is observed only as a retired
   compatibility method; registration and renewal remain owned by the local
   Core producer.
-- Reward preview is shown as unavailable when the pinned Core returns
-  `preview_available=false`; this is not labelled as disabled EPoSe.
+- The pinned Core's unavailable reward-preview result is not presented as a
+  warning or observation source. The GUI does not guess a future payee from
+  independently observed service-node data.
 - Descriptor update, deregistration, key recovery and envelope submission have
   no GUI buttons because no reviewed administrative backend contract supports
   them at this pin.
