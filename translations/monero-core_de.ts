@@ -2464,8 +2464,8 @@ Die alte Wallet-Cache-Datei wird umbenannt und kann später wiederhergestellt we
     </message>
     <message>
         <location line="+8"/>
-        <source>Check for updates periodically (not configured for Qwertycoin yet)</source>
-        <translation>Regelmäßig nach Updates suchen (für Qwertycoin noch nicht konfiguriert)</translation>
+        <source>Check for updates periodically</source>
+        <translation>Regelmäßig nach Updates suchen</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -3869,8 +3869,8 @@ Für einen reinen Sendenachweis muss die Empfängeradresse nicht angegeben werde
     </message>
     <message>
         <location line="+5"/>
-        <source>Update downloaded, signature verified</source>
-        <translation>Update heruntergeladen, Signatur verifiziert</translation>
+        <source>Update downloaded, SHA-256 verified against DNSSEC metadata</source>
+        <translation>Update heruntergeladen, SHA-256 anhand DNSSEC-Metadaten verifiziert</translation>
     </message>
     <message>
         <location line="+2"/>

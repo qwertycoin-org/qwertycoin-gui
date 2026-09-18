@@ -43,8 +43,8 @@
 #include <QMutexLocker>
 #include <QString>
 
-#include "qt/updater.h"
 #include "qt/ScopeGuard.h"
+#include "qt/UpdateMetadata.h"
 
 class WalletPassphraseListenerImpl : public  Monero::WalletListener, public PassphraseReceiver
 {
@@ -503,21 +503,32 @@ void WalletManager::checkUpdatesAsync(
     const QString &buildTag,
     const QString &version)
 {
+#ifndef WITH_UPDATER
     Q_UNUSED(software)
     Q_UNUSED(subdir)
     Q_UNUSED(buildTag)
     Q_UNUSED(version)
+    qInfo() << "GUI update checks are disabled in this build";
+#else
+    m_scheduler.run([this, software, subdir, buildTag, version] {
+        if (software != QStringLiteral("qwertycoin-gui") || subdir != QStringLiteral("gui"))
+        {
+            qCritical() << "Rejected unsupported GUI update channel" << software << subdir;
+            return;
+        }
 
-    qInfo() << "Qwertycoin GUI update checks are disabled until QWC release infrastructure is configured";
-}
+        const UpdateMetadata::Result updateInfo = UpdateMetadata().check(
+            buildTag.toStdString(), version.toStdString());
+        if (!updateInfo.available)
+            return;
 
-QString WalletManager::checkUpdates(const QString &software, const QString &subdir) const
-{
-  Q_UNUSED(software)
-  Q_UNUSED(subdir)
-
-  qInfo() << "Qwertycoin GUI update checks are disabled until QWC release infrastructure is configured";
-  return QString("");
+        const QString availableVersion = QString::fromStdString(updateInfo.version);
+        const QString downloadUrl = QString::fromStdString(updateInfo.downloadUrl);
+        const QString hash = QString::fromStdString(updateInfo.hash);
+        qInfo() << "DNSSEC-validated update found" << availableVersion << downloadUrl;
+        emit checkUpdatesComplete(availableVersion, downloadUrl, hash);
+    });
+#endif
 }
 
 bool WalletManager::clearWalletCache(const QString &wallet_path) const

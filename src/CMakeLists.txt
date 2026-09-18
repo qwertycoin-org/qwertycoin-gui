@@ -1,5 +1,4 @@
 add_subdirectory(QR-Code-scanner)
-add_subdirectory(openpgp)
 add_subdirectory(zxcvbn-c)
 
 qt5_add_resources(RESOURCES ../qml.qrc)
@@ -145,7 +144,6 @@ target_link_libraries(qwertycoin-gui
     Qt5::Concurrent
     ${QT5_LIBRARIES}
     ${EXTRA_LIBRARIES}
-    openpgp
     qrdecoder
     translations
     zxcvbn
@@ -204,4 +202,28 @@ if(QML_TESTS)
     )
     add_test(NAME qwertycoin-gui-epose-tests
              COMMAND qwertycoin-gui-epose-tests)
+
+    add_executable(qwertycoin-gui-updater-tests
+        "${CMAKE_SOURCE_DIR}/tests/updater/tst_UpdateMetadata.cpp"
+        qt/UpdateMetadata.cpp
+    )
+    set_target_properties(qwertycoin-gui-updater-tests PROPERTIES
+        AUTOMOC ON
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    )
+    target_include_directories(qwertycoin-gui-updater-tests PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}"
+        "${CMAKE_SOURCE_DIR}/qwertycoin/src"
+        "${CMAKE_SOURCE_DIR}/qwertycoin/contrib/epee/include"
+        "${CMAKE_SOURCE_DIR}/qwertycoin/external/easylogging++"
+    )
+    target_link_libraries(qwertycoin-gui-updater-tests
+        common
+        epee
+        Qt5::Core
+        Qt5::Test
+        ${EXTRA_LIBRARIES}
+    )
+    add_test(NAME qwertycoin-gui-updater-tests
+             COMMAND qwertycoin-gui-updater-tests)
 endif()

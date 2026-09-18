@@ -58,8 +58,10 @@ Mainnet binding:
   them at this pin.
 - Inherited Monero P2Pool download/launch remains disabled. Solo RandomX mining
   remains separate from EPoSe.
-- Hardware-wallet creation, fiat feeds and automatic updates remain disabled
-  until QWC-specific compatibility and release infrastructure are reviewed.
+- Hardware-wallet creation and fiat feeds remain disabled until QWC-specific
+  compatibility is reviewed. Desktop update checks are enabled only for the
+  fixed QWC GitHub assets authenticated by DNSSEC TXT metadata; Flatpak updates
+  remain package-manager-owned.
 
 ## Compatibility names and attribution
 
