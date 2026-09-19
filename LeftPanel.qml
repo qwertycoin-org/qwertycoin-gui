@@ -397,6 +397,7 @@ Rectangle {
             // ------------- Transfer tab ---------------
             MoneroComponents.MenuButton {
                 id: transferButton
+                objectName: "sendMenuButton"
                 anchors.left: parent.left
                 anchors.right: parent.right
                 text: qsTr("Send") + translationManager.emptyString
@@ -415,36 +416,14 @@ Rectangle {
                 anchors.leftMargin: 20
             }
 
-            // ------------- AddressBook tab ---------------
-
-            MoneroComponents.MenuButton {
-                id: addressBookButton
-                anchors.left: parent.left
-                anchors.right: parent.right
-                text: qsTr("Address book") + translationManager.emptyString
-                symbol: (isMac ? "⌃" : qsTr("Ctrl+")) + "B" + translationManager.emptyString
-                under: transferButton
-                onClicked: {
-                    parent.previousButton.checked = false
-                    parent.previousButton = addressBookButton
-                    panel.addressBookClicked()
-                }
-            }
-
-            MoneroComponents.MenuButtonDivider {
-                visible: addressBookButton.present
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.leftMargin: 20
-            }
-
-            // ------------- Messages tab ---------------
+            // ------------- Messenger tab ---------------
             MoneroComponents.MenuButton {
                 id: messagesButton
+                objectName: "messengerMenuButton"
                 anchors.left: parent.left
                 anchors.right: parent.right
-                text: qsTr("Messages") + translationManager.emptyString
-                under: addressBookButton
+                text: qsTr("Messenger") + translationManager.emptyString
+                under: transferButton
                 onClicked: {
                     parent.previousButton.checked = false
                     parent.previousButton = messagesButton
@@ -459,6 +438,30 @@ Rectangle {
                 anchors.leftMargin: 20
             }
 
+            // ------------- AddressBook tab ---------------
+
+            MoneroComponents.MenuButton {
+                id: addressBookButton
+                objectName: "addressBookMenuButton"
+                anchors.left: parent.left
+                anchors.right: parent.right
+                text: qsTr("Address book") + translationManager.emptyString
+                symbol: (isMac ? "⌃" : qsTr("Ctrl+")) + "B" + translationManager.emptyString
+                under: messagesButton
+                onClicked: {
+                    parent.previousButton.checked = false
+                    parent.previousButton = addressBookButton
+                    panel.addressBookClicked()
+                }
+            }
+
+            MoneroComponents.MenuButtonDivider {
+                visible: addressBookButton.present
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: 20
+            }
+
             // ------------- Receive tab ---------------
             MoneroComponents.MenuButton {
                 id: receiveButton
@@ -466,7 +469,7 @@ Rectangle {
                 anchors.right: parent.right
                 text: qsTr("Receive") + translationManager.emptyString
                 symbol: (isMac ? "⌃" : qsTr("Ctrl+")) + "R" + translationManager.emptyString
-                under: messagesButton
+                under: addressBookButton
                 onClicked: {
                     parent.previousButton.checked = false
                     parent.previousButton = receiveButton
