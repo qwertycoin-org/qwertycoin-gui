@@ -72,5 +72,16 @@ Item {
             appWindow.walletMode = 2
             compare(eposeButton.visible, true)
         }
+
+        function test_messenger_is_directly_below_send() {
+            var sendButton = findChild(panel, "sendMenuButton")
+            var messengerButton = findChild(panel, "messengerMenuButton")
+            var addressBookButton = findChild(panel, "addressBookMenuButton")
+            verify(sendButton !== null)
+            verify(messengerButton !== null)
+            verify(addressBookButton !== null)
+            compare(messengerButton.under, sendButton)
+            compare(addressBookButton.under, messengerButton)
+        }
     }
 }

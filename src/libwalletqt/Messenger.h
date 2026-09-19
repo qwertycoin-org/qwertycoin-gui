@@ -18,6 +18,7 @@ class Messenger : public QObject
     Q_PROPERTY(QVariantList messages READ messages NOTIFY stateChanged)
     Q_PROPERTY(int preparedTransactionCount READ preparedTransactionCount NOTIFY planChanged)
     Q_PROPERTY(quint64 preparedFee READ preparedFee NOTIFY planChanged)
+    Q_PROPERTY(QString preparedContactFingerprint READ preparedContactFingerprint NOTIFY planChanged)
     Q_PROPERTY(QString status READ status NOTIFY statusChanged)
 
 public:
@@ -30,9 +31,12 @@ public:
     QVariantList messages() const;
     int preparedTransactionCount() const;
     quint64 preparedFee() const;
+    QString preparedContactFingerprint() const { return m_preparedContactFingerprint; }
     QString status() const { return m_status; }
 
     Q_INVOKABLE bool importInvitation(const QString &label, const QString &encodedHex);
+    Q_INVOKABLE bool renameContact(const QString &fingerprint, const QString &label);
+    Q_INVOKABLE bool removeContact(const QString &fingerprint);
     Q_INVOKABLE bool prepare(const QString &contactFingerprint, const QString &text);
     Q_INVOKABLE bool commitPrepared();
     Q_INVOKABLE void cancelPrepared();
@@ -65,6 +69,7 @@ private:
     QJsonObject m_incomplete;
     Monero::PendingTransaction *m_prepared = nullptr;
     QString m_preparedMessageId;
+    QString m_preparedContactFingerprint;
     QByteArray m_preparedJournal;
     QString m_status;
 };
