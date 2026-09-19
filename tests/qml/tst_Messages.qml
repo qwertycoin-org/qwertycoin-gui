@@ -44,6 +44,7 @@ Item {
 
         function init() {
             page.selectedFingerprint = ""
+            page.showContactManagement = false
             wait(0)
         }
 
@@ -72,6 +73,19 @@ Item {
             var composer = findChild(page, "messengerComposer")
             verify(composer !== null)
             verify(composer.height >= 90)
+        }
+
+        function test_chat_is_primary_and_contact_management_is_separate() {
+            var contacts = findChild(page, "messengerContacts")
+            var manageButton = findChild(page, "messengerContactManagementButton")
+            verify(contacts !== null)
+            verify(manageButton !== null)
+            compare(page.showContactManagement, false)
+            compare(contacts.visible, true)
+
+            manageButton.clicked()
+            compare(page.showContactManagement, true)
+            compare(contacts.visible, false)
         }
     }
 }

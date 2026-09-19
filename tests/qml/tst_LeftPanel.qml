@@ -73,15 +73,16 @@ Item {
             compare(eposeButton.visible, true)
         }
 
-        function test_messenger_is_directly_below_send() {
+        function test_messenger_is_between_send_and_transactions() {
             var sendButton = findChild(panel, "sendMenuButton")
             var messengerButton = findChild(panel, "messengerMenuButton")
-            var addressBookButton = findChild(panel, "addressBookMenuButton")
+            var transactionsButton = findChild(panel, "transactionsMenuButton")
             verify(sendButton !== null)
             verify(messengerButton !== null)
-            verify(addressBookButton !== null)
-            compare(messengerButton.under, sendButton)
-            compare(addressBookButton.under, messengerButton)
+            verify(transactionsButton !== null)
+            compare(messengerButton.under, null)
+            verify(messengerButton.y >= sendButton.y + sendButton.height)
+            verify(transactionsButton.y >= messengerButton.y + messengerButton.height)
         }
     }
 }
