@@ -154,6 +154,24 @@ Item {
             appWindow.height = 900
         }
 
+        function test_public_endpoint_host_is_wider_than_port() {
+            appWindow.width = 1000
+            appWindow.height = 900
+            wait(0)
+
+            var fields = findChild(page, "publicEndpointFields")
+            var host = findChild(page, "endpointHostField")
+            var port = findChild(page, "endpointPortField")
+            verify(fields !== null)
+            verify(host !== null)
+            verify(port !== null)
+            compare(Math.round(port.width), 200)
+            verify(host.width > port.width * 2,
+                   "The hostname field must receive the flexible desktop width")
+            verify(host.x + host.width <= port.x,
+                   "The public endpoint fields must not overlap")
+        }
+
         function test_remote_daemon_is_observation_only() {
             persistentSettings.useRemoteNode = true
             compare(page.locallyConfigurable, false)

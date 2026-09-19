@@ -699,8 +699,8 @@ Der öffentliche eingeschränkte RPC-Prüfendpunkt ist %2. Es wird kein privater
     </message>
     <message>
         <location line="+0"/>
-        <source>Comma-, semicolon- or whitespace-separated public HTTP endpoints.</source>
-        <translation>Öffentliche HTTP-Endpunkte, getrennt durch Komma, Semikolon oder Leerzeichen.</translation>
+        <source>Public restricted-RPC endpoints used to fetch signed service descriptors for EPoSe probes. They bootstrap discovery only; they do not grant admission.</source>
+        <translation>Öffentliche Restricted-RPC-Endpunkte zum Abrufen signierter Service-Deskriptoren für EPoSe-Prüfungen. Sie starten nur die Discovery und gewähren keine Zulassung.</translation>
     </message>
     <message>
         <location line="+5"/>

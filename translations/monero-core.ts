@@ -694,7 +694,7 @@ The public restricted-RPC probe endpoint will be %2. No wallet private key is us
     </message>
     <message>
         <location line="+0"/>
-        <source>Comma-, semicolon- or whitespace-separated public HTTP endpoints.</source>
+        <source>Public restricted-RPC endpoints used to fetch signed service descriptors for EPoSe probes. They bootstrap discovery only; they do not grant admission.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

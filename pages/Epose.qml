@@ -361,12 +361,13 @@ Item {
                 MoneroComponents.TextPlain { Layout.fillWidth: true; text: root.localized(qsTr("Service mode is opt-in. The Core producer handles admission, registration and renewal. No wallet private view or spend key is required.")); color: MoneroComponents.Style.textSecondaryColor; font.pixelSize: 14; wrapMode: Text.Wrap }
                 MoneroComponents.LineEdit { id: rewardAddress; Layout.fillWidth: true; labelText: root.localized(qsTr("Primary public QWC reward address")); placeholderText: root.localized(qsTr("QWC primary address")); text: persistentSettings.eposeRewardAddress }
                 RowLayout {
+                    objectName: "publicEndpointFields"
                     Layout.fillWidth: true
                     spacing: MoneroComponents.Style.spaceMd
-                    MoneroComponents.LineEdit { id: endpointHost; Layout.fillWidth: true; labelText: root.localized(qsTr("Public endpoint host")); placeholderText: root.localized(qsTr("service.example.org")); text: persistentSettings.eposeEndpointHost }
-                    MoneroComponents.LineEdit { id: endpointPort; Layout.preferredWidth: 170; labelText: root.localized(qsTr("Restricted RPC port")); placeholderText: "8198"; text: String(persistentSettings.eposeEndpointPort); validator: IntValidator { bottom: 1; top: 65535 } }
+                    MoneroComponents.LineEdit { id: endpointHost; objectName: "endpointHostField"; Layout.fillWidth: true; labelText: root.localized(qsTr("Public endpoint host")); placeholderText: root.localized(qsTr("service.example.org")); text: persistentSettings.eposeEndpointHost }
+                    MoneroComponents.LineEdit { id: endpointPort; objectName: "endpointPortField"; Layout.fillWidth: false; Layout.minimumWidth: 200; Layout.preferredWidth: 200; Layout.maximumWidth: 200; labelText: root.localized(qsTr("Restricted RPC port")); placeholderText: "8198"; text: String(persistentSettings.eposeEndpointPort); validator: IntValidator { bottom: 1; top: 65535 } }
                 }
-                MoneroComponents.LineEdit { id: discoveryEndpoints; Layout.fillWidth: true; labelText: root.localized(qsTr("Discovery endpoints")); placeholderText: root.localized(qsTr("http://seed-01.example.org:8198, http://seed-02.example.org:8198")); text: persistentSettings.eposeDiscoveryEndpoints; tipText: root.localized(qsTr("Comma-, semicolon- or whitespace-separated public HTTP endpoints.")) }
+                MoneroComponents.LineEdit { id: discoveryEndpoints; Layout.fillWidth: true; labelText: root.localized(qsTr("Discovery endpoints")); placeholderText: root.localized(qsTr("http://seed-01.example.org:8198, http://seed-02.example.org:8198")); text: persistentSettings.eposeDiscoveryEndpoints; tipText: root.localized(qsTr("Public restricted-RPC endpoints used to fetch signed service descriptors for EPoSe probes. They bootstrap discovery only; they do not grant admission.")) }
                 MoneroComponents.WarningBox { Layout.fillWidth: true; visible: root.setupError !== ""; text: root.setupError }
                 RowLayout {
                     Layout.fillWidth: true
