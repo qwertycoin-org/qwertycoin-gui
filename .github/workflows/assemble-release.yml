@@ -126,11 +126,11 @@ jobs:
             run=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}")
             local run_head
             run_head=$(jq -er '.head_sha' <<<"$run")
-            jq -e \
+            jq -e --arg expected_revision "$EXPECTED_REVISION" \
               '.name == "qwc/gui-release-candidate"
                and .path == ".github/workflows/release.yml"
                and .event == "workflow_dispatch"
-               and .head_branch == "master"
+               and (.head_branch == "master" or .head_sha == $expected_revision)
                and .status == "completed"
                and .conclusion == "success"
                and .run_attempt == 1' <<<"$run" >/dev/null
