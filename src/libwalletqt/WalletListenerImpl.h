@@ -46,6 +46,9 @@ public:
     virtual void unconfirmedMoneyReceived(const std::string &txId, uint64_t amount) override;
 
     virtual void newBlock(uint64_t height) override;
+    void qmsCarrier(uint64_t height, const std::string &blockHash,
+                    const std::string &txId, const std::string &extraHex) override;
+    void qmsReorg(uint64_t height, uint64_t blocksDetached) override;
 
     virtual void updated() override;
 
