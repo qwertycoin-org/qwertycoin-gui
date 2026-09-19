@@ -19,6 +19,9 @@ The current Qwertycoin GUI source line provides:
 - Qwertycoin Core submodule at the explicit `qwertycoin/` path;
 - `qwertycoind` local daemon integration and QWC mainnet defaults;
 - typed asynchronous EPoSe observer and a dedicated EPoSe page;
+- experimental QMS1 encrypted messaging with personal invitations, explicit
+  prepare/review/send, persistent local conversations and wallet-side receive
+  scanning over existing transaction nonce fields;
 - explicit local EPoSe producer setup through the supported Core flags;
 - QWC 8-decimal amounts and `qwertycoin:` URI handling;
 - DNSSEC-validated update checks with fixed QWC GitHub release targets;
@@ -36,9 +39,13 @@ The Core is tracked as a submodule at `qwertycoin/` with remote:
 https://github.com/qwertycoin-org/qwertycoin.git
 ```
 
-This release line pins reviewed Core commit
-`54308d8473dc5606d054c0ba428cfb2d64e758c1`. It contains the current QWC v2
-mainnet genesis and network identity.
+This experimental messenger release line pins Core commit
+`82cf8703c895663cbe69347188448b5f00f7a0e8`. It contains the wallet-side QMS1
+carrier implementation while preserving the current QWC v2 mainnet genesis,
+network identity and unchanged daemon consensus rules.
+
+QMS1 is an experimental MVP. It has no forward secrecy, ratchet recovery or
+post-quantum protection and has not received an external protocol audit.
 
 | Binding | Value |
 | --- | --- |
