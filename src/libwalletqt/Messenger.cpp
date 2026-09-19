@@ -26,8 +26,8 @@ Messenger::Messenger(Monero::Wallet *wallet, QObject *parent)
         m_prepared = m_wallet->restoreQmsCarrierTransactions(m_preparedJournal.toStdString());
         if (!m_prepared || m_prepared->status() != Monero::PendingTransaction::Status_Ok) {
             if (m_prepared) m_wallet->disposeTransaction(m_prepared);
-            m_prepared = nullptr; m_preparedJournal.clear(); m_preparedMessageId.clear();
-            m_preparedContactFingerprint.clear(); save();
+            m_prepared = nullptr;
+            cancelPrepared();
         }
     }
 }
@@ -276,6 +276,14 @@ bool Messenger::commitPrepared()
 void Messenger::cancelPrepared()
 {
     if (m_prepared) m_wallet->disposeTransaction(m_prepared);
+    if (!m_preparedMessageId.isEmpty()) {
+        for (int i = m_messages.size() - 1; i >= 0; --i) {
+            const QJsonObject message = m_messages[i].toObject();
+            if (message.value("id").toString() == m_preparedMessageId &&
+                message.value("status").toString() == DOMAIN_STATUS_PREPARED)
+                m_messages.removeAt(i);
+        }
+    }
     m_prepared = nullptr; m_preparedMessageId.clear(); m_preparedContactFingerprint.clear(); m_preparedJournal.clear(); save(); emit planChanged();
 }
 

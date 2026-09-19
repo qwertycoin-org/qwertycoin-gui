@@ -200,7 +200,7 @@ Item {
                                 RowLayout { id: planRow; anchors.fill: parent; anchors.margins: 8
                                     Label { Layout.fillWidth: true; wrapMode: Text.WordWrap; color: "#5f4b00"; text: currentWallet ? qsTr("Encrypted message ready for %1: %2 transaction(s), total fee %3 atomic QWC").arg(root.selectedContact ? root.selectedContact.label : "").arg(currentWallet.messenger.preparedTransactionCount).arg(currentWallet.messenger.preparedFee) : "" }
                                     Button { text: qsTr("Send encrypted message"); onClicked: currentWallet.messenger.commitPrepared() }
-                                    Button { text: qsTr("Cancel"); onClicked: currentWallet.messenger.cancelPrepared() }
+                                    Button { text: qsTr("Cancel and delete draft"); onClicked: currentWallet.messenger.cancelPrepared() }
                                 }
                             }
                             Label { Layout.fillWidth: true; wrapMode: Text.WordWrap; color: "#667781"; text: currentWallet ? currentWallet.messenger.status : "" }
