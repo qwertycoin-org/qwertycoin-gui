@@ -4,7 +4,8 @@ import QtQuick.Layouts 1.3
 
 Item {
     id: root
-    property int contentHeight: 1120
+    property int contentHeight: showContactManagement ? 800 : 700
+    property bool showContactManagement: false
     property string selectedFingerprint: ""
     property var contactsData: currentWallet ? currentWallet.messenger.contacts : []
     property var messagesData: currentWallet ? currentWallet.messenger.messages : []
@@ -60,10 +61,20 @@ Item {
 
     ColumnLayout {
         id: page; width: parent.width; spacing: 12
-        Label { text: qsTr("Messenger"); font.pixelSize: 28; font.bold: true }
+        RowLayout {
+            Layout.fillWidth: true
+            Label { text: root.showContactManagement ? qsTr("Messenger contacts") : qsTr("Messenger"); font.pixelSize: 28; font.bold: true }
+            Item { Layout.fillWidth: true }
+            Button {
+                objectName: "messengerContactManagementButton"
+                text: root.showContactManagement ? qsTr("Back to chat") : qsTr("Manage contacts")
+                onClicked: root.showContactManagement = !root.showContactManagement
+            }
+        }
         Label { Layout.fillWidth: true; wrapMode: Text.WordWrap; text: qsTr("Experimental encrypted QMS1 messenger. No forward secrecy or post-quantum protection. Invitations contain a confidential discovery secret.") }
 
         GroupBox {
+            visible: root.showContactManagement
             title: qsTr("My personal invitation"); Layout.fillWidth: true
             ColumnLayout { anchors.fill: parent
                 Label { Layout.fillWidth: true; wrapMode: Text.WordWrap; font.bold: true; text: qsTr("Send the long invitation below to your contact through a trusted private channel. Compare the shorter fingerprint separately before accepting the contact.") }
@@ -75,6 +86,7 @@ Item {
         }
 
         GroupBox {
+            visible: root.showContactManagement
             title: qsTr("Add a messenger contact"); Layout.fillWidth: true
             ColumnLayout { anchors.fill: parent
                 Label { Layout.fillWidth: true; wrapMode: Text.WordWrap; text: qsTr("Paste the other wallet's long personal invitation. A payment address or fingerprint alone is not sufficient.") }
@@ -88,8 +100,24 @@ Item {
             }
         }
 
+        GroupBox {
+            visible: root.showContactManagement && root.selectedContact !== null
+            title: qsTr("Selected contact"); Layout.fillWidth: true
+            ColumnLayout {
+                anchors.fill: parent
+                Label { Layout.fillWidth: true; elide: Text.ElideMiddle; text: root.selectedFingerprint; color: "#667781" }
+                RowLayout {
+                    Layout.fillWidth: true
+                    TextField { id: renameField; Layout.fillWidth: true; placeholderText: qsTr("Contact name") }
+                    Button { text: qsTr("Rename"); enabled: renameField.text.trim().length > 0; onClicked: currentWallet.messenger.renameContact(root.selectedFingerprint, renameField.text) }
+                    Button { text: qsTr("Remove"); enabled: !currentWallet || currentWallet.messenger.preparedTransactionCount === 0; onClicked: removeDialog.open() }
+                }
+            }
+        }
+
         RowLayout {
-            Layout.fillWidth: true; Layout.preferredHeight: 520; spacing: 12
+            visible: !root.showContactManagement
+            Layout.fillWidth: true; Layout.preferredHeight: 560; spacing: 12
             Rectangle {
                 Layout.preferredWidth: 260; Layout.fillHeight: true; color: "#f0f2f5"; border.color: "#c8ccd0"; radius: 6
                 ColumnLayout { anchors.fill: parent; anchors.margins: 8; spacing: 8
@@ -122,9 +150,6 @@ Item {
                                 Label { text: root.selectedContact ? root.selectedContact.label : ""; color: "#111b21"; font.pixelSize: 18; font.bold: true }
                                 Label { text: root.selectedFingerprint; color: "#667781"; font.pixelSize: 11; elide: Text.ElideMiddle; Layout.fillWidth: true }
                             }
-                            TextField { id: renameField; Layout.preferredWidth: 180; placeholderText: qsTr("Contact name") }
-                            Button { text: qsTr("Rename"); enabled: renameField.text.trim().length > 0; onClicked: currentWallet.messenger.renameContact(root.selectedFingerprint, renameField.text) }
-                            Button { text: qsTr("Remove"); enabled: !currentWallet || currentWallet.messenger.preparedTransactionCount === 0; onClicked: removeDialog.open() }
                         }
                     }
                     Label { Layout.fillWidth: true; Layout.fillHeight: true; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter; color: "#667781"; font.pixelSize: 18; visible: root.selectedContact === null; text: qsTr("Select a contact to open the conversation") }
