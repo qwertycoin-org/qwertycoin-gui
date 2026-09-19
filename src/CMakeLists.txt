@@ -12,6 +12,7 @@ file(GLOB SOURCE_FILES
     "libwalletqt/WalletManager.cpp"
     "libwalletqt/WalletListenerImpl.cpp"
     "libwalletqt/Wallet.cpp"
+    "libwalletqt/Messenger.cpp"
     "libwalletqt/PassphraseHelper.cpp"
     "libwalletqt/PendingTransaction.cpp"
     "libwalletqt/TransactionHistory.cpp"
@@ -23,6 +24,7 @@ file(GLOB SOURCE_FILES
     "libwalletqt/UnsignedTransaction.cpp"
     "libwalletqt/WalletManager.h"
     "libwalletqt/Wallet.h"
+    "libwalletqt/Messenger.h"
     "libwalletqt/PassphraseHelper.h"
     "libwalletqt/PendingTransaction.h"
     "libwalletqt/TransactionHistory.h"
@@ -142,6 +144,7 @@ target_link_libraries(qwertycoin-gui
     common
     net
     epose
+    qms
     wallet_api
     qrcodegen
     easylogging
