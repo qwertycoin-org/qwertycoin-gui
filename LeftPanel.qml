@@ -62,6 +62,7 @@ Rectangle {
     signal advancedClicked()
     signal settingsClicked()
     signal addressBookClicked()
+    signal messagesClicked()
     signal accountClicked()
 
     function selectItem(pos) {
@@ -71,6 +72,7 @@ Rectangle {
         else if(pos === "Transfer") menuColumn.previousButton = transferButton
         else if(pos === "Receive")  menuColumn.previousButton = receiveButton
         else if(pos === "AddressBook") menuColumn.previousButton = addressBookButton
+        else if(pos === "Messages") menuColumn.previousButton = messagesButton
         else if(pos === "Settings") menuColumn.previousButton = settingsButton
         else if(pos === "Advanced") menuColumn.previousButton = advancedButton
         else if(pos === "Account") menuColumn.previousButton = accountButton
@@ -436,6 +438,27 @@ Rectangle {
                 anchors.leftMargin: 20
             }
 
+            // ------------- Messages tab ---------------
+            MoneroComponents.MenuButton {
+                id: messagesButton
+                anchors.left: parent.left
+                anchors.right: parent.right
+                text: qsTr("Messages") + translationManager.emptyString
+                under: addressBookButton
+                onClicked: {
+                    parent.previousButton.checked = false
+                    parent.previousButton = messagesButton
+                    panel.messagesClicked()
+                }
+            }
+
+            MoneroComponents.MenuButtonDivider {
+                visible: messagesButton.present
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: 20
+            }
+
             // ------------- Receive tab ---------------
             MoneroComponents.MenuButton {
                 id: receiveButton
@@ -443,6 +466,7 @@ Rectangle {
                 anchors.right: parent.right
                 text: qsTr("Receive") + translationManager.emptyString
                 symbol: (isMac ? "⌃" : qsTr("Ctrl+")) + "R" + translationManager.emptyString
+                under: messagesButton
                 onClicked: {
                     parent.previousButton.checked = false
                     parent.previousButton = receiveButton

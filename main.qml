@@ -1861,6 +1861,12 @@ ApplicationWindow {
                     updateBalance();
                 }
 
+                onMessagesClicked: {
+                    middlePanel.state = "Messages";
+                    middlePanel.flickable.contentY = 0;
+                    updateBalance();
+                }
+
                 onAdvancedClicked: {
                     middlePanel.state = "Advanced";
                     middlePanel.flickable.contentY = 0;
