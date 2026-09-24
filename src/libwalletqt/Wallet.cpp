@@ -597,6 +597,11 @@ void Wallet::stopBackgroundSync(const QString &password)
 
 bool Wallet::refresh(bool historyAndSubaddresses /* = true */)
 {
+    if (m_messenger && m_messenger->enabled()
+        && !m_messenger->strictTransportReady()) {
+        qWarning() << "QMS2 wallet refresh blocked: strict SOCKS/onion transport is unavailable";
+        return false;
+    }
     refreshingSet(true);
     const auto cleanup = sg::make_scope_guard([this]() noexcept {
         refreshingSet(false);

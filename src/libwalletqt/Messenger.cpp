@@ -11,6 +11,7 @@
 #include "cryptonote_basic/cryptonote_basic_impl.h"
 #include "cryptonote_core/cryptonote_tx_utils.h"
 #include "string_tools.h"
+#include "qms/wallet_state.h"
 
 namespace
 {
@@ -30,14 +31,30 @@ Messenger::Messenger(Monero::Wallet *wallet, QObject *parent)
 bool Messenger::initialize()
 {
     if (m_ready) return true;
+    emit enabledChanged(); // Also refreshes canEnable after a password change.
+    if (!m_wallet->qmsStateExists()) {
+        setStatus(tr("Messenger is not enabled for this wallet."));
+        return false;
+    }
+    return enable();
+}
+
+bool Messenger::enable()
+{
+    if (m_ready) return true;
     if (!m_wallet->qmsStateStorageAvailable()) {
         setStatus(tr("Messenger requires a password-protected, unlocked wallet."));
+        return false;
+    }
+    if (!m_wallet->qmsStateExists() && !m_wallet->qmsStrictTransportReady()) {
+        setStatus(tr("Configure a SOCKS proxy and Tor v3 onion daemon before enabling Messenger."));
         return false;
     }
     try {
         load();
         ensureIdentity();
         m_ready = true;
+        emit enabledChanged();
         emit readyChanged();
         if (!m_preparedJournal.isEmpty()) {
             m_prepared = m_wallet->restoreQmsCarrierTransactions(m_preparedJournal.toStdString());
@@ -53,6 +70,16 @@ bool Messenger::initialize()
         setStatus(tr("Messenger unavailable: ") + QString::fromUtf8(e.what()));
         return false;
     }
+}
+
+bool Messenger::enabled() const
+{
+    return m_wallet->qmsStateExists();
+}
+
+bool Messenger::canEnable() const
+{
+    return m_wallet->qmsStateStorageAvailable() && m_wallet->qmsStrictTransportReady();
 }
 
 Messenger::~Messenger()
@@ -100,6 +127,11 @@ qwertycoin::qms::hash32 Messenger::genesis() const
 
 std::string Messenger::stateContext() const
 {
+    return qwertycoin::qms::wallet_state_context(genesis(), m_wallet->mainAddress());
+}
+
+std::string Messenger::legacyStateContext() const
+{
     const auto network = genesis();
     return std::string("QWC-QMS2-GUI|")
         + hex(network.data(), network.size()).toStdString()
@@ -122,8 +154,13 @@ void Messenger::ensureIdentity()
 void Messenger::load()
 {
     std::string plaintext;
-    if (!m_wallet->loadQmsState(plaintext, stateContext()))
-        throw std::runtime_error(m_wallet->errorString());
+    bool migratedLegacyContext = false;
+    if (!m_wallet->loadQmsState(plaintext, stateContext())) {
+        const std::string neutralError = m_wallet->errorString();
+        if (!m_wallet->loadQmsState(plaintext, legacyStateContext()))
+            throw std::runtime_error(neutralError);
+        migratedLegacyContext = !plaintext.empty();
+    }
     const QByteArray raw = QByteArray::fromStdString(plaintext);
     if (raw.isEmpty()) return;
     const QJsonDocument document = QJsonDocument::fromJson(raw);
@@ -163,6 +200,8 @@ void Messenger::load()
             }
         }
     }
+    if (migratedLegacyContext && !save())
+        throw std::runtime_error("cannot migrate legacy GUI messenger state context");
 }
 
 bool Messenger::save()
@@ -397,22 +436,97 @@ bool Messenger::prepare(const QString &contactFingerprint, const QString &text)
 bool Messenger::commitPrepared()
 {
     if (!m_prepared) { setStatus(tr("No prepared message.")); return false; }
-    const bool ok = m_prepared->commit();
-    for (int i = 0; i < m_messages.size(); ++i) { QJsonObject message = m_messages[i].toObject(); if (message.value("id").toString() == m_preparedMessageId) {
-        message["status"] = ok ? "sent" : "send failed"; m_messages[i] = message; break; } }
-    if (!ok) setStatus(QString::fromStdString(m_prepared->errorString())); else setStatus(tr("Encrypted message transactions submitted."));
-    m_wallet->disposeTransaction(m_prepared); m_prepared = nullptr; m_preparedMessageId.clear(); m_preparedContactFingerprint.clear(); m_preparedJournal.clear();
+    if (m_checkpointPending) {
+        if (!save()) {
+            setStatus(tr("The previous carrier checkpoint is still not durable. No carrier was submitted."));
+            emit planChanged();
+            return false;
+        }
+        m_checkpointPending = false;
+        if (m_prepared->txCount() == 0) {
+            m_wallet->disposeTransaction(m_prepared); m_prepared = nullptr;
+            setStatus(tr("Encrypted message transactions submitted and completion persisted."));
+            emit planChanged();
+            return true;
+        }
+        setStatus(tr("The carrier checkpoint is now durable. Review the remaining transaction count, then resume sending explicitly."));
+        emit planChanged();
+        return true;
+    }
+    while (m_prepared->txCount() != 0) {
+        if (!m_prepared->commitQmsNext()) {
+            setStatus(tr("Carrier submission stopped; the remaining encrypted transactions are still recoverable: ")
+                + QString::fromStdString(m_prepared->errorString()));
+            emit planChanged();
+            return false;
+        }
+
+        for (int i = 0; i < m_messages.size(); ++i) {
+            QJsonObject message = m_messages[i].toObject();
+            if (message.value("id").toString() != m_preparedMessageId) continue;
+            message["submittedTransactions"] =
+                message.value("transactions").toInt() - int(m_prepared->txCount());
+            m_messages[i] = message;
+            break;
+        }
+
+        if (m_prepared->txCount() != 0) {
+            m_preparedJournal = QByteArray::fromStdString(m_prepared->qmsJournalData());
+            m_checkpointPending = true;
+            if (m_preparedJournal.isEmpty() || !save()) {
+                setStatus(tr("Carrier accepted, but the reduced recovery journal could not be persisted. "
+                    "No further carrier was submitted."));
+                emit planChanged();
+                return false;
+            }
+            m_checkpointPending = false;
+        }
+    }
+
+    for (int i = 0; i < m_messages.size(); ++i) {
+        QJsonObject message = m_messages[i].toObject();
+        if (message.value("id").toString() != m_preparedMessageId) continue;
+        message["status"] = "sent";
+        m_messages[i] = message;
+        break;
+    }
+    setStatus(tr("Encrypted message transactions submitted."));
+    m_preparedMessageId.clear(); m_preparedContactFingerprint.clear(); m_preparedJournal.clear();
     if (!m_historyEnabled) {
         for (int i = m_messages.size() - 1; i >= 0; --i)
             if (m_messages[i].toObject().value("direction").toString() == "out"
                 && m_messages[i].toObject().value("status").toString() != DOMAIN_STATUS_PREPARED)
                 m_messages.removeAt(i);
     }
-    save(); emit planChanged(); return ok;
+    m_checkpointPending = true;
+    if (!save()) {
+        setStatus(tr("All carriers were submitted, but local completion could not be persisted. "
+            "Retry Send to persist completion; no carrier will be rebroadcast."));
+        emit planChanged();
+        return false;
+    }
+    m_checkpointPending = false;
+    m_wallet->disposeTransaction(m_prepared); m_prepared = nullptr;
+    emit planChanged();
+    return true;
 }
 
 void Messenger::cancelPrepared()
 {
+    if (m_checkpointPending && !save()) {
+        setStatus(tr("The carrier checkpoint is not durable yet; cancellation was refused."));
+        emit planChanged();
+        return;
+    }
+    if (m_checkpointPending) {
+        m_checkpointPending = false;
+        if (m_prepared && m_prepared->txCount() == 0) {
+            m_wallet->disposeTransaction(m_prepared); m_prepared = nullptr;
+            setStatus(tr("Encrypted message transactions submitted and completion persisted."));
+            emit planChanged();
+            return;
+        }
+    }
     if (m_prepared) m_wallet->disposeTransaction(m_prepared);
     if (!m_preparedMessageId.isEmpty()) {
         for (int i = m_messages.size() - 1; i >= 0; --i) {

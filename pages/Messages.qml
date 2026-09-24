@@ -84,6 +84,13 @@ Item {
             color: "#d93025"
             text: currentWallet ? currentWallet.messenger.status : ""
         }
+        Button {
+            objectName: "messengerEnableButton"
+            visible: currentWallet && !currentWallet.messenger.enabled
+            enabled: currentWallet && currentWallet.messenger.canEnable
+            text: qsTr("Enable experimental messenger for this wallet")
+            onClicked: currentWallet.messenger.enable()
+        }
 
         GroupBox {
             visible: root.showContactManagement
@@ -237,11 +244,12 @@ Item {
                                 }
                             }
                             Rectangle {
+                                objectName: "messengerPlanPanel"
                                 Layout.fillWidth: true; Layout.preferredHeight: planRow.implicitHeight + 16; color: "#fff4ce"; radius: 5
-                                visible: currentWallet && currentWallet.messenger.preparedTransactionCount > 0
+                                visible: currentWallet && (currentWallet.messenger.preparedTransactionCount > 0 || currentWallet.messenger.checkpointPending)
                                 RowLayout { id: planRow; anchors.fill: parent; anchors.margins: 8
-                                    Label { Layout.fillWidth: true; wrapMode: Text.WordWrap; color: "#5f4b00"; text: currentWallet ? qsTr("Encrypted message ready for %1: %2 transaction(s), total fee %3 atomic QWC").arg(root.selectedContact ? root.selectedContact.label : "").arg(currentWallet.messenger.preparedTransactionCount).arg(currentWallet.messenger.preparedFee) : "" }
-                                    Button { text: qsTr("Send encrypted message"); onClicked: currentWallet.messenger.commitPrepared() }
+                                    Label { Layout.fillWidth: true; wrapMode: Text.WordWrap; color: "#5f4b00"; text: currentWallet ? (currentWallet.messenger.checkpointPending ? qsTr("A local recovery checkpoint must be persisted before any further action.") : qsTr("Encrypted message ready for %1: %2 transaction(s), total fee %3 atomic QWC").arg(root.selectedContact ? root.selectedContact.label : "").arg(currentWallet.messenger.preparedTransactionCount).arg(currentWallet.messenger.preparedFee)) : "" }
+                                    Button { objectName: "messengerSendButton"; text: currentWallet && currentWallet.messenger.checkpointPending ? qsTr("Retry local checkpoint") : qsTr("Send encrypted message"); onClicked: currentWallet.messenger.commitPrepared() }
                                     Button { text: qsTr("Cancel and delete draft"); onClicked: currentWallet.messenger.cancelPrepared() }
                                 }
                             }

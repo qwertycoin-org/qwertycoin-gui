@@ -20,10 +20,13 @@ class Messenger : public QObject
     Q_PROPERTY(QVariantList messages READ messages NOTIFY stateChanged)
     Q_PROPERTY(int preparedTransactionCount READ preparedTransactionCount NOTIFY planChanged)
     Q_PROPERTY(quint64 preparedFee READ preparedFee NOTIFY planChanged)
+    Q_PROPERTY(bool checkpointPending READ checkpointPending NOTIFY planChanged)
     Q_PROPERTY(QString preparedContactFingerprint READ preparedContactFingerprint NOTIFY planChanged)
     Q_PROPERTY(QString status READ status NOTIFY statusChanged)
     Q_PROPERTY(bool historyEnabled READ historyEnabled WRITE setHistoryEnabled NOTIFY historyEnabledChanged)
     Q_PROPERTY(bool ready READ ready NOTIFY readyChanged)
+    Q_PROPERTY(bool enabled READ enabled NOTIFY enabledChanged)
+    Q_PROPERTY(bool canEnable READ canEnable NOTIFY enabledChanged)
     Q_PROPERTY(bool strictTransportReady READ strictTransportReady NOTIFY strictTransportReadyChanged)
 
 public:
@@ -36,13 +39,17 @@ public:
     QVariantList messages() const;
     int preparedTransactionCount() const;
     quint64 preparedFee() const;
+    bool checkpointPending() const { return m_checkpointPending; }
     QString preparedContactFingerprint() const { return m_preparedContactFingerprint; }
     QString status() const { return m_status; }
     bool historyEnabled() const { return m_historyEnabled; }
     bool ready() const { return m_ready; }
+    bool enabled() const;
+    bool canEnable() const;
     bool strictTransportReady() const;
 
     bool initialize();
+    Q_INVOKABLE bool enable();
     Q_INVOKABLE bool importInvitation(const QString &label, const QString &encodedHex);
     Q_INVOKABLE bool renameContact(const QString &fingerprint, const QString &label);
     Q_INVOKABLE bool removeContact(const QString &fingerprint);
@@ -61,6 +68,7 @@ signals:
     void statusChanged();
     void historyEnabledChanged();
     void readyChanged();
+    void enabledChanged();
     void strictTransportReadyChanged();
 
 private:
@@ -69,6 +77,7 @@ private:
     bool save();
     void setStatus(const QString &value);
     std::string stateContext() const;
+    std::string legacyStateContext() const;
     qwertycoin::qms::hash32 genesis() const;
     static QByteArray bytes(const qwertycoin::qms::bytes &value);
     static qwertycoin::qms::bytes bytes(const QByteArray &value);
@@ -90,5 +99,6 @@ private:
     QString m_preparedMessageId;
     QString m_preparedContactFingerprint;
     QByteArray m_preparedJournal;
+    bool m_checkpointPending = false;
     QString m_status;
 };

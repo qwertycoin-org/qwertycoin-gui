@@ -24,12 +24,16 @@ Item {
         ]
         property int preparedTransactionCount: 0
         property int preparedFee: 0
+        property bool checkpointPending: false
         property string preparedContactFingerprint: ""
         property string status: ""
         property bool ready: true
+        property bool enabled: true
+        property bool canEnable: true
         property bool strictTransportReady: true
         property bool historyEnabled: false
         function importInvitation(label, invitation) { return true }
+        function enable() { enabled = true; ready = true; return true }
         function renameContact(fingerprint, label) { return true }
         function removeContact(fingerprint) { return true }
         function prepare(fingerprint, text) { return true }
@@ -48,9 +52,43 @@ Item {
         when: windowShown
 
         function init() {
+            messengerMock.enabled = true
+            messengerMock.ready = true
+            messengerMock.canEnable = true
+            messengerMock.preparedTransactionCount = 0
+            messengerMock.checkpointPending = false
             page.selectedFingerprint = ""
             page.showContactManagement = false
             wait(0)
+        }
+
+        function test_activation_is_explicit() {
+            messengerMock.enabled = false
+            messengerMock.ready = false
+            wait(0)
+            var enableButton = findChild(page, "messengerEnableButton")
+            verify(enableButton !== null)
+            compare(enableButton.visible, true)
+            enableButton.clicked()
+            compare(messengerMock.enabled, true)
+            compare(messengerMock.ready, true)
+        }
+
+        function test_checkpoint_retry_is_distinct_from_send() {
+            page.selectedFingerprint = "alice-fingerprint"
+            messengerMock.preparedTransactionCount = 2
+            wait(0)
+            var planPanel = findChild(page, "messengerPlanPanel")
+            var sendButton = findChild(page, "messengerSendButton")
+            verify(planPanel !== null)
+            verify(sendButton !== null)
+            compare(planPanel.visible, true)
+            compare(sendButton.text, "Send encrypted message")
+
+            messengerMock.checkpointPending = true
+            wait(0)
+            compare(planPanel.visible, true)
+            compare(sendButton.text, "Retry local checkpoint")
         }
 
         function test_conversation_is_filtered_by_selected_contact() {
