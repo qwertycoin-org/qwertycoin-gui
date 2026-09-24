@@ -4,8 +4,9 @@
 #include <QJsonValue>
 #include <QDateTime>
 #include <QVariantMap>
+#include <algorithm>
 #include <cstring>
-#include <sodium.h>
+#include <stdexcept>
 
 #include "cryptonote_basic/cryptonote_basic_impl.h"
 #include "cryptonote_core/cryptonote_tx_utils.h"
@@ -13,22 +14,44 @@
 
 namespace
 {
-    const char *STATE_KEY = "qms/state/v1";
     const char *DOMAIN_STATUS_PREPARED = "prepared";
+    const int MAX_INCOMPLETE_MESSAGES = 64;
+    const int MAX_INCOMPLETE_PER_CONTACT = 16;
+    const qint64 MAX_REASSEMBLY_BYTES = 8 * 1024 * 1024;
+    const int MAX_SEEN_MESSAGES = 4096;
 }
 
 Messenger::Messenger(Monero::Wallet *wallet, QObject *parent)
     : QObject(parent), m_wallet(wallet)
 {
-    load();
-    ensureIdentity();
-    if (!m_preparedJournal.isEmpty()) {
-        m_prepared = m_wallet->restoreQmsCarrierTransactions(m_preparedJournal.toStdString());
-        if (!m_prepared || m_prepared->status() != Monero::PendingTransaction::Status_Ok) {
-            if (m_prepared) m_wallet->disposeTransaction(m_prepared);
-            m_prepared = nullptr;
-            cancelPrepared();
+    initialize();
+}
+
+bool Messenger::initialize()
+{
+    if (m_ready) return true;
+    if (!m_wallet->qmsStateStorageAvailable()) {
+        setStatus(tr("Messenger requires a password-protected, unlocked wallet."));
+        return false;
+    }
+    try {
+        load();
+        ensureIdentity();
+        m_ready = true;
+        emit readyChanged();
+        if (!m_preparedJournal.isEmpty()) {
+            m_prepared = m_wallet->restoreQmsCarrierTransactions(m_preparedJournal.toStdString());
+            if (!m_prepared || m_prepared->status() != Monero::PendingTransaction::Status_Ok) {
+                if (m_prepared) m_wallet->disposeTransaction(m_prepared);
+                m_prepared = nullptr;
+                cancelPrepared();
+            }
         }
+        return true;
+    } catch (const std::exception &e) {
+        m_ready = false;
+        setStatus(tr("Messenger unavailable: ") + QString::fromUtf8(e.what()));
+        return false;
     }
 }
 
@@ -75,41 +98,59 @@ qwertycoin::qms::hash32 Messenger::genesis() const
     return result;
 }
 
+std::string Messenger::stateContext() const
+{
+    const auto network = genesis();
+    return std::string("QWC-QMS2-GUI|")
+        + hex(network.data(), network.size()).toStdString()
+        + "|" + m_wallet->mainAddress();
+}
+
 void Messenger::ensureIdentity()
 {
-    if (m_invitation.version == qwertycoin::qms::WIRE_VERSION &&
-        qwertycoin::qms::verify_invitation(m_invitation)) return;
-    m_identity = qwertycoin::qms::generate_identity();
-    m_invitation = qwertycoin::qms::create_invitation(m_identity, genesis());
-    save();
+    if (m_crypto && !m_contactPackage.isEmpty()) return;
+    m_crypto.reset(new qwertycoin::qms::crypto_backend(
+        qwertycoin::qms::crypto_backend::create()));
+    const auto prepared = m_crypto->prepare_contact_package(genesis());
+    m_crypto.reset(new qwertycoin::qms::crypto_backend(prepared.next_state));
+    m_invitationId = prepared.invitation_id;
+    m_fingerprint = prepared.fingerprint;
+    m_contactPackage = bytes(prepared.package);
+    if (!save()) throw std::runtime_error("cannot persist new QMS2 identity");
 }
 
 void Messenger::load()
 {
-    const QByteArray raw = QByteArray::fromStdString(m_wallet->getCacheAttribute(STATE_KEY));
+    std::string plaintext;
+    if (!m_wallet->loadQmsState(plaintext, stateContext()))
+        throw std::runtime_error(m_wallet->errorString());
+    const QByteArray raw = QByteArray::fromStdString(plaintext);
+    if (raw.isEmpty()) return;
     const QJsonDocument document = QJsonDocument::fromJson(raw);
-    if (!document.isObject()) return;
+    if (!document.isObject()) throw std::runtime_error("invalid QMS2 wallet state");
     const QJsonObject root = document.object();
-    auto copy = [](const QString &encoded, uint8_t *destination, size_t size) {
-        const QByteArray decoded = QByteArray::fromBase64(encoded.toLatin1());
-        if (size_t(decoded.size()) != size) return false;
-        std::memcpy(destination, decoded.constData(), size); return true;
-    };
-    const QJsonObject identity = root.value("identity").toObject();
-    bool valid = copy(identity.value("boxPublic").toString(), m_identity.box_public.data(), m_identity.box_public.size()) &&
-        copy(identity.value("boxSecret").toString(), m_identity.box_secret.data(), m_identity.box_secret.size()) &&
-        copy(identity.value("signPublic").toString(), m_identity.sign_public.data(), m_identity.sign_public.size()) &&
-        copy(identity.value("signSecret").toString(), m_identity.sign_secret.data(), m_identity.sign_secret.size());
-    if (valid) {
-        try {
-            m_invitation = qwertycoin::qms::decode_invitation(bytes(QByteArray::fromBase64(root.value("invitation").toString().toLatin1())));
-            valid = m_invitation.genesis == genesis();
-        } catch (...) { valid = false; }
-    }
-    if (!valid) m_invitation = {};
+    if (root.value("profile").toInt() != qwertycoin::qms::CRYPTO_PROFILE_TRIPLE_RATCHET)
+        throw std::runtime_error("unsupported or legacy QMS state profile");
+    const QByteArray cryptoState = QByteArray::fromBase64(
+        root.value("cryptoState").toString().toLatin1());
+    m_contactPackage = QByteArray::fromBase64(
+        root.value("contactPackage").toString().toLatin1());
+    const QByteArray invitation = QByteArray::fromHex(
+        root.value("invitationId").toString().toLatin1());
+    const QByteArray fingerprint = QByteArray::fromHex(
+        root.value("fingerprint").toString().toLatin1());
+    if (cryptoState.isEmpty() || m_contactPackage.isEmpty()
+        || size_t(invitation.size()) != m_invitationId.size()
+        || size_t(fingerprint.size()) != m_fingerprint.size())
+        throw std::runtime_error("incomplete QMS2 wallet identity");
+    std::memcpy(m_invitationId.data(), invitation.constData(), m_invitationId.size());
+    std::memcpy(m_fingerprint.data(), fingerprint.constData(), m_fingerprint.size());
+    m_crypto.reset(new qwertycoin::qms::crypto_backend(bytes(cryptoState)));
     m_contacts = root.value("contacts").toArray();
-    m_messages = root.value("messages").toArray();
+    m_historyEnabled = root.value("historyEnabled").toBool(false);
+    if (m_historyEnabled) m_messages = root.value("messages").toArray();
     m_incomplete = root.value("incomplete").toObject();
+    m_seenMessages = root.value("seenMessages").toArray();
     m_preparedJournal = QByteArray::fromBase64(root.value("preparedJournal").toString().toLatin1());
     m_preparedMessageId = root.value("preparedMessageId").toString();
     m_preparedContactFingerprint = root.value("preparedContactFingerprint").toString();
@@ -124,46 +165,53 @@ void Messenger::load()
     }
 }
 
-void Messenger::save()
+bool Messenger::save()
 {
-    auto b64 = [](const uint8_t *data, size_t size) {
-        return QString::fromLatin1(QByteArray(reinterpret_cast<const char *>(data), int(size)).toBase64());
-    };
-    QJsonObject identity;
-    identity["boxPublic"] = b64(m_identity.box_public.data(), m_identity.box_public.size());
-    identity["boxSecret"] = b64(m_identity.box_secret.data(), m_identity.box_secret.size());
-    identity["signPublic"] = b64(m_identity.sign_public.data(), m_identity.sign_public.size());
-    identity["signSecret"] = b64(m_identity.sign_secret.data(), m_identity.sign_secret.size());
+    if (!m_crypto) return false;
     QJsonObject root;
-    root["identity"] = identity;
-    root["invitation"] = QString::fromLatin1(bytes(qwertycoin::qms::encode_invitation(m_invitation)).toBase64());
+    root["profile"] = int(qwertycoin::qms::CRYPTO_PROFILE_TRIPLE_RATCHET);
+    root["cryptoState"] = QString::fromLatin1(bytes(m_crypto->state()).toBase64());
+    root["contactPackage"] = QString::fromLatin1(m_contactPackage.toBase64());
+    root["invitationId"] = hex(m_invitationId.data(), m_invitationId.size());
+    root["fingerprint"] = hex(m_fingerprint.data(), m_fingerprint.size());
     root["contacts"] = m_contacts;
-    root["messages"] = m_messages;
+    root["historyEnabled"] = m_historyEnabled;
+    if (m_historyEnabled) root["messages"] = m_messages;
     root["incomplete"] = m_incomplete;
+    root["seenMessages"] = m_seenMessages;
     root["preparedJournal"] = QString::fromLatin1(m_preparedJournal.toBase64());
     root["preparedMessageId"] = m_preparedMessageId;
     root["preparedContactFingerprint"] = m_preparedContactFingerprint;
-    // Wallet cache attributes are covered by the wallet's encrypted cache persistence.
-    m_wallet->setCacheAttribute(STATE_KEY, QJsonDocument(root).toJson(QJsonDocument::Compact).toStdString());
+    const bool stored = m_wallet->storeQmsState(
+        QJsonDocument(root).toJson(QJsonDocument::Compact).toStdString(), stateContext());
+    if (!stored) {
+        setStatus(tr("Messenger state could not be stored: ")
+            + QString::fromStdString(m_wallet->errorString()));
+        return false;
+    }
     emit stateChanged();
+    return true;
 }
-
-qwertycoin::qms::invitation Messenger::ownInvitationValue() const { return m_invitation; }
 
 QString Messenger::ownInvitation() const
 {
-    return QString::fromStdString(qwertycoin::qms::hex(qwertycoin::qms::encode_invitation(m_invitation)));
+    return QString::fromLatin1(m_contactPackage.toHex());
 }
 
 QString Messenger::ownFingerprint() const
 {
-    const auto value = qwertycoin::qms::fingerprint(m_identity.box_public, m_identity.sign_public);
-    return hex(value.data(), value.size());
+    return hex(m_fingerprint.data(), m_fingerprint.size());
 }
 
 QVariantList Messenger::contacts() const
 {
-    QVariantList result; for (const auto value : m_contacts) result.push_back(value.toObject().toVariantMap()); return result;
+    QVariantList result;
+    for (const auto value : m_contacts) {
+        const QJsonObject contact = value.toObject();
+        if (!contact.value("removed").toBool(false))
+            result.push_back(contact.toVariantMap());
+    }
+    return result;
 }
 
 QVariantList Messenger::messages() const
@@ -182,29 +230,61 @@ void Messenger::setStatus(const QString &value)
 bool Messenger::importInvitation(const QString &label, const QString &encodedHex)
 {
     try {
+        if (!m_ready || !m_crypto) throw std::runtime_error("messenger is not ready");
         const QString normalizedLabel = label.trimmed();
         if (normalizedLabel.isEmpty()) throw std::runtime_error("contact name is required");
         const QByteArray raw = unhex(encodedHex.trimmed());
         if (raw.isEmpty()) throw std::runtime_error("invitation is not canonical hexadecimal");
-        const auto invitation = qwertycoin::qms::decode_invitation(bytes(raw));
-        if (invitation.genesis != genesis()) throw std::runtime_error("invitation belongs to another network");
-        const auto fp = qwertycoin::qms::fingerprint(invitation.box_public, invitation.sign_public);
-        const QString fingerprint = hex(fp.data(), fp.size());
+        const auto prepared = m_crypto->prepare_import_contact(
+            m_invitationId, bytes(raw), quint64(QDateTime::currentSecsSinceEpoch()));
+        const QString fingerprint = hex(prepared.fingerprint.data(), prepared.fingerprint.size());
         if (fingerprint == ownFingerprint())
             throw std::runtime_error("cannot import this wallet's own messenger invitation");
-        for (const auto value : m_contacts)
-            if (value.toObject().value("fingerprint").toString() == fingerprint)
+        for (int i = 0; i < m_contacts.size(); ++i) {
+            QJsonObject existing = m_contacts[i].toObject();
+            if (existing.value("fingerprint").toString() != fingerprint) continue;
+            if (!existing.value("removed").toBool(false))
                 throw std::runtime_error("contact fingerprint is already present");
-        QJsonObject contact; contact["label"] = normalizedLabel; contact["fingerprint"] = fingerprint;
-        contact["invitation"] = encodedHex.trimmed().toLower(); contact["confirmed"] = true;
-        m_contacts.push_back(contact); save(); setStatus(tr("Contact imported; verify the fingerprint out of band.")); return true;
-    } catch (const std::exception &e) { setStatus(tr("Invitation rejected: ") + e.what()); return false; }
+            const QJsonArray previous = m_contacts;
+            existing["label"] = normalizedLabel;
+            existing["removed"] = false;
+            m_contacts[i] = existing;
+            if (!save()) { m_contacts = previous; return false; }
+            setStatus(tr("Contact restored; verify the fingerprint out of band."));
+            return true;
+        }
+
+        QJsonObject contact;
+        contact["label"] = normalizedLabel;
+        contact["fingerprint"] = fingerprint;
+        contact["contactId"] = QString::fromStdString(prepared.contact_id);
+        contact["package"] = QString::fromLatin1(raw.toBase64());
+        contact["confirmed"] = true;
+        contact["removed"] = false;
+        const QJsonArray previousContacts = m_contacts;
+        const auto previousState = m_crypto->state();
+        m_contacts.push_back(contact);
+        m_crypto.reset(new qwertycoin::qms::crypto_backend(prepared.next_state));
+        if (!save()) {
+            m_contacts = previousContacts;
+            m_crypto.reset(new qwertycoin::qms::crypto_backend(previousState));
+            return false;
+        }
+        setStatus(tr("Contact imported; verify the fingerprint out of band."));
+        return true;
+    } catch (const std::exception &e) {
+        setStatus(tr("Invitation rejected: ") + QString::fromUtf8(e.what()));
+        return false;
+    }
 }
 
 bool Messenger::renameContact(const QString &fingerprint, const QString &label)
 {
+    if (!m_ready) { setStatus(tr("Messenger is not ready.")); return false; }
     const QString normalized = label.trimmed();
     if (normalized.isEmpty()) { setStatus(tr("Contact name cannot be empty.")); return false; }
+    const QJsonArray previousContacts = m_contacts;
+    const QJsonArray previousMessages = m_messages;
     bool found = false;
     for (int i = 0; i < m_contacts.size(); ++i) {
         QJsonObject contact = m_contacts[i].toObject();
@@ -217,17 +297,23 @@ bool Messenger::renameContact(const QString &fingerprint, const QString &label)
         if (message.value("contact").toString() != fingerprint) continue;
         message["label"] = normalized; m_messages[i] = message;
     }
-    save(); setStatus(tr("Contact renamed.")); return true;
+    if (!save()) { m_contacts = previousContacts; m_messages = previousMessages; return false; }
+    setStatus(tr("Contact renamed.")); return true;
 }
 
 bool Messenger::removeContact(const QString &fingerprint)
 {
+    if (!m_ready) { setStatus(tr("Messenger is not ready.")); return false; }
     if (!m_preparedContactFingerprint.isEmpty() && m_preparedContactFingerprint == fingerprint) {
         setStatus(tr("Cancel or send the prepared message before removing this contact.")); return false;
     }
     for (int i = 0; i < m_contacts.size(); ++i) {
         if (m_contacts[i].toObject().value("fingerprint").toString() != fingerprint) continue;
-        m_contacts.removeAt(i); save();
+        const QJsonArray previous = m_contacts;
+        QJsonObject contact = m_contacts[i].toObject();
+        contact["removed"] = true;
+        m_contacts[i] = contact;
+        if (!save()) { m_contacts = previous; return false; }
         setStatus(tr("Contact removed. Existing local message history was retained.")); return true;
     }
     setStatus(tr("Contact not found.")); return false;
@@ -237,20 +323,42 @@ bool Messenger::prepare(const QString &contactFingerprint, const QString &text)
 {
     cancelPrepared();
     try {
-        qwertycoin::qms::invitation recipient; QString label; bool found = false;
-        for (const auto value : m_contacts) { const QJsonObject contact = value.toObject(); if (contact.value("fingerprint").toString() == contactFingerprint) {
-            recipient = qwertycoin::qms::decode_invitation(bytes(unhex(contact.value("invitation").toString()))); label = contact.value("label").toString(); found = true; break; } }
+        if (!m_ready || !m_crypto) throw std::runtime_error("messenger is not ready");
+        const QByteArray utf8 = text.toUtf8();
+        if (utf8.isEmpty()) throw std::runtime_error("message is empty");
+        if (utf8.size() > int(qwertycoin::qms::MAX_TEXT_BYTES))
+            throw std::runtime_error("message exceeds 4096 UTF-8 bytes");
+        QString label;
+        std::string contactId;
+        bool found = false;
+        for (const auto value : m_contacts) {
+            const QJsonObject contact = value.toObject();
+            if (contact.value("fingerprint").toString() != contactFingerprint
+                || contact.value("removed").toBool(false)) continue;
+            contactId = contact.value("contactId").toString().toStdString();
+            label = contact.value("label").toString();
+            found = !contactId.empty();
+            break;
+        }
         if (!found) throw std::runtime_error("unknown messenger contact");
-        qwertycoin::qms::id16 id{}; randombytes_buf(id.data(), id.size());
-        const std::string utf8 = text.toUtf8().toStdString();
-        const auto ciphertext = qwertycoin::qms::seal_text(m_identity, recipient, genesis(), id, utf8);
-        const auto fragments = qwertycoin::qms::fragment_ciphertext(recipient, genesis(), id, ciphertext);
+        const auto preparedSend = m_crypto->prepare_send_text(
+            contactId, utf8.toStdString(), quint64(QDateTime::currentSecsSinceEpoch()));
+        qwertycoin::qms::bytes inner;
+        inner.reserve(1 + preparedSend.ciphertext.data.size());
+        inner.push_back(preparedSend.ciphertext.message_type);
+        inner.insert(inner.end(), preparedSend.ciphertext.data.begin(),
+                     preparedSend.ciphertext.data.end());
+        const auto context = m_crypto->transport_context(contactId, true);
+        const auto envelope = qwertycoin::qms::seal_outer_envelope(
+            context, preparedSend.message_id, inner);
+        const auto fragments = qwertycoin::qms::fragment_envelope(
+            context, preparedSend.message_id, envelope);
         std::vector<std::vector<uint8_t>> extras;
         for (const auto &fragment : fragments) { std::vector<uint8_t> extra; if (!qwertycoin::qms::append_carrier_nonces(extra, fragment)) throw std::runtime_error("fragment does not fit unchanged tx_extra limit"); extras.push_back(std::move(extra)); }
         m_prepared = m_wallet->createQmsCarrierTransactions(extras, 1, m_wallet->defaultMixin());
         if (!m_prepared || m_prepared->status() != Monero::PendingTransaction::Status_Ok)
             throw std::runtime_error(m_prepared ? m_prepared->errorString() : "wallet returned no transaction plan");
-        m_preparedMessageId = hex(id.data(), id.size());
+        m_preparedMessageId = hex(preparedSend.message_id.data(), preparedSend.message_id.size());
         m_preparedContactFingerprint = contactFingerprint;
         m_preparedJournal = QByteArray::fromStdString(m_prepared->qmsJournalData());
         if (m_preparedJournal.isEmpty()) throw std::runtime_error("wallet could not create encrypted QMS journal");
@@ -258,9 +366,29 @@ bool Messenger::prepare(const QString &contactFingerprint, const QString &text)
         message["label"] = label; message["text"] = text; message["direction"] = "out";
         message["status"] = DOMAIN_STATUS_PREPARED; message["transactions"] = int(m_prepared->txCount());
         message["fee"] = QString::number(m_prepared->fee());
-        message["timestamp"] = QDateTime::currentDateTimeUtc().toString(Qt::ISODate); m_messages.push_back(message); save();
+        message["timestamp"] = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+
+        const auto previousState = m_crypto->state();
+        const QJsonArray previousMessages = m_messages;
+        m_crypto.reset(new qwertycoin::qms::crypto_backend(preparedSend.next_state));
+        m_messages.push_back(message);
+        if (!save()) {
+            m_crypto.reset(new qwertycoin::qms::crypto_backend(previousState));
+            m_messages = previousMessages;
+            m_wallet->disposeTransaction(m_prepared);
+            m_prepared = nullptr;
+            m_preparedMessageId.clear();
+            m_preparedContactFingerprint.clear();
+            m_preparedJournal.clear();
+            emit planChanged();
+            return false;
+        }
         setStatus(tr("Encrypted and prepared. Review transaction count and total fee, then send explicitly.")); emit planChanged(); return true;
-    } catch (const std::exception &e) { cancelPrepared(); setStatus(tr("Preparation failed: ") + e.what()); return false; }
+    } catch (const std::exception &e) {
+        cancelPrepared();
+        setStatus(tr("Preparation failed: ") + QString::fromUtf8(e.what()));
+        return false;
+    }
 }
 
 bool Messenger::commitPrepared()
@@ -270,7 +398,14 @@ bool Messenger::commitPrepared()
     for (int i = 0; i < m_messages.size(); ++i) { QJsonObject message = m_messages[i].toObject(); if (message.value("id").toString() == m_preparedMessageId) {
         message["status"] = ok ? "sent" : "send failed"; m_messages[i] = message; break; } }
     if (!ok) setStatus(QString::fromStdString(m_prepared->errorString())); else setStatus(tr("Encrypted message transactions submitted."));
-    m_wallet->disposeTransaction(m_prepared); m_prepared = nullptr; m_preparedMessageId.clear(); m_preparedContactFingerprint.clear(); m_preparedJournal.clear(); save(); emit planChanged(); return ok;
+    m_wallet->disposeTransaction(m_prepared); m_prepared = nullptr; m_preparedMessageId.clear(); m_preparedContactFingerprint.clear(); m_preparedJournal.clear();
+    if (!m_historyEnabled) {
+        for (int i = m_messages.size() - 1; i >= 0; --i)
+            if (m_messages[i].toObject().value("direction").toString() == "out"
+                && m_messages[i].toObject().value("status").toString() != DOMAIN_STATUS_PREPARED)
+                m_messages.removeAt(i);
+    }
+    save(); emit planChanged(); return ok;
 }
 
 void Messenger::cancelPrepared()
@@ -284,33 +419,122 @@ void Messenger::cancelPrepared()
                 m_messages.removeAt(i);
         }
     }
-    m_prepared = nullptr; m_preparedMessageId.clear(); m_preparedContactFingerprint.clear(); m_preparedJournal.clear(); save(); emit planChanged();
+    m_prepared = nullptr; m_preparedMessageId.clear(); m_preparedContactFingerprint.clear(); m_preparedJournal.clear();
+    if (m_crypto) save();
+    emit planChanged();
 }
 
 void Messenger::ingestCarrier(quint64 height, const QString &blockHash, const QString &txId, const QString &extraHex)
 {
     try {
+        if (!m_ready || !m_crypto) return;
         const auto fragments = qwertycoin::qms::extract_carrier_fragments(bytes(unhex(extraHex)));
-        if (fragments.size() != 1 || !qwertycoin::qms::verify_fragment(m_invitation, genesis(), fragments[0])) return;
-        const auto &fragment = fragments[0]; const QString id = hex(fragment.message_id.data(), fragment.message_id.size());
-        QJsonArray parts = m_incomplete.value(id).toArray();
+        if (fragments.size() != 1
+            || fragments[0].profile != qwertycoin::qms::CRYPTO_PROFILE_TRIPLE_RATCHET)
+            return;
+        const auto &fragment = fragments[0];
+        const QString id = hex(fragment.message_id.data(), fragment.message_id.size());
+        QString contactId;
+        QString contactFingerprint;
+        QString contactLabel;
+        qwertycoin::qms::envelope_context context;
+        bool matched = false;
+        for (const auto value : m_contacts) {
+            const QJsonObject contact = value.toObject();
+            const std::string candidateId = contact.value("contactId").toString().toStdString();
+            if (candidateId.empty()) continue;
+            try {
+                const auto candidate = m_crypto->transport_context(candidateId, false);
+                if (!qwertycoin::qms::verify_envelope_fragment(candidate, fragment)) continue;
+                contactId = QString::fromStdString(candidateId);
+                contactFingerprint = contact.value("fingerprint").toString();
+                contactLabel = contact.value("label").toString();
+                context = candidate;
+                matched = true;
+                break;
+            } catch (...) {}
+        }
+        if (!matched) return;
+        const QString seenKey = contactId + ":" + id;
+        for (const auto value : m_seenMessages)
+            if (value.toString() == seenKey) return;
+
+        const QString incompleteKey = seenKey;
+        const QJsonObject previousIncomplete = m_incomplete;
+        QJsonObject incomplete = m_incomplete.value(incompleteKey).toObject();
+        if (!incomplete.isEmpty() && incomplete.value("count").toInt() != fragment.count) {
+            m_incomplete.remove(incompleteKey);
+            if (!save()) m_incomplete = previousIncomplete;
+            return;
+        }
+        QJsonArray parts = incomplete.value("parts").toArray();
         const QString encoded = QString::fromLatin1(bytes(qwertycoin::qms::encode_fragment(fragment)).toBase64());
         for (const auto value : parts) if (value.toObject().value("index").toInt() == fragment.index) {
-            if (value.toObject().value("data").toString() != encoded) { m_incomplete.remove(id); save(); } return; }
-        if (m_incomplete.size() >= 64 && !m_incomplete.contains(id)) return;
-        QJsonObject part; part["index"] = fragment.index; part["data"] = encoded; parts.push_back(part); m_incomplete[id] = parts;
-        if (parts.size() != fragment.count) { save(); return; }
+            if (value.toObject().value("data").toString() != encoded) {
+                m_incomplete.remove(incompleteKey);
+                if (!save()) m_incomplete = previousIncomplete;
+            }
+            return;
+        }
+        if (!m_incomplete.contains(incompleteKey)) {
+            if (m_incomplete.size() >= MAX_INCOMPLETE_MESSAGES) return;
+            int perContact = 0;
+            for (auto i = m_incomplete.begin(); i != m_incomplete.end(); ++i)
+                if (i.value().toObject().value("contactId").toString() == contactId)
+                    ++perContact;
+            if (perContact >= MAX_INCOMPLETE_PER_CONTACT) return;
+        }
+        qint64 storedBytes = 0;
+        for (auto i = m_incomplete.begin(); i != m_incomplete.end(); ++i)
+            for (const auto partValue : i.value().toObject().value("parts").toArray())
+                storedBytes += QByteArray::fromBase64(
+                    partValue.toObject().value("data").toString().toLatin1()).size();
+        if (storedBytes + QByteArray::fromBase64(encoded.toLatin1()).size()
+            > MAX_REASSEMBLY_BYTES) return;
+        QJsonObject part; part["index"] = fragment.index; part["data"] = encoded; parts.push_back(part);
+        incomplete["contactId"] = contactId;
+        incomplete["fingerprint"] = contactFingerprint;
+        incomplete["count"] = fragment.count;
+        incomplete["parts"] = parts;
+        m_incomplete[incompleteKey] = incomplete;
+        if (parts.size() != fragment.count) {
+            if (!save()) m_incomplete = previousIncomplete;
+            return;
+        }
         std::vector<qwertycoin::qms::fragment> complete; for (const auto value : parts) complete.push_back(qwertycoin::qms::decode_fragment(bytes(QByteArray::fromBase64(value.toObject().value("data").toString().toLatin1()))));
-        const auto ciphertext = qwertycoin::qms::reassemble(complete);
-        for (const auto value : m_contacts) { const QJsonObject contact = value.toObject(); try {
-            const auto sender = qwertycoin::qms::decode_invitation(bytes(unhex(contact.value("invitation").toString())));
-            const auto opened = qwertycoin::qms::open_text(m_identity, sender, m_invitation, genesis(), fragment.message_id, ciphertext);
-            QJsonObject message; message["id"] = id; message["contact"] = contact.value("fingerprint"); message["label"] = contact.value("label");
-            message["text"] = QString::fromUtf8(opened.text.data(), int(opened.text.size())); message["direction"] = "in"; message["status"] = "confirmed";
-            message["height"] = QString::number(height); message["blockHash"] = blockHash; message["txId"] = txId;
-            message["timestamp"] = QDateTime::currentDateTimeUtc().toString(Qt::ISODate); m_messages.push_back(message); m_incomplete.remove(id); save(); return;
-        } catch (...) {} }
-        m_incomplete.remove(id); save();
+        const auto envelope = qwertycoin::qms::reassemble(complete);
+        const auto opened = qwertycoin::qms::open_outer_envelope(
+            context, fragment.message_id, envelope);
+        if (opened.size() < 2) throw std::runtime_error("empty QMS2 inner ciphertext");
+        qwertycoin::qms::ratchet_ciphertext ciphertext;
+        ciphertext.message_type = opened.front();
+        ciphertext.data.assign(opened.begin() + 1, opened.end());
+        const auto received = m_crypto->prepare_receive_text(
+            contactId.toStdString(), ciphertext);
+        if (received.message_id != fragment.message_id)
+            throw std::runtime_error("QMS2 message identifier mismatch");
+
+        const auto previousState = m_crypto->state();
+        const QJsonArray previousSeen = m_seenMessages;
+        const QJsonArray previousMessages = m_messages;
+        m_crypto.reset(new qwertycoin::qms::crypto_backend(received.next_state));
+        m_incomplete.remove(incompleteKey);
+        m_seenMessages.push_back(seenKey);
+        while (m_seenMessages.size() > MAX_SEEN_MESSAGES) m_seenMessages.removeAt(0);
+        QJsonObject message; message["id"] = id; message["contact"] = contactFingerprint;
+        message["label"] = contactLabel;
+        message["text"] = QString::fromUtf8(received.text.data(), int(received.text.size()));
+        message["direction"] = "in"; message["status"] = "confirmed";
+        message["height"] = QString::number(height); message["blockHash"] = blockHash;
+        message["txId"] = txId;
+        message["timestamp"] = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+        m_messages.push_back(message);
+        if (!save()) {
+            m_crypto.reset(new qwertycoin::qms::crypto_backend(previousState));
+            m_incomplete = previousIncomplete;
+            m_seenMessages = previousSeen;
+            m_messages = previousMessages;
+        }
     } catch (...) { /* unauthenticated malformed chain data is ignored */ }
 }
 
@@ -319,4 +543,21 @@ void Messenger::handleReorg(quint64 height, quint64)
     bool changed = false; for (int i = 0; i < m_messages.size(); ++i) { QJsonObject message = m_messages[i].toObject();
         if (message.value("direction") == "in" && message.value("height").toString().toULongLong() >= height) { message["status"] = "chain proof lost"; m_messages[i] = message; changed = true; } }
     if (changed) save();
+}
+
+void Messenger::setHistoryEnabled(bool enabled)
+{
+    if (m_historyEnabled == enabled) return;
+    const bool previous = m_historyEnabled;
+    m_historyEnabled = enabled;
+    if (!save()) { m_historyEnabled = previous; return; }
+    emit historyEnabledChanged();
+}
+
+void Messenger::clearHistory()
+{
+    const QJsonArray previous = m_messages;
+    m_messages = QJsonArray();
+    if (!save()) { m_messages = previous; return; }
+    setStatus(tr("Local messenger history cleared. Blockchain carrier data is unchanged."));
 }

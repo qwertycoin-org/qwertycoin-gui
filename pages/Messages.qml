@@ -54,7 +54,7 @@ Item {
         y: 160
         contentItem: Label {
             wrapMode: Text.WordWrap
-            text: qsTr("Remove %1 from the contact list? Existing local message history is retained and becomes visible again if the same invitation is re-imported.").arg(root.selectedContact ? root.selectedContact.label : "")
+            text: qsTr("Remove %1 from the contact list? The encrypted ratchet state is retained so delayed messages remain decryptable. Any locally retained chat history is unchanged.").arg(root.selectedContact ? root.selectedContact.label : "")
         }
         onAccepted: if (currentWallet && currentWallet.messenger.removeContact(root.selectedFingerprint)) root.selectedFingerprint = ""
     }
@@ -71,7 +71,19 @@ Item {
                 onClicked: root.showContactManagement = !root.showContactManagement
             }
         }
-        Label { Layout.fillWidth: true; wrapMode: Text.WordWrap; text: qsTr("Experimental encrypted QMS1 messenger. No forward secrecy or post-quantum protection. Invitations contain a confidential discovery secret.") }
+        Label {
+            Layout.fillWidth: true
+            wrapMode: Text.WordWrap
+            color: "#8a4b00"
+            text: qsTr("Experimental QMS2 messenger: PQXDH plus an ongoing Triple Ratchet. The protocol has not received an independent security audit. Blockchain timing, fees and carrier count remain public. Use only test funds during the preview.")
+        }
+        Label {
+            Layout.fillWidth: true
+            wrapMode: Text.WordWrap
+            visible: currentWallet && !currentWallet.messenger.ready
+            color: "#d93025"
+            text: currentWallet ? currentWallet.messenger.status : ""
+        }
 
         GroupBox {
             visible: root.showContactManagement
@@ -87,6 +99,35 @@ Item {
 
         GroupBox {
             visible: root.showContactManagement
+            title: qsTr("Local message history")
+            Layout.fillWidth: true
+            ColumnLayout {
+                anchors.fill: parent
+                Label {
+                    Layout.fillWidth: true
+                    wrapMode: Text.WordWrap
+                    text: qsTr("Message plaintext is not persisted by default. Enabling history stores it inside the password-bound encrypted QMS2 wallet state. This does not remove carrier data from the blockchain.")
+                }
+                RowLayout {
+                    Layout.fillWidth: true
+                    Switch {
+                        text: qsTr("Persist decrypted chat history")
+                        checked: currentWallet ? currentWallet.messenger.historyEnabled : false
+                        enabled: currentWallet && currentWallet.messenger.ready
+                        onToggled: if (currentWallet) currentWallet.messenger.setHistoryEnabled(checked)
+                    }
+                    Item { Layout.fillWidth: true }
+                    Button {
+                        text: qsTr("Clear local history")
+                        enabled: currentWallet && currentWallet.messenger.ready
+                        onClicked: currentWallet.messenger.clearHistory()
+                    }
+                }
+            }
+        }
+
+        GroupBox {
+            visible: root.showContactManagement
             title: qsTr("Add a messenger contact"); Layout.fillWidth: true
             ColumnLayout { anchors.fill: parent
                 Label { Layout.fillWidth: true; wrapMode: Text.WordWrap; text: qsTr("Paste the other wallet's long personal invitation. A payment address or fingerprint alone is not sufficient.") }
@@ -94,7 +135,7 @@ Item {
                 TextArea { id: contactInvitation; Layout.fillWidth: true; Layout.preferredHeight: 82; placeholderText: qsTr("Long invitation hex"); wrapMode: TextEdit.WrapAnywhere }
                 Button {
                     text: qsTr("Import invitation")
-                    enabled: contactLabel.text.trim().length > 0 && contactInvitation.text.trim().length > 0
+                    enabled: currentWallet && currentWallet.messenger.ready && contactLabel.text.trim().length > 0 && contactInvitation.text.trim().length > 0
                     onClicked: if (currentWallet.messenger.importInvitation(contactLabel.text, contactInvitation.text)) { contactInvitation.clear(); contactLabel.clear() }
                 }
             }
@@ -128,7 +169,7 @@ Item {
                         delegate: Button {
                             width: contacts.width; height: 66; checkable: true
                             checked: root.selectedFingerprint === modelData.fingerprint
-                            enabled: !currentWallet || currentWallet.messenger.preparedTransactionCount === 0 || currentWallet.messenger.preparedContactFingerprint === modelData.fingerprint
+                            enabled: currentWallet && currentWallet.messenger.ready && (currentWallet.messenger.preparedTransactionCount === 0 || currentWallet.messenger.preparedContactFingerprint === modelData.fingerprint)
                             background: Rectangle { radius: 5; color: parent.checked ? "#d9fdd3" : (parent.hovered ? "#e7e9eb" : "transparent"); border.width: parent.checked ? 2 : 0; border.color: "#00a884" }
                             contentItem: Column { spacing: 3
                                 Text { text: modelData.label; color: "#111b21"; font.bold: root.selectedFingerprint === modelData.fingerprint; font.pixelSize: 16; elide: Text.ElideRight; width: parent.width }
@@ -184,7 +225,7 @@ Item {
                     Rectangle {
                         Layout.fillWidth: true; Layout.preferredHeight: composerColumn.implicitHeight + 20; color: "#f0f2f5"; visible: root.selectedContact !== null
                         ColumnLayout { id: composerColumn; anchors.left: parent.left; anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter; anchors.margins: 10; spacing: 6
-                            TextArea { id: composer; objectName: "messengerComposer"; Layout.fillWidth: true; Layout.preferredHeight: 92; enabled: currentWallet && currentWallet.messenger.preparedTransactionCount === 0; placeholderText: qsTr("Write an encrypted message (maximum 4,096 UTF-8 bytes)"); wrapMode: TextEdit.Wrap }
+                            TextArea { id: composer; objectName: "messengerComposer"; Layout.fillWidth: true; Layout.preferredHeight: 92; enabled: currentWallet && currentWallet.messenger.ready && currentWallet.messenger.preparedTransactionCount === 0; placeholderText: qsTr("Write an encrypted message (maximum 4,096 UTF-8 bytes)"); wrapMode: TextEdit.Wrap }
                             RowLayout { Layout.fillWidth: true
                                 Label { text: qsTr("UTF-8 bytes: %1 / 4096").arg(unescape(encodeURIComponent(composer.text)).length); color: unescape(encodeURIComponent(composer.text)).length > 4096 ? "#d93025" : "#667781" }
                                 Item { Layout.fillWidth: true }

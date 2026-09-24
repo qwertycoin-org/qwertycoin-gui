@@ -212,7 +212,9 @@ QString Wallet::errorString() const
 
 bool Wallet::setPassword(const QString &password)
 {
-    return m_walletImpl->setPassword(password.toStdString());
+    const bool changed = m_walletImpl->setPassword(password.toStdString());
+    if (changed && m_messenger) m_messenger->initialize();
+    return changed;
 }
 
 QString Wallet::address(quint32 accountIndex, quint32 addressIndex) const

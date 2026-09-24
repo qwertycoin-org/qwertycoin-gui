@@ -26,12 +26,16 @@ Item {
         property int preparedFee: 0
         property string preparedContactFingerprint: ""
         property string status: ""
+        property bool ready: true
+        property bool historyEnabled: false
         function importInvitation(label, invitation) { return true }
         function renameContact(fingerprint, label) { return true }
         function removeContact(fingerprint) { return true }
         function prepare(fingerprint, text) { return true }
         function commitPrepared() { return true }
         function cancelPrepared() {}
+        function setHistoryEnabled(enabled) { historyEnabled = enabled }
+        function clearHistory() { messages = [] }
     }
     QtObject { id: walletMock; property var messenger: messengerMock }
     property var currentWallet: walletMock
@@ -86,6 +90,13 @@ Item {
             manageButton.clicked()
             compare(page.showContactManagement, true)
             compare(contacts.visible, false)
+        }
+
+        function test_history_persistence_is_opt_in() {
+            compare(messengerMock.historyEnabled, false)
+            messengerMock.setHistoryEnabled(true)
+            compare(messengerMock.historyEnabled, true)
+            messengerMock.setHistoryEnabled(false)
         }
     }
 }

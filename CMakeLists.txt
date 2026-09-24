@@ -62,6 +62,10 @@ if(NOT MANUAL_SUBMODULES)
   endif()
 endif()
 
+# Messenger profile 2 is a required part of this feature branch.  Build the
+# pinned Rust/libsignal backend through the Core submodule; there is no silent
+# fallback to the legacy sealed-box profile.
+set(QWC_ENABLE_QMS2_CRYPTO ON CACHE BOOL "Build QMS2 Triple Ratchet backend" FORCE)
 add_subdirectory(qwertycoin)
 add_subdirectory(external)
 
