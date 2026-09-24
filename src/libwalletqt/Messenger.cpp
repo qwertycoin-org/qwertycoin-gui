@@ -221,6 +221,7 @@ QVariantList Messenger::messages() const
 
 int Messenger::preparedTransactionCount() const { return m_prepared ? int(m_prepared->txCount()) : 0; }
 quint64 Messenger::preparedFee() const { return m_prepared ? m_prepared->fee() : 0; }
+bool Messenger::strictTransportReady() const { return m_wallet->qmsStrictTransportReady(); }
 
 void Messenger::setStatus(const QString &value)
 {
@@ -324,6 +325,8 @@ bool Messenger::prepare(const QString &contactFingerprint, const QString &text)
     cancelPrepared();
     try {
         if (!m_ready || !m_crypto) throw std::runtime_error("messenger is not ready");
+        if (!strictTransportReady())
+            throw std::runtime_error("QMS2 requires a SOCKS proxy and Tor v3 onion daemon");
         const QByteArray utf8 = text.toUtf8();
         if (utf8.isEmpty()) throw std::runtime_error("message is empty");
         if (utf8.size() > int(qwertycoin::qms::MAX_TEXT_BYTES))
@@ -428,6 +431,10 @@ void Messenger::ingestCarrier(quint64 height, const QString &blockHash, const QS
 {
     try {
         if (!m_ready || !m_crypto) return;
+        if (!strictTransportReady()) {
+            setStatus(tr("Messenger sync blocked: configure a SOCKS proxy and Tor v3 onion daemon."));
+            return;
+        }
         const auto fragments = qwertycoin::qms::extract_carrier_fragments(bytes(unhex(extraHex)));
         if (fragments.size() != 1
             || fragments[0].profile != qwertycoin::qms::CRYPTO_PROFILE_TRIPLE_RATCHET)

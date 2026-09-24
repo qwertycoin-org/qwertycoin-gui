@@ -27,6 +27,7 @@ Item {
         property string preparedContactFingerprint: ""
         property string status: ""
         property bool ready: true
+        property bool strictTransportReady: true
         property bool historyEnabled: false
         function importInvitation(label, invitation) { return true }
         function renameContact(fingerprint, label) { return true }
@@ -77,6 +78,18 @@ Item {
             var composer = findChild(page, "messengerComposer")
             verify(composer !== null)
             verify(composer.height >= 90)
+        }
+
+        function test_composer_fails_closed_without_strict_transport() {
+            page.selectedFingerprint = "alice-fingerprint"
+            messengerMock.strictTransportReady = false
+            wait(0)
+            var composer = findChild(page, "messengerComposer")
+            verify(composer !== null)
+            compare(composer.enabled, false)
+            messengerMock.strictTransportReady = true
+            wait(0)
+            compare(composer.enabled, true)
         }
 
         function test_chat_is_primary_and_contact_management_is_separate() {

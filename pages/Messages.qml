@@ -225,13 +225,14 @@ Item {
                     Rectangle {
                         Layout.fillWidth: true; Layout.preferredHeight: composerColumn.implicitHeight + 20; color: "#f0f2f5"; visible: root.selectedContact !== null
                         ColumnLayout { id: composerColumn; anchors.left: parent.left; anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter; anchors.margins: 10; spacing: 6
-                            TextArea { id: composer; objectName: "messengerComposer"; Layout.fillWidth: true; Layout.preferredHeight: 92; enabled: currentWallet && currentWallet.messenger.ready && currentWallet.messenger.preparedTransactionCount === 0; placeholderText: qsTr("Write an encrypted message (maximum 4,096 UTF-8 bytes)"); wrapMode: TextEdit.Wrap }
+                            TextArea { id: composer; objectName: "messengerComposer"; Layout.fillWidth: true; Layout.preferredHeight: 92; enabled: currentWallet && currentWallet.messenger.ready && currentWallet.messenger.strictTransportReady && currentWallet.messenger.preparedTransactionCount === 0; placeholderText: qsTr("Write an encrypted message (maximum 4,096 UTF-8 bytes)"); wrapMode: TextEdit.Wrap }
+                            Label { Layout.fillWidth: true; wrapMode: Text.WordWrap; visible: currentWallet && !currentWallet.messenger.strictTransportReady; color: "#d93025"; text: qsTr("Sending and message sync are blocked until a SOCKS proxy and Tor v3 onion daemon are configured. Contact management remains available.") }
                             RowLayout { Layout.fillWidth: true
                                 Label { text: qsTr("UTF-8 bytes: %1 / 4096").arg(unescape(encodeURIComponent(composer.text)).length); color: unescape(encodeURIComponent(composer.text)).length > 4096 ? "#d93025" : "#667781" }
                                 Item { Layout.fillWidth: true }
                                 Button {
                                     text: qsTr("Encrypt & review")
-                                    enabled: root.selectedFingerprint !== "" && composer.text.length > 0 && unescape(encodeURIComponent(composer.text)).length <= 4096 && currentWallet.messenger.preparedTransactionCount === 0
+                                    enabled: root.selectedFingerprint !== "" && composer.text.length > 0 && unescape(encodeURIComponent(composer.text)).length <= 4096 && currentWallet.messenger.strictTransportReady && currentWallet.messenger.preparedTransactionCount === 0
                                     onClicked: if (currentWallet.messenger.prepare(root.selectedFingerprint, composer.text)) composer.clear()
                                 }
                             }

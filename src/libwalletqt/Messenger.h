@@ -24,6 +24,7 @@ class Messenger : public QObject
     Q_PROPERTY(QString status READ status NOTIFY statusChanged)
     Q_PROPERTY(bool historyEnabled READ historyEnabled WRITE setHistoryEnabled NOTIFY historyEnabledChanged)
     Q_PROPERTY(bool ready READ ready NOTIFY readyChanged)
+    Q_PROPERTY(bool strictTransportReady READ strictTransportReady NOTIFY strictTransportReadyChanged)
 
 public:
     explicit Messenger(Monero::Wallet *wallet, QObject *parent = nullptr);
@@ -39,6 +40,7 @@ public:
     QString status() const { return m_status; }
     bool historyEnabled() const { return m_historyEnabled; }
     bool ready() const { return m_ready; }
+    bool strictTransportReady() const;
 
     bool initialize();
     Q_INVOKABLE bool importInvitation(const QString &label, const QString &encodedHex);
@@ -59,6 +61,7 @@ signals:
     void statusChanged();
     void historyEnabledChanged();
     void readyChanged();
+    void strictTransportReadyChanged();
 
 private:
     void ensureIdentity();
