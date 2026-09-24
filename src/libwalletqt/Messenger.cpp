@@ -565,14 +565,16 @@ void Messenger::ingestCarrier(quint64 height, const QString &blockHash, const QS
             const std::string candidateId = contact.value("contactId").toString().toStdString();
             if (candidateId.empty()) continue;
             try {
-                const auto candidate = m_crypto->transport_context(candidateId, false);
-                if (!qwertycoin::qms::verify_envelope_fragment(candidate, fragment)) continue;
-                contactId = QString::fromStdString(candidateId);
-                contactFingerprint = contact.value("fingerprint").toString();
-                contactLabel = contact.value("label").toString();
-                context = candidate;
-                matched = true;
-                break;
+                for (const auto &candidate : m_crypto->transport_contexts(candidateId, false)) {
+                    if (!qwertycoin::qms::verify_envelope_fragment(candidate, fragment)) continue;
+                    contactId = QString::fromStdString(candidateId);
+                    contactFingerprint = contact.value("fingerprint").toString();
+                    contactLabel = contact.value("label").toString();
+                    context = candidate;
+                    matched = true;
+                    break;
+                }
+                if (matched) break;
             } catch (...) {}
         }
         if (!matched) return;
@@ -681,4 +683,39 @@ void Messenger::clearHistory()
     m_messages = QJsonArray();
     if (!save()) { m_messages = previous; return; }
     setStatus(tr("Local messenger history cleared. Blockchain carrier data is unchanged."));
+}
+
+bool Messenger::resetState()
+{
+    if (m_prepared) {
+        m_wallet->disposeTransaction(m_prepared);
+        m_prepared = nullptr;
+    }
+    if (!m_wallet->clearQmsState()) {
+        setStatus(tr("Unable to reset Messenger state: ") + QString::fromStdString(m_wallet->errorString()));
+        return false;
+    }
+    m_crypto.reset();
+    m_contactPackage.fill('\0');
+    m_contactPackage.clear();
+    std::fill(m_invitationId.begin(), m_invitationId.end(), 0);
+    std::fill(m_fingerprint.begin(), m_fingerprint.end(), 0);
+    m_contacts = QJsonArray();
+    m_messages = QJsonArray();
+    m_incomplete = QJsonObject();
+    m_seenMessages = QJsonArray();
+    m_preparedJournal.fill('\0');
+    m_preparedJournal.clear();
+    m_preparedMessageId.clear();
+    m_preparedContactFingerprint.clear();
+    m_checkpointPending = false;
+    m_historyEnabled = false;
+    m_ready = false;
+    emit stateChanged();
+    emit planChanged();
+    emit historyEnabledChanged();
+    emit readyChanged();
+    emit enabledChanged();
+    setStatus(tr("Messenger identity and sessions reset. Enable Messenger again and exchange fresh contact packages before sending."));
+    return true;
 }

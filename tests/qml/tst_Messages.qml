@@ -41,6 +41,7 @@ Item {
         function cancelPrepared() {}
         function setHistoryEnabled(enabled) { historyEnabled = enabled }
         function clearHistory() { messages = [] }
+        function resetState() { ready = false; enabled = false; contacts = []; messages = []; return true }
     }
     QtObject { id: walletMock; property var messenger: messengerMock }
     property var currentWallet: walletMock
@@ -55,6 +56,14 @@ Item {
             messengerMock.enabled = true
             messengerMock.ready = true
             messengerMock.canEnable = true
+            messengerMock.contacts = [
+                { "label": "Alice", "fingerprint": "alice-fingerprint" },
+                { "label": "Bob", "fingerprint": "bob-fingerprint" }
+            ]
+            messengerMock.messages = [
+                { "id": "1", "contact": "alice-fingerprint", "label": "Alice", "text": "outgoing", "direction": "out", "status": "sent", "timestamp": "2026-09-19T12:30:00Z" },
+                { "id": "2", "contact": "bob-fingerprint", "label": "Bob", "text": "incoming", "direction": "in", "status": "confirmed", "timestamp": "2026-09-19T12:31:00Z" }
+            ]
             messengerMock.preparedTransactionCount = 0
             messengerMock.checkpointPending = false
             page.selectedFingerprint = ""
@@ -148,6 +157,27 @@ Item {
             messengerMock.setHistoryEnabled(true)
             compare(messengerMock.historyEnabled, true)
             messengerMock.setHistoryEnabled(false)
+        }
+
+        function test_reset_requires_confirmation_and_clears_local_identity() {
+            page.showContactManagement = true
+            wait(0)
+            var resetButton = findChild(page, "messengerResetButton")
+            var resetDialog = findChild(page, "messengerResetDialog")
+            verify(resetButton !== null)
+            verify(resetDialog !== null)
+            compare(messengerMock.enabled, true)
+            compare(messengerMock.contacts.length, 2)
+
+            resetButton.clicked()
+            compare(resetDialog.visible, true)
+            compare(messengerMock.enabled, true)
+            resetDialog.accept()
+            wait(0)
+            compare(messengerMock.enabled, false)
+            compare(messengerMock.ready, false)
+            compare(messengerMock.contacts.length, 0)
+            compare(messengerMock.messages.length, 0)
         }
     }
 }

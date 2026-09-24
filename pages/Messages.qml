@@ -130,6 +130,26 @@ Item {
                         onClicked: currentWallet.messenger.clearHistory()
                     }
                 }
+                Button {
+                    objectName: "messengerResetButton"
+                    text: qsTr("Reset Messenger identity and sessions…")
+                    enabled: currentWallet && currentWallet.messenger.enabled
+                    onClicked: resetMessengerDialog.open()
+                }
+            }
+        }
+
+        Dialog {
+            id: resetMessengerDialog
+            objectName: "messengerResetDialog"
+            modal: true
+            title: qsTr("Reset Messenger identity?")
+            standardButtons: Dialog.Yes | Dialog.Cancel
+            onAccepted: if (currentWallet) currentWallet.messenger.resetState()
+            Label {
+                width: 420
+                wrapMode: Text.WordWrap
+                text: qsTr("This deletes the local Messenger identity, contacts, sessions, plaintext history, and prepared plan. It does not remove blockchain carrier data. Use this after restoring an old backup or suspected state rollback, then exchange fresh contact packages.")
             }
         }
 

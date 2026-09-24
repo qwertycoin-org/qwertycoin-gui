@@ -61,6 +61,7 @@ public:
     Q_INVOKABLE void handleReorg(quint64 height, quint64 blocksDetached);
     Q_INVOKABLE void setHistoryEnabled(bool enabled);
     Q_INVOKABLE void clearHistory();
+    Q_INVOKABLE bool resetState();
 
 signals:
     void stateChanged();
