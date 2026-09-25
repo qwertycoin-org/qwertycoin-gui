@@ -62,6 +62,7 @@ Rectangle {
     signal advancedClicked()
     signal settingsClicked()
     signal addressBookClicked()
+    signal messagesClicked()
     signal accountClicked()
 
     function selectItem(pos) {
@@ -71,6 +72,7 @@ Rectangle {
         else if(pos === "Transfer") menuColumn.previousButton = transferButton
         else if(pos === "Receive")  menuColumn.previousButton = receiveButton
         else if(pos === "AddressBook") menuColumn.previousButton = addressBookButton
+        else if(pos === "Messages") menuColumn.previousButton = messagesButton
         else if(pos === "Settings") menuColumn.previousButton = settingsButton
         else if(pos === "Advanced") menuColumn.previousButton = advancedButton
         else if(pos === "Account") menuColumn.previousButton = accountButton
@@ -395,6 +397,7 @@ Rectangle {
             // ------------- Transfer tab ---------------
             MoneroComponents.MenuButton {
                 id: transferButton
+                objectName: "sendMenuButton"
                 anchors.left: parent.left
                 anchors.right: parent.right
                 text: qsTr("Send") + translationManager.emptyString
@@ -417,6 +420,7 @@ Rectangle {
 
             MoneroComponents.MenuButton {
                 id: addressBookButton
+                objectName: "addressBookMenuButton"
                 anchors.left: parent.left
                 anchors.right: parent.right
                 text: qsTr("Address book") + translationManager.emptyString
@@ -443,6 +447,7 @@ Rectangle {
                 anchors.right: parent.right
                 text: qsTr("Receive") + translationManager.emptyString
                 symbol: (isMac ? "⌃" : qsTr("Ctrl+")) + "R" + translationManager.emptyString
+                under: addressBookButton
                 onClicked: {
                     parent.previousButton.checked = false
                     parent.previousButton = receiveButton
@@ -457,10 +462,32 @@ Rectangle {
                 anchors.leftMargin: 20
             }
 
+            // ------------- Messenger tab ---------------
+            MoneroComponents.MenuButton {
+                id: messagesButton
+                objectName: "messengerMenuButton"
+                anchors.left: parent.left
+                anchors.right: parent.right
+                text: qsTr("Messenger") + translationManager.emptyString
+                onClicked: {
+                    parent.previousButton.checked = false
+                    parent.previousButton = messagesButton
+                    panel.messagesClicked()
+                }
+            }
+
+            MoneroComponents.MenuButtonDivider {
+                visible: messagesButton.present
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: 20
+            }
+
             // ------------- History tab ---------------
 
             MoneroComponents.MenuButton {
                 id: historyButton
+                objectName: "transactionsMenuButton"
                 anchors.left: parent.left
                 anchors.right: parent.right
                 text: qsTr("Transactions") + translationManager.emptyString

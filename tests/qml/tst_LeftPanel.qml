@@ -72,5 +72,17 @@ Item {
             appWindow.walletMode = 2
             compare(eposeButton.visible, true)
         }
+
+        function test_messenger_is_between_send_and_transactions() {
+            var sendButton = findChild(panel, "sendMenuButton")
+            var messengerButton = findChild(panel, "messengerMenuButton")
+            var transactionsButton = findChild(panel, "transactionsMenuButton")
+            verify(sendButton !== null)
+            verify(messengerButton !== null)
+            verify(transactionsButton !== null)
+            compare(messengerButton.under, null)
+            verify(messengerButton.y >= sendButton.y + sendButton.height)
+            verify(transactionsButton.y >= messengerButton.y + messengerButton.height)
+        }
     }
 }

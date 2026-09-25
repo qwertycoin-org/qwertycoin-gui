@@ -56,6 +56,7 @@
 #include "model/TransactionHistorySortFilterModel.h"
 #include "model/LanguageModel.h"
 #include "AddressBook.h"
+#include "Messenger.h"
 #include "model/AddressBookModel.h"
 #include "Subaddress.h"
 #include "model/SubaddressModel.h"
@@ -399,6 +400,8 @@ int main(int argc, char *argv[])
 
     qmlRegisterUncreatableType<AddressBook>("moneroComponents.AddressBook", 1, 0, "AddressBook",
                                                         "AddressBook can't be instantiated directly");
+    qmlRegisterUncreatableType<Messenger>("qwertycoinComponents.Messenger", 1, 0, "Messenger",
+                                                        "Messenger can't be instantiated directly");
 
     qmlRegisterUncreatableType<SubaddressModel>("moneroComponents.SubaddressModel", 1, 0, "SubaddressModel",
                                                         "SubaddressModel can't be instantiated directly");

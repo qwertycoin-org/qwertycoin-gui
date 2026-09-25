@@ -198,9 +198,10 @@ run IDs.
 Before creating any release, it verifies that every referenced run:
 
 - is a successful first-attempt `workflow_dispatch` execution of
-  `release.yml` on `master`, using the same reviewed workflow definition as the
-  assembler; the packaged `BUILD-INFO.txt` must independently bind the exact
-  requested source revision;
+  `release.yml` on `master`, or an execution whose head SHA exactly equals the
+  requested immutable revision for an explicitly approved feature prerelease,
+  using the same reviewed workflow definition as the assembler; the packaged
+  `BUILD-INFO.txt` must independently bind the exact requested source revision;
 - contains exactly one non-expired artifact with the expected platform name;
 - contains archives with safe paths and links, no case-folding collisions,
   complete matching per-file SHA-256 coverage and exact GUI/Core build metadata;

@@ -7,7 +7,7 @@ message(STATUS "Initiating compile using CMake ${CMAKE_VERSION}")
 
 set(VERSION_MAJOR "2")
 set(VERSION_MINOR "0")
-set(VERSION_REVISION "2")
+set(VERSION_REVISION "3")
 set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_REVISION}")
 
 option(STATIC "Link libraries statically, requires static Qt")
@@ -62,6 +62,10 @@ if(NOT MANUAL_SUBMODULES)
   endif()
 endif()
 
+# Messenger profile 2 is a required part of this feature branch.  Build the
+# pinned Rust/libsignal backend through the Core submodule; there is no silent
+# fallback to the legacy sealed-box profile.
+set(QWC_ENABLE_QMS2_CRYPTO ON CACHE BOOL "Build QMS2 Triple Ratchet backend" FORCE)
 add_subdirectory(qwertycoin)
 add_subdirectory(external)
 

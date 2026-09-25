@@ -1,0 +1,183 @@
+// Copyright (c) 2026, The Qwertycoin Project
+// SPDX-License-Identifier: BSD-3-Clause
+
+import QtQuick 2.9
+import QtTest 1.2
+import "../../pages"
+
+Item {
+    id: appWindow
+    width: 1180
+    height: 900
+
+    QtObject {
+        id: messengerMock
+        property string ownFingerprint: "self-fingerprint"
+        property string ownInvitation: "long-personal-invitation"
+        property var contacts: [
+            { "label": "Alice", "fingerprint": "alice-fingerprint" },
+            { "label": "Bob", "fingerprint": "bob-fingerprint" }
+        ]
+        property var messages: [
+            { "id": "1", "contact": "alice-fingerprint", "label": "Alice", "text": "outgoing", "direction": "out", "status": "sent", "timestamp": "2026-09-19T12:30:00Z" },
+            { "id": "2", "contact": "bob-fingerprint", "label": "Bob", "text": "incoming", "direction": "in", "status": "confirmed", "timestamp": "2026-09-19T12:31:00Z" }
+        ]
+        property int preparedTransactionCount: 0
+        property int preparedFee: 0
+        property bool checkpointPending: false
+        property string preparedContactFingerprint: ""
+        property string status: ""
+        property bool ready: true
+        property bool enabled: true
+        property bool canEnable: true
+        property bool strictTransportReady: true
+        property bool historyEnabled: false
+        function importInvitation(label, invitation) { return true }
+        function enable() { enabled = true; ready = true; return true }
+        function renameContact(fingerprint, label) { return true }
+        function removeContact(fingerprint) { return true }
+        function prepare(fingerprint, text) { return true }
+        function commitPrepared() { return true }
+        function cancelPrepared() {}
+        function setHistoryEnabled(enabled) { historyEnabled = enabled }
+        function clearHistory() { messages = [] }
+        function resetState() { ready = false; enabled = false; contacts = []; messages = []; return true }
+    }
+    QtObject { id: walletMock; property var messenger: messengerMock }
+    property var currentWallet: walletMock
+
+    Messages { id: page; anchors.fill: parent }
+
+    TestCase {
+        name: "MessagesPage"
+        when: windowShown
+
+        function init() {
+            messengerMock.enabled = true
+            messengerMock.ready = true
+            messengerMock.canEnable = true
+            messengerMock.contacts = [
+                { "label": "Alice", "fingerprint": "alice-fingerprint" },
+                { "label": "Bob", "fingerprint": "bob-fingerprint" }
+            ]
+            messengerMock.messages = [
+                { "id": "1", "contact": "alice-fingerprint", "label": "Alice", "text": "outgoing", "direction": "out", "status": "sent", "timestamp": "2026-09-19T12:30:00Z" },
+                { "id": "2", "contact": "bob-fingerprint", "label": "Bob", "text": "incoming", "direction": "in", "status": "confirmed", "timestamp": "2026-09-19T12:31:00Z" }
+            ]
+            messengerMock.preparedTransactionCount = 0
+            messengerMock.checkpointPending = false
+            page.selectedFingerprint = ""
+            page.showContactManagement = false
+            wait(0)
+        }
+
+        function test_activation_is_explicit() {
+            messengerMock.enabled = false
+            messengerMock.ready = false
+            wait(0)
+            var enableButton = findChild(page, "messengerEnableButton")
+            verify(enableButton !== null)
+            compare(enableButton.visible, true)
+            enableButton.clicked()
+            compare(messengerMock.enabled, true)
+            compare(messengerMock.ready, true)
+        }
+
+        function test_checkpoint_retry_is_distinct_from_send() {
+            page.selectedFingerprint = "alice-fingerprint"
+            messengerMock.preparedTransactionCount = 2
+            wait(0)
+            var planPanel = findChild(page, "messengerPlanPanel")
+            var sendButton = findChild(page, "messengerSendButton")
+            verify(planPanel !== null)
+            verify(sendButton !== null)
+            compare(planPanel.visible, true)
+            compare(sendButton.text, "Send encrypted message")
+
+            messengerMock.checkpointPending = true
+            wait(0)
+            compare(planPanel.visible, true)
+            compare(sendButton.text, "Retry local checkpoint")
+        }
+
+        function test_conversation_is_filtered_by_selected_contact() {
+            compare(page.filteredMessages.length, 0)
+            page.selectedFingerprint = "alice-fingerprint"
+            compare(page.selectedContact.label, "Alice")
+            compare(page.filteredMessages.length, 1)
+            compare(page.filteredMessages[0].text, "outgoing")
+            page.selectedFingerprint = "bob-fingerprint"
+            compare(page.selectedContact.label, "Bob")
+            compare(page.filteredMessages.length, 1)
+            compare(page.filteredMessages[0].text, "incoming")
+        }
+
+        function test_status_and_timestamp_labels_are_human_readable() {
+            compare(page.statusLabel("broadcast"), "Sent")
+            compare(page.statusLabel("prepared"), "Ready to send")
+            verify(page.timestampLabel("2026-09-19T12:30:00Z").length > 0)
+            compare(page.timestampLabel(""), "")
+        }
+
+        function test_composer_has_usable_height() {
+            page.selectedFingerprint = "alice-fingerprint"
+            wait(0)
+            var composer = findChild(page, "messengerComposer")
+            verify(composer !== null)
+            verify(composer.height >= 90)
+        }
+
+        function test_composer_fails_closed_without_strict_transport() {
+            page.selectedFingerprint = "alice-fingerprint"
+            messengerMock.strictTransportReady = false
+            wait(0)
+            var composer = findChild(page, "messengerComposer")
+            verify(composer !== null)
+            compare(composer.enabled, false)
+            messengerMock.strictTransportReady = true
+            wait(0)
+            compare(composer.enabled, true)
+        }
+
+        function test_chat_is_primary_and_contact_management_is_separate() {
+            var contacts = findChild(page, "messengerContacts")
+            var manageButton = findChild(page, "messengerContactManagementButton")
+            verify(contacts !== null)
+            verify(manageButton !== null)
+            compare(page.showContactManagement, false)
+            compare(contacts.visible, true)
+
+            manageButton.clicked()
+            compare(page.showContactManagement, true)
+            compare(contacts.visible, false)
+        }
+
+        function test_history_persistence_is_opt_in() {
+            compare(messengerMock.historyEnabled, false)
+            messengerMock.setHistoryEnabled(true)
+            compare(messengerMock.historyEnabled, true)
+            messengerMock.setHistoryEnabled(false)
+        }
+
+        function test_reset_requires_confirmation_and_clears_local_identity() {
+            page.showContactManagement = true
+            wait(0)
+            var resetButton = findChild(page, "messengerResetButton")
+            var resetDialog = findChild(page, "messengerResetDialog")
+            verify(resetButton !== null)
+            verify(resetDialog !== null)
+            compare(messengerMock.enabled, true)
+            compare(messengerMock.contacts.length, 2)
+
+            resetButton.clicked()
+            compare(resetDialog.visible, true)
+            compare(messengerMock.enabled, true)
+            resetDialog.accept()
+            wait(0)
+            compare(messengerMock.enabled, false)
+            compare(messengerMock.ready, false)
+            compare(messengerMock.contacts.length, 0)
+            compare(messengerMock.messages.length, 0)
+        }
+    }
+}
