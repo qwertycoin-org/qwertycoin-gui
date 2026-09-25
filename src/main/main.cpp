@@ -400,7 +400,7 @@ int main(int argc, char *argv[])
 
     qmlRegisterUncreatableType<AddressBook>("moneroComponents.AddressBook", 1, 0, "AddressBook",
                                                         "AddressBook can't be instantiated directly");
-    qmlRegisterUncreatableType<Messenger>("moneroComponents.Messenger", 1, 0, "Messenger",
+    qmlRegisterUncreatableType<Messenger>("qwertycoinComponents.Messenger", 1, 0, "Messenger",
                                                         "Messenger can't be instantiated directly");
 
     qmlRegisterUncreatableType<SubaddressModel>("moneroComponents.SubaddressModel", 1, 0, "SubaddressModel",
