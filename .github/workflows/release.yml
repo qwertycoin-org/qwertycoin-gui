@@ -362,6 +362,7 @@ jobs:
             mingw-w64-x86_64-qt5-tools
             mingw-w64-x86_64-angleproject
             mingw-w64-x86_64-protobuf
+            mingw-w64-x86_64-rust
 
       # Use the same MSYS2 Git for the recursive checkout and the post-build
       # cleanliness check. Mixing Git-for-Windows and MSYS2 Git makes the Core
@@ -382,6 +383,14 @@ jobs:
           version_revision=$(sed -nE 's/^set\(VERSION_REVISION "([0-9]+)"\)$/\1/p' CMakeLists.txt)
           test -n "$version_major" && test -n "$version_minor" && test -n "$version_revision"
           echo "QWC_GUI_VERSION=${version_major}.${version_minor}.${version_revision}" >> "$GITHUB_ENV"
+
+      - name: Verify QMS2 native toolchain
+        run: |
+          set -euo pipefail
+          command -v cargo
+          command -v protoc
+          cargo --version
+          protoc --version
 
       - name: Install pinned Inno Setup compiler
         shell: pwsh
