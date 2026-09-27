@@ -41,7 +41,7 @@ https://github.com/qwertycoin-org/qwertycoin.git
 ```
 
 This experimental messenger release line pins Core commit
-`efd0667129d52c89157cb36241a703c3becfb52f`. It contains the wallet-side QMS2
+`cd6ce02da439cd54eafbda68d952f9d88c7fd994`. It contains the wallet-side QMS2
 carrier, hybrid PQXDH and ongoing Triple Ratchet/SPQR implementation while
 preserving the current QWC v2 mainnet genesis, network identity and unchanged
 daemon consensus rules.
