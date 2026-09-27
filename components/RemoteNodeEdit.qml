@@ -79,6 +79,15 @@ GridLayout {
 
         var addr = daemonAddr.text.trim();
         var port = daemonPort.text.trim();
+        // The remote-node UI historically stores host:port values without a
+        // scheme. QMS2 deliberately validates the effective daemon URL before
+        // enabling carrier traffic, and therefore requires an explicit HTTP
+        // scheme. Normalize bare onion hosts at the UI boundary so the regular
+        // wallet connection and the strict QMS2 transport gate inspect the
+        // same value. Clearnet/custom hosts retain their legacy representation.
+        if (addr.toLowerCase().endsWith(".onion") && addr.indexOf("://") === -1) {
+            addr = "http://" + addr;
+        }
         return addr + ":" + port;
     }
 
