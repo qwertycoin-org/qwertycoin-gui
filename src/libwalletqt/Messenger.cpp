@@ -30,10 +30,10 @@ Messenger::Messenger(Monero::Wallet *wallet, QObject *parent)
 
 bool Messenger::initialize()
 {
+    refreshAvailability();
     if (m_ready) return true;
-    emit enabledChanged(); // Also refreshes canEnable after a password change.
     if (!m_wallet->qmsStateExists()) {
-        setStatus(tr("Messenger is not enabled for this wallet."));
+        setStatus(activationRequirement());
         return false;
     }
     return enable();
@@ -55,6 +55,7 @@ bool Messenger::enable()
         ensureIdentity();
         m_ready = true;
         emit enabledChanged();
+        emit availabilityChanged();
         emit readyChanged();
         if (!m_preparedJournal.isEmpty()) {
             m_prepared = m_wallet->restoreQmsCarrierTransactions(m_preparedJournal.toStdString());
@@ -80,6 +81,22 @@ bool Messenger::enabled() const
 bool Messenger::canEnable() const
 {
     return m_wallet->qmsStateStorageAvailable() && m_wallet->qmsStrictTransportReady();
+}
+
+QString Messenger::activationRequirement() const
+{
+    if (m_wallet->qmsStateExists()) return QString();
+    if (!m_wallet->qmsStateStorageAvailable())
+        return tr("Messenger requires a password-protected, unlocked wallet. Set a non-empty wallet password under Settings > Wallet.");
+    if (!m_wallet->qmsStrictTransportReady())
+        return tr("Messenger requires two network settings: enable a SOCKS5 proxy under Settings > Interface and select a Tor v3 .onion remote node under Settings > Node.");
+    return tr("Messenger is ready to be enabled for this wallet.");
+}
+
+void Messenger::refreshAvailability()
+{
+    emit availabilityChanged();
+    if (!m_wallet->qmsStateExists()) setStatus(activationRequirement());
 }
 
 Messenger::~Messenger()
@@ -716,6 +733,7 @@ bool Messenger::resetState()
     emit historyEnabledChanged();
     emit readyChanged();
     emit enabledChanged();
+    emit availabilityChanged();
     setStatus(tr("Messenger identity and sessions reset. Enable Messenger again and exchange fresh contact packages before sending."));
     return true;
 }

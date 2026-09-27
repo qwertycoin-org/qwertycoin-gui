@@ -23,11 +23,12 @@ class Messenger : public QObject
     Q_PROPERTY(bool checkpointPending READ checkpointPending NOTIFY planChanged)
     Q_PROPERTY(QString preparedContactFingerprint READ preparedContactFingerprint NOTIFY planChanged)
     Q_PROPERTY(QString status READ status NOTIFY statusChanged)
+    Q_PROPERTY(QString activationRequirement READ activationRequirement NOTIFY availabilityChanged)
     Q_PROPERTY(bool historyEnabled READ historyEnabled WRITE setHistoryEnabled NOTIFY historyEnabledChanged)
     Q_PROPERTY(bool ready READ ready NOTIFY readyChanged)
     Q_PROPERTY(bool enabled READ enabled NOTIFY enabledChanged)
-    Q_PROPERTY(bool canEnable READ canEnable NOTIFY enabledChanged)
-    Q_PROPERTY(bool strictTransportReady READ strictTransportReady NOTIFY strictTransportReadyChanged)
+    Q_PROPERTY(bool canEnable READ canEnable NOTIFY availabilityChanged)
+    Q_PROPERTY(bool strictTransportReady READ strictTransportReady NOTIFY availabilityChanged)
 
 public:
     explicit Messenger(Monero::Wallet *wallet, QObject *parent = nullptr);
@@ -42,6 +43,7 @@ public:
     bool checkpointPending() const { return m_checkpointPending; }
     QString preparedContactFingerprint() const { return m_preparedContactFingerprint; }
     QString status() const { return m_status; }
+    QString activationRequirement() const;
     bool historyEnabled() const { return m_historyEnabled; }
     bool ready() const { return m_ready; }
     bool enabled() const;
@@ -62,6 +64,7 @@ public:
     Q_INVOKABLE void setHistoryEnabled(bool enabled);
     Q_INVOKABLE void clearHistory();
     Q_INVOKABLE bool resetState();
+    void refreshAvailability();
 
 signals:
     void stateChanged();
@@ -70,7 +73,7 @@ signals:
     void historyEnabledChanged();
     void readyChanged();
     void enabledChanged();
-    void strictTransportReadyChanged();
+    void availabilityChanged();
 
 private:
     void ensureIdentity();

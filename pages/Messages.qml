@@ -78,11 +78,16 @@ Item {
             text: qsTr("Experimental QMS2 messenger: PQXDH plus an ongoing Triple Ratchet. The protocol has not received an independent security audit. Blockchain timing, fees and carrier count remain public. Use only test funds during the preview.")
         }
         Label {
+            objectName: "messengerStatusLabel"
             Layout.fillWidth: true
             wrapMode: Text.WordWrap
             visible: currentWallet && !currentWallet.messenger.ready
             color: "#d93025"
-            text: currentWallet ? currentWallet.messenger.status : ""
+            text: currentWallet
+                ? (currentWallet.messenger.enabled
+                    ? currentWallet.messenger.status
+                    : currentWallet.messenger.activationRequirement)
+                : ""
         }
         Button {
             objectName: "messengerEnableButton"

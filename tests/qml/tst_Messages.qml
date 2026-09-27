@@ -27,6 +27,7 @@ Item {
         property bool checkpointPending: false
         property string preparedContactFingerprint: ""
         property string status: ""
+        property string activationRequirement: "Messenger is ready to be enabled for this wallet."
         property bool ready: true
         property bool enabled: true
         property bool canEnable: true
@@ -56,6 +57,8 @@ Item {
             messengerMock.enabled = true
             messengerMock.ready = true
             messengerMock.canEnable = true
+            messengerMock.strictTransportReady = true
+            messengerMock.activationRequirement = "Messenger is ready to be enabled for this wallet."
             messengerMock.contacts = [
                 { "label": "Alice", "fingerprint": "alice-fingerprint" },
                 { "label": "Bob", "fingerprint": "bob-fingerprint" }
@@ -81,6 +84,21 @@ Item {
             enableButton.clicked()
             compare(messengerMock.enabled, true)
             compare(messengerMock.ready, true)
+        }
+
+        function test_activation_explains_missing_transport() {
+            messengerMock.enabled = false
+            messengerMock.ready = false
+            messengerMock.canEnable = false
+            messengerMock.strictTransportReady = false
+            messengerMock.activationRequirement = "Messenger requires two network settings: enable a SOCKS5 proxy under Settings > Interface and select a Tor v3 .onion remote node under Settings > Node."
+            wait(0)
+            var enableButton = findChild(page, "messengerEnableButton")
+            var statusLabel = findChild(page, "messengerStatusLabel")
+            verify(enableButton !== null)
+            verify(statusLabel !== null)
+            compare(enableButton.enabled, false)
+            compare(statusLabel.text, messengerMock.activationRequirement)
         }
 
         function test_checkpoint_retry_is_distinct_from_send() {
