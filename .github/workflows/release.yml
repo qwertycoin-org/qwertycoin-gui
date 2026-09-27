@@ -87,6 +87,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential cmake pkg-config git ccache python3 file patchelf \
+            protobuf-compiler \
             libboost-all-dev libssl-dev libzmq3-dev libpgm-dev libunbound-dev \
             libsodium-dev libhidapi-dev libusb-1.0-0-dev libunwind-dev \
             liblzma-dev libreadline-dev libexpat1-dev libudev-dev \
@@ -350,6 +351,7 @@ jobs:
             mingw-w64-x86_64-qt5-svg
             mingw-w64-x86_64-qt5-tools
             mingw-w64-x86_64-angleproject
+            mingw-w64-x86_64-protobuf
 
       # Use the same MSYS2 Git for the recursive checkout and the post-build
       # cleanliness check. Mixing Git-for-Windows and MSYS2 Git makes the Core
