@@ -1,6 +1,26 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+is_windows_system_dll() {
+  # This allowlist is limited to DLLs shipped by the supported Windows
+  # baseline. The Media Foundation entries are required by Qt's camera/media
+  # service plugins, while bcryptprimitives.dll is a Windows cryptographic
+  # provider imported by Rust std. They must remain system-supplied.
+  case "$1" in
+    api-ms-win-*|ext-ms-win-*|advapi32.dll|bcrypt.dll|bcryptprimitives.dll|cfgmgr32.dll|comctl32.dll|comdlg32.dll|crypt32.dll|cryptui.dll|d3d11.dll|d3d9.dll|dbghelp.dll|dnsapi.dll|dwmapi.dll|dwrite.dll|dxgi.dll|dxva2.dll|evr.dll|gdi32.dll|imm32.dll|iphlpapi.dll|kernel32.dll|kernelbase.dll|mf.dll|mfplat.dll|mfreadwrite.dll|mpr.dll|msvcp_win.dll|msvcrt.dll|mswsock.dll|netapi32.dll|normaliz.dll|ntdll.dll|ole32.dll|oleacc.dll|oleaut32.dll|opengl32.dll|powrprof.dll|propsys.dll|psapi.dll|rpcrt4.dll|secur32.dll|setupapi.dll|shell32.dll|shlwapi.dll|user32.dll|userenv.dll|usp10.dll|uxtheme.dll|version.dll|winhttp.dll|winmm.dll|winspool.drv|wintrust.dll|ws2_32.dll|wtsapi32.dll|wldap32.dll)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+if [[ $# -eq 2 && "$1" == "--is-system-dll" ]]; then
+  is_windows_system_dll "${2,,}"
+  exit
+fi
+
 if [[ $# -ne 1 ]]; then
   echo "usage: $0 <portable-windows-directory>" >&2
   exit 64
@@ -36,20 +56,6 @@ if (( pe_count == 0 )); then
   echo "Windows artifact contains no PE binaries" >&2
   exit 1
 fi
-
-is_windows_system_dll() {
-  # This allowlist is limited to DLLs shipped by the supported Windows
-  # baseline. The Media Foundation entries are required by Qt's camera/media
-  # service plugins and must not be copied into an application package.
-  case "$1" in
-    api-ms-win-*|ext-ms-win-*|advapi32.dll|bcrypt.dll|cfgmgr32.dll|comctl32.dll|comdlg32.dll|crypt32.dll|cryptui.dll|d3d11.dll|d3d9.dll|dbghelp.dll|dnsapi.dll|dwmapi.dll|dwrite.dll|dxgi.dll|dxva2.dll|evr.dll|gdi32.dll|imm32.dll|iphlpapi.dll|kernel32.dll|kernelbase.dll|mf.dll|mfplat.dll|mfreadwrite.dll|mpr.dll|msvcp_win.dll|msvcrt.dll|mswsock.dll|netapi32.dll|normaliz.dll|ntdll.dll|ole32.dll|oleacc.dll|oleaut32.dll|opengl32.dll|powrprof.dll|propsys.dll|psapi.dll|rpcrt4.dll|secur32.dll|setupapi.dll|shell32.dll|shlwapi.dll|user32.dll|userenv.dll|usp10.dll|uxtheme.dll|version.dll|winhttp.dll|winmm.dll|winspool.drv|wintrust.dll|ws2_32.dll|wtsapi32.dll|wldap32.dll)
-      return 0
-      ;;
-    *)
-      return 1
-      ;;
-  esac
-}
 
 declare -A missing=()
 while IFS= read -r -d '' binary; do

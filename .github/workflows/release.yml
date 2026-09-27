@@ -54,7 +54,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 tools/release/tests/test_updater_contract.py
+          python3 -m unittest \
+            tools/release/tests/test_updater_contract.py \
+            tools/release/tests/test_verify_windows_runtime.py
           version_major=$(sed -nE 's/^set\(VERSION_MAJOR "([0-9]+)"\)$/\1/p' CMakeLists.txt)
           version_minor=$(sed -nE 's/^set\(VERSION_MINOR "([0-9]+)"\)$/\1/p' CMakeLists.txt)
           version_revision=$(sed -nE 's/^set\(VERSION_REVISION "([0-9]+)"\)$/\1/p' CMakeLists.txt)

@@ -160,6 +160,7 @@ jobs:
             tools/release/tests/test_compare_bundle_trees.py \
             tools/release/tests/test_verify_candidate_archive.py \
             tools/release/tests/test_validate_candidate_files.py \
+            tools/release/tests/test_verify_windows_runtime.py \
             tools/release/tests/test_windows_package_manifest.py
 
       - name: Download Linux candidate
