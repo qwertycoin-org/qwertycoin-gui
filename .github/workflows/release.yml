@@ -51,7 +51,17 @@ jobs:
           submodules: false
           persist-credentials: false
       - name: Verify updater release contract
-        run: python3 tools/release/tests/test_updater_contract.py
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/release/tests/test_updater_contract.py
+          version_major=$(sed -nE 's/^set\(VERSION_MAJOR "([0-9]+)"\)$/\1/p' CMakeLists.txt)
+          version_minor=$(sed -nE 's/^set\(VERSION_MINOR "([0-9]+)"\)$/\1/p' CMakeLists.txt)
+          version_revision=$(sed -nE 's/^set\(VERSION_REVISION "([0-9]+)"\)$/\1/p' CMakeLists.txt)
+          test -n "$version_major" && test -n "$version_minor" && test -n "$version_revision"
+          source_version="${version_major}.${version_minor}.${version_revision}"
+          escaped_version=${source_version//./\\.}
+          [[ "$ARTIFACT_PREFIX" =~ ^qwertycoin-gui-v${escaped_version}(-rc[1-9][0-9]*)?(-review-[0-9a-f]{7,40})?$ ]]
 
   linux-x86_64:
     name: Linux x86_64
