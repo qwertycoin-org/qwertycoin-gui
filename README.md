@@ -19,9 +19,10 @@ The current Qwertycoin GUI source line provides:
 - Qwertycoin Core submodule at the explicit `qwertycoin/` path;
 - `qwertycoind` local daemon integration and QWC mainnet defaults;
 - typed asynchronous EPoSe observer and a dedicated EPoSe page;
-- experimental QMS1 encrypted messaging with personal invitations, explicit
-  prepare/review/send, persistent local conversations and wallet-side receive
-  scanning over existing transaction nonce fields;
+- experimental QMS2 encrypted messaging with hybrid PQXDH session setup,
+  ongoing Triple Ratchet/SPQR state, explicit prepare/review/send, persistent
+  encrypted state and wallet-side receive scanning over existing transaction
+  nonce fields;
 - explicit local EPoSe producer setup through the supported Core flags;
 - QWC 8-decimal amounts and `qwertycoin:` URI handling;
 - DNSSEC-validated update checks with fixed QWC GitHub release targets;
@@ -40,12 +41,17 @@ https://github.com/qwertycoin-org/qwertycoin.git
 ```
 
 This experimental messenger release line pins Core commit
-`82cf8703c895663cbe69347188448b5f00f7a0e8`. It contains the wallet-side QMS1
-carrier implementation while preserving the current QWC v2 mainnet genesis,
-network identity and unchanged daemon consensus rules.
+`efd0667129d52c89157cb36241a703c3becfb52f`. It contains the wallet-side QMS2
+carrier, hybrid PQXDH and ongoing Triple Ratchet/SPQR implementation while
+preserving the current QWC v2 mainnet genesis, network identity and unchanged
+daemon consensus rules.
 
-QMS1 is an experimental MVP. It has no forward secrecy, ratchet recovery or
-post-quantum protection and has not received an external protocol audit.
+QMS2 remains an experimental beta and has not received an independent
+cryptographic or funds-safety audit. Messenger activation requires a
+password-protected wallet and a validated SOCKS plus Tor-v3 onion transport;
+all daemon traffic fails closed while QMS2 is active if that transport contract
+is not satisfied. Message history is disabled by default, restore requires an
+explicit ratchet reset, and interoperability is limited to QMS2/ABI 3 peers.
 
 | Binding | Value |
 | --- | --- |
