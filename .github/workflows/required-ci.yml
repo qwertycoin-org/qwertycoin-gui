@@ -1,0 +1,93 @@
+name: Required CI
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gui-required-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout immutable revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Verify updater contract
+        run: python3 tools/release/tests/test_updater_contract.py
+      - name: Reject whitespace errors
+        run: git diff --check
+
+  linux:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 120
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      - name: Checkout immutable revision and submodules
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          submodules: recursive
+      - name: Verify pinned Core
+        run: tools/check_core_pin.sh
+      - name: Install Linux build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake pkg-config git ccache python3 \
+            libboost-all-dev libssl-dev libzmq3-dev libpgm-dev libunbound-dev \
+            libsodium-dev libhidapi-dev libusb-1.0-0-dev libunwind-dev \
+            liblzma-dev libreadline-dev libexpat1-dev libudev-dev \
+            libgcrypt20-dev libgpg-error-dev \
+            qtbase5-dev qtdeclarative5-dev qml-module-qtquick-controls \
+            qml-module-qtquick-controls2 qml-module-qtquick-layouts \
+            qml-module-qtquick-dialogs qml-module-qtquick-window2 \
+            qml-module-qtgraphicaleffects qml-module-qtmultimedia \
+            qml-module-qt-labs-platform qml-module-qttest qttools5-dev-tools \
+            libqt5svg5-dev libqt5xmlpatterns5-dev xvfb
+      - name: Configure with GUI tests
+        run: |
+          cmake -S . -B build/required \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DMANUAL_SUBMODULES=1 \
+            -DDEV_MODE=OFF \
+            -DWITH_UPDATER=ON \
+            -DBUILD_TAG=linux-x64 \
+            -DUSE_DEVICE_TREZOR=OFF \
+            -DQML_TESTS=ON
+      - name: Compile GUI and contract tests
+        run: |
+          cmake --build build/required \
+            --target qwertycoin-gui qwertycoin-gui-epose-tests qwertycoin-gui-updater-tests \
+            --parallel 2
+      - name: Run EPoSE and updater tests
+        run: ctest --test-dir build/required --output-on-failure
+      - name: Run QML tests
+        run: xvfb-run -a build/required/bin/qwertycoin-gui --test-qml
+      - name: Recheck immutable Core pin
+        run: tools/check_core_pin.sh
+
+  required:
+    name: required
+    if: always()
+    needs: [contracts, linux]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Require every gate
+        env:
+          CONTRACT_RESULT: ${{ needs.contracts.result }}
+          LINUX_RESULT: ${{ needs.linux.result }}
+        run: |
+          test "$CONTRACT_RESULT" = success
+          test "$LINUX_RESULT" = success

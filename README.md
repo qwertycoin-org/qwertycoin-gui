@@ -40,6 +40,9 @@ This release line pins reviewed Core commit
 `54308d8473dc5606d054c0ba428cfb2d64e758c1`. It contains the current QWC v2
 mainnet genesis and network identity.
 
+The cross-repository release and development pins are recorded in the
+[canonical compatibility matrix](https://github.com/qwertycoin-org/qwertycoin/blob/main/docs/releases/COMPATIBILITY.md).
+
 | Binding | Value |
 | --- | --- |
 | Mainnet genesis | `4f95857586e2c66063c277370eda99cd75897d773af09f0c3cd1e22f7e87db39` |
