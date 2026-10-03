@@ -84,7 +84,9 @@ public:
         std::shared_ptr<epee::net_utils::http::abstract_http_client> httpClient,
         const QString &url,
         std::string &response,
-        const QString &contentType = {}) const;
+        const QString &contentType = {},
+        const QStringList &allowedRedirectHosts = {},
+        int maximumRedirects = 0) const;
 
 signals:
     void proxyAddressChanged() const;

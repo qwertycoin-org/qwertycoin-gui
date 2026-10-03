@@ -32,6 +32,13 @@ class UpdaterContractTests(unittest.TestCase):
         self.assertIn("SHA-256 verified against DNSSEC metadata", dialog)
         self.assertNotIn("signature verified", dialog)
 
+        downloader = self.read("src/qt/downloader.cpp")
+        network = self.read("src/qt/network.cpp")
+        self.assertIn('QStringLiteral("release-assets.githubusercontent.com")', downloader)
+        self.assertIn("maximumReleaseRedirects = 5", downloader)
+        self.assertIn("DownloadRedirectPolicy::resolve", network)
+        self.assertIn("QUrl::FullyEncoded", network)
+
     def test_legacy_monero_update_trust_is_not_shipped(self):
         self.assertNotIn("verify-update", self.read("src/main/main.cpp"))
         self.assertNotIn("add_subdirectory(openpgp)", self.read("src/CMakeLists.txt"))
