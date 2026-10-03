@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: "Exact release tag (for example v2.0.3-rc1 or v2.0.2)"
+        description: "Exact release tag (for example v2.0.4-rc1 or v2.0.3)"
         required: true
-        default: "v2.0.2"
+        default: "v2.0.3"
         type: string
       release_kind:
         description: "Keep a private draft prerelease or publish a stable release"
