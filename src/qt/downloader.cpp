@@ -36,6 +36,13 @@
 namespace
 {
 
+constexpr int maximumReleaseRedirects = 5;
+
+const QStringList trustedReleaseHosts{
+    QStringLiteral("github.com"),
+    QStringLiteral("release-assets.githubusercontent.com"),
+    QStringLiteral("objects.githubusercontent.com")};
+
 class DownloaderStateGuard
 {
 public:
@@ -136,7 +143,13 @@ bool Downloader::get(const QString &url, const QString &hash, const QJSValue &ca
             {
                 QString error;
                 auto task = m_scheduler.run([this, &error, &response, &url] {
-                    error = m_network.get(m_httpClient, url, response);
+                    error = m_network.get(
+                        m_httpClient,
+                        url,
+                        response,
+                        {},
+                        trustedReleaseHosts,
+                        maximumReleaseRedirects);
                 });
                 if (!task.first)
                 {

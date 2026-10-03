@@ -211,6 +211,9 @@ if(QML_TESTS)
 
     add_executable(qwertycoin-gui-updater-tests
         "${CMAKE_SOURCE_DIR}/tests/updater/tst_UpdateMetadata.cpp"
+        qt/DownloadRedirectPolicy.cpp
+        qt/FutureScheduler.cpp
+        qt/network.cpp
         qt/UpdateMetadata.cpp
     )
     set_target_properties(qwertycoin-gui-updater-tests PROPERTIES
@@ -227,7 +230,11 @@ if(QML_TESTS)
     target_link_libraries(qwertycoin-gui-updater-tests
         common
         epee
+        net
+        Qt5::Concurrent
         Qt5::Core
+        Qt5::Network
+        Qt5::Qml
         Qt5::Test
         ${EXTRA_LIBRARIES}
     )

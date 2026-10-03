@@ -31,6 +31,7 @@
 #include <QDebug>
 #include <QtCore>
 
+#include "DownloadRedirectPolicy.h"
 #include "utils.h"
 
 using epee::net_utils::http::fields_list;
@@ -141,46 +142,91 @@ QString Network::get(
     std::shared_ptr<abstract_http_client> httpClient,
     const QString &url,
     std::string &response,
-    const QString &contentType /* = {} */) const
+    const QString &contentType /* = {} */,
+    const QStringList &allowedRedirectHosts /* = {} */,
+    const int maximumRedirects /* = 0 */) const
 {
-    const QUrl urlParsed(url);
-    const bool isHttps = urlParsed.scheme() == "https";
+    if (maximumRedirects < 0 || maximumRedirects > 10 ||
+        (maximumRedirects > 0 && allowedRedirectHosts.isEmpty()))
+        return "invalid redirect policy";
 
-    const auto sslSupport = isHttps
-        ? epee::net_utils::ssl_support_t::e_ssl_support_enabled
-        : epee::net_utils::ssl_support_t::e_ssl_support_disabled;
+    response.clear();
 
-    httpClient->set_server(
-        urlParsed.host().toStdString(),
-        std::to_string(urlParsed.port(isHttps ? 443 : 80)),
-        {},
-        epee::net_utils::ssl_options_t{sslSupport});
+    QUrl currentUrl = QUrl::fromEncoded(url.toUtf8(), QUrl::StrictMode);
+    if (!currentUrl.isValid())
+        return "invalid URL";
 
-    const QString uri = (urlParsed.hasQuery() ? urlParsed.path() + "?" + urlParsed.query() : urlParsed.path());
-    const http_response_info *pri = NULL;
-    constexpr std::chrono::milliseconds timeout = std::chrono::seconds(15);
+    const bool redirectsEnabled = maximumRedirects > 0;
+    if (redirectsEnabled && !DownloadRedirectPolicy::isAllowedUrl(currentUrl, allowedRedirectHosts))
+        return "untrusted download URL";
 
-    fields_list headers({{"User-Agent", randomUserAgent().toStdString()}});
-    if (!contentType.isEmpty())
+    QSet<QByteArray> visitedUrls;
+    visitedUrls.insert(currentUrl.toEncoded(QUrl::FullyEncoded | QUrl::RemoveFragment));
+
+    for (int redirectCount = 0;;)
     {
-        headers.push_back({"Content-Type", contentType.toStdString()});
-    }
-    const bool result = httpClient->invoke(uri.toStdString(), "GET", {}, timeout, std::addressof(pri), headers);
-    if (!result)
-    {
-        return "unknown error";
-    }
-    if (!pri)
-    {
-        return "internal error";
-    }
-    if (pri->m_response_code != 200)
-    {
-        return QString("response code %1").arg(pri->m_response_code);
-    }
+        const bool isHttps = currentUrl.scheme().compare(QStringLiteral("https"), Qt::CaseInsensitive) == 0;
+        const auto sslSupport = isHttps
+            ? epee::net_utils::ssl_support_t::e_ssl_support_enabled
+            : epee::net_utils::ssl_support_t::e_ssl_support_disabled;
 
-    response = std::move(pri->m_body);
-    return {};
+        httpClient->set_server(
+            currentUrl.host().toStdString(),
+            std::to_string(currentUrl.port(isHttps ? 443 : 80)),
+            {},
+            epee::net_utils::ssl_options_t{sslSupport});
+
+        QString path = currentUrl.path(QUrl::FullyEncoded);
+        if (path.isEmpty())
+            path = QStringLiteral("/");
+        const QString uri = currentUrl.hasQuery()
+            ? path + QStringLiteral("?") + currentUrl.query(QUrl::FullyEncoded)
+            : path;
+        const http_response_info *pri = NULL;
+        constexpr std::chrono::milliseconds timeout = std::chrono::seconds(15);
+
+        fields_list headers({{"User-Agent", randomUserAgent().toStdString()}});
+        if (!contentType.isEmpty())
+            headers.push_back({"Content-Type", contentType.toStdString()});
+
+        const bool result = httpClient->invoke(
+            uri.toStdString(), "GET", {}, timeout, std::addressof(pri), headers);
+        if (!result)
+            return "unknown error";
+        if (!pri)
+            return "internal error";
+        if (pri->m_response_code == 200)
+        {
+            response = std::move(pri->m_body);
+            return {};
+        }
+        if (!redirectsEnabled || !DownloadRedirectPolicy::isRedirectStatus(pri->m_response_code))
+            return QString("response code %1").arg(pri->m_response_code);
+        if (redirectCount >= maximumRedirects)
+            return "too many redirects";
+
+        QString redirectLocation;
+        for (const auto &field : pri->m_header_info.m_etc_fields)
+        {
+            if (!epee::string_tools::compare_no_case(field.first, "Location"))
+            {
+                if (!redirectLocation.isEmpty())
+                    return "multiple redirect locations";
+                redirectLocation = QString::fromStdString(field.second);
+            }
+        }
+        const QUrl redirectUrl = DownloadRedirectPolicy::resolve(
+            currentUrl, redirectLocation, allowedRedirectHosts);
+        if (!redirectUrl.isValid())
+            return "invalid or untrusted redirect";
+
+        const QByteArray encodedRedirect = redirectUrl.toEncoded(QUrl::FullyEncoded | QUrl::RemoveFragment);
+        if (visitedUrls.contains(encodedRedirect))
+            return "redirect cycle";
+        visitedUrls.insert(encodedRedirect);
+        currentUrl = redirectUrl;
+        ++redirectCount;
+    }
 }
 
 std::shared_ptr<abstract_http_client> Network::newClient() const

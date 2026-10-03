@@ -106,6 +106,13 @@ matching records fail closed. The downloaded file is exposed to the user only
 after its SHA-256 matches the DNSSEC-authenticated metadata; the GUI never
 executes an update automatically.
 
+GitHub release assets are reached through an HTTP redirect. The downloader
+follows at most five redirects, keeps HTTPS mandatory, rejects credentials and
+non-standard ports, and accepts only the exact GitHub release hosts compiled
+into the application. Redirect targets outside that allowlist, redirect loops
+and ambiguous `Location` headers fail closed. Signed query strings are forwarded
+in their fully encoded form.
+
 The local daemon launched by the GUI continues to use
 `--check-updates disabled`; the GUI owns the package-level notification and
 verification flow, so one application does not present competing Core and GUI
@@ -120,6 +127,11 @@ The placeholder TXT record `qwc:update-metadata-not-yet-published`, an unsigned
 zone or any DNSSEC validation failure means "no update available". Existing
 v2.0.1 installations do not contain this QWC updater and therefore require a
 manual upgrade to the first release that enables it.
+
+The v2.0.2 and v2.0.3 downloaders detect newer DNSSEC-authenticated releases but
+do not follow GitHub's release-asset redirect. Those installed versions require
+one manual download from the public GUI release page before subsequent updates
+can use the corrected in-application download path.
 
 ## Local verification
 
