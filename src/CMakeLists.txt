@@ -230,6 +230,7 @@ if(QML_TESTS)
     target_link_libraries(qwertycoin-gui-updater-tests
         common
         epee
+        net
         Qt5::Concurrent
         Qt5::Core
         Qt5::Network
