@@ -80,9 +80,15 @@ Item {
             verify(sendButton !== null)
             verify(messengerButton !== null)
             verify(transactionsButton !== null)
+            compare(messengerButton.visible, false)
+            compare(messengerButton.height, 0)
+            panel.messengerAvailable = true
+            compare(messengerButton.visible, true)
+            tryVerify(function() { return messengerButton.height > 0 })
             compare(messengerButton.under, null)
             verify(messengerButton.y >= sendButton.y + sendButton.height)
             verify(transactionsButton.y >= messengerButton.y + messengerButton.height)
+            panel.messengerAvailable = false
         }
     }
 }

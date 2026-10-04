@@ -20,6 +20,8 @@ class Messenger : public QObject
     Q_PROPERTY(quint64 preparedFee READ preparedFee NOTIFY planChanged)
     Q_PROPERTY(QString preparedContactFingerprint READ preparedContactFingerprint NOTIFY planChanged)
     Q_PROPERTY(QString status READ status NOTIFY statusChanged)
+    Q_PROPERTY(bool available READ available NOTIFY availabilityChanged)
+    Q_PROPERTY(bool canCancelPrepared READ canCancelPrepared NOTIFY planChanged)
 
 public:
     explicit Messenger(Monero::Wallet *wallet, QObject *parent = nullptr);
@@ -33,8 +35,14 @@ public:
     quint64 preparedFee() const;
     QString preparedContactFingerprint() const { return m_preparedContactFingerprint; }
     QString status() const { return m_status; }
+    bool available() const;
+    bool canCancelPrepared() const { return m_prepared && !m_broadcastAttempted; }
+
+    bool initialize();
+    void refreshAvailability();
 
     Q_INVOKABLE bool importInvitation(const QString &label, const QString &encodedHex);
+    Q_INVOKABLE bool confirmContact(const QString &fingerprint, const QString &confirmation);
     Q_INVOKABLE bool renameContact(const QString &fingerprint, const QString &label);
     Q_INVOKABLE bool removeContact(const QString &fingerprint);
     Q_INVOKABLE bool prepare(const QString &contactFingerprint, const QString &text);
@@ -48,11 +56,17 @@ signals:
     void stateChanged();
     void planChanged();
     void statusChanged();
+    void availabilityChanged();
 
 private:
     void ensureIdentity();
     void load();
-    void save();
+    bool save();
+    void clearSession();
+    bool requireReady();
+    bool openStoredCiphertext(const QString &id, const QJsonObject &candidate);
+    void retryUnknown();
+    bool messageExists(const QString &id, bool confirmedOnly = false) const;
     void setStatus(const QString &value);
     qwertycoin::qms::hash32 genesis() const;
     qwertycoin::qms::invitation ownInvitationValue() const;
@@ -60,6 +74,7 @@ private:
     static qwertycoin::qms::bytes bytes(const QByteArray &value);
     static QString hex(const uint8_t *data, size_t size);
     static QByteArray unhex(const QString &value);
+    static QString normalizeFingerprint(const QString &value);
 
     Monero::Wallet *m_wallet;
     qwertycoin::qms::identity m_identity;
@@ -67,9 +82,13 @@ private:
     QJsonArray m_contacts;
     QJsonArray m_messages;
     QJsonObject m_incomplete;
+    QJsonObject m_unknown;
     Monero::PendingTransaction *m_prepared = nullptr;
     QString m_preparedMessageId;
     QString m_preparedContactFingerprint;
     QByteArray m_preparedJournal;
     QString m_status;
+    bool m_ready = false;
+    bool m_broadcastAttempted = false;
+    int m_preparedTotalTransactions = 0;
 };

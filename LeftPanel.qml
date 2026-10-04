@@ -47,6 +47,7 @@ Rectangle {
     property string balanceFiatString: "?.??"
     property string minutesToUnlock: ""
     property bool isSyncing: false
+    property bool messengerAvailable: false
     property alias networkStatus : networkStatus
     property alias progressBar : progressBar
     property alias daemonProgressBar : daemonProgressBar
@@ -469,6 +470,8 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 text: qsTr("Messenger") + translationManager.emptyString
+                present: panel.messengerAvailable
+                visible: panel.messengerAvailable
                 onClicked: {
                     parent.previousButton.checked = false
                     parent.previousButton = messagesButton
@@ -477,7 +480,7 @@ Rectangle {
             }
 
             MoneroComponents.MenuButtonDivider {
-                visible: messagesButton.present
+                visible: panel.messengerAvailable && messagesButton.present
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.leftMargin: 20

@@ -10,7 +10,8 @@ Item {
     property var contactsData: currentWallet ? currentWallet.messenger.contacts : []
     property var messagesData: currentWallet ? currentWallet.messenger.messages : []
     property var selectedContact: contactForFingerprint(contactsData, selectedFingerprint)
-    property var filteredMessages: messagesForContact(messagesData, selectedFingerprint)
+    property var filteredMessages: selectedContact && selectedContact.confirmed
+        ? messagesForContact(messagesData, selectedFingerprint) : []
 
     function contactForFingerprint(contacts, fingerprint) {
         for (var i = 0; i < contacts.length; ++i)
@@ -24,8 +25,17 @@ Item {
             if (messages[i].contact === fingerprint) result.push(messages[i])
         return result
     }
+    function utf8Length(value) {
+        try {
+            return unescape(encodeURIComponent(value)).length
+        } catch (error) {
+            return 4097
+        }
+    }
     function statusLabel(status) {
         if (status === "prepared") return qsTr("Ready to send")
+        if (status === "broadcasting") return qsTr("Broadcasting")
+        if (status === "broadcast outcome unknown") return qsTr("Broadcast outcome unknown")
         if (status === "broadcast" || status === "sent") return qsTr("Sent")
         if (status === "broadcast failed" || status === "send failed") return qsTr("Send failed")
         if (status === "confirmed") return qsTr("Confirmed")
@@ -71,7 +81,7 @@ Item {
                 onClicked: root.showContactManagement = !root.showContactManagement
             }
         }
-        Label { Layout.fillWidth: true; wrapMode: Text.WordWrap; text: qsTr("Experimental encrypted QMS1 messenger. No forward secrecy or post-quantum protection. Invitations contain a confidential discovery secret.") }
+        Label { Layout.fillWidth: true; wrapMode: Text.WordWrap; text: qsTr("QMS1/Fast Profile: compact authenticated end-to-end encryption compatible with the Qwertycoin Web Wallet. A short message normally uses one carrier transaction. There is no forward secrecy, post-compromise recovery or post-quantum protection. Invitations contain a confidential discovery secret.") }
 
         GroupBox {
             visible: root.showContactManagement
@@ -106,6 +116,34 @@ Item {
             ColumnLayout {
                 anchors.fill: parent
                 Label { Layout.fillWidth: true; elide: Text.ElideMiddle; text: root.selectedFingerprint; color: "#667781" }
+                Label {
+                    Layout.fillWidth: true
+                    wrapMode: Text.WordWrap
+                    font.bold: true
+                    color: root.selectedContact && root.selectedContact.confirmed ? "#087f23" : "#a15c00"
+                    text: root.selectedContact && root.selectedContact.confirmed
+                        ? qsTr("Fingerprint verified")
+                        : qsTr("Not verified. Compare the complete fingerprint over an independently authenticated channel. Sending and plaintext display stay disabled until verification.")
+                }
+                RowLayout {
+                    visible: root.selectedContact !== null && !root.selectedContact.confirmed
+                    Layout.fillWidth: true
+                    TextField {
+                        id: fingerprintConfirmation
+                        objectName: "messengerFingerprintConfirmation"
+                        Layout.fillWidth: true
+                        placeholderText: qsTr("Enter the complete verified fingerprint")
+                    }
+                    Button {
+                        objectName: "messengerConfirmFingerprintButton"
+                        text: qsTr("Mark verified")
+                        enabled: fingerprintConfirmation.text.trim().length > 0
+                        onClicked: {
+                            if (currentWallet.messenger.confirmContact(root.selectedFingerprint, fingerprintConfirmation.text))
+                                fingerprintConfirmation.clear()
+                        }
+                    }
+                }
                 RowLayout {
                     Layout.fillWidth: true
                     TextField { id: renameField; Layout.fillWidth: true; placeholderText: qsTr("Contact name") }
@@ -126,13 +164,14 @@ Item {
                     ListView {
                         id: contacts; objectName: "messengerContacts"; Layout.fillWidth: true; Layout.fillHeight: true; clip: true; spacing: 4; model: root.contactsData
                         delegate: Button {
-                            width: contacts.width; height: 66; checkable: true
+                            width: contacts.width; height: 80; checkable: true
                             checked: root.selectedFingerprint === modelData.fingerprint
                             enabled: !currentWallet || currentWallet.messenger.preparedTransactionCount === 0 || currentWallet.messenger.preparedContactFingerprint === modelData.fingerprint
                             background: Rectangle { radius: 5; color: parent.checked ? "#d9fdd3" : (parent.hovered ? "#e7e9eb" : "transparent"); border.width: parent.checked ? 2 : 0; border.color: "#00a884" }
                             contentItem: Column { spacing: 3
                                 Text { text: modelData.label; color: "#111b21"; font.bold: root.selectedFingerprint === modelData.fingerprint; font.pixelSize: 16; elide: Text.ElideRight; width: parent.width }
                                 Text { text: modelData.fingerprint.substring(0, 20) + "…"; color: "#667781"; font.pixelSize: 12; elide: Text.ElideRight; width: parent.width }
+                                Text { text: modelData.confirmed ? qsTr("Verified") : qsTr("Verification required"); color: modelData.confirmed ? "#087f23" : "#a15c00"; font.pixelSize: 11; width: parent.width }
                             }
                             onClicked: root.selectedFingerprint = modelData.fingerprint
                         }
@@ -141,7 +180,7 @@ Item {
             }
 
             Rectangle {
-                Layout.fillWidth: true; Layout.fillHeight: true; color: "#efeae2"; border.color: "#c8ccd0"; radius: 6
+                Layout.fillWidth: true; Layout.fillHeight: true; color: "#ffffff"; border.color: "#c8ccd0"; radius: 6
                 ColumnLayout { anchors.fill: parent; spacing: 0
                     Rectangle {
                         Layout.fillWidth: true; Layout.preferredHeight: 68; color: "#f0f2f5"; visible: root.selectedContact !== null
@@ -166,12 +205,12 @@ Item {
                                 height: messageColumn.implicitHeight + 20
                                 anchors.right: parent.mine ? parent.right : undefined
                                 anchors.left: parent.mine ? undefined : parent.left
-                                color: parent.mine ? "#d9fdd3" : "#ffffff"; radius: 8
+                                color: parent.mine ? "#ffb000" : "#e9eef5"; border.color: parent.mine ? "#d98c00" : "#cbd5e1"; radius: 8
                                 Column { id: messageColumn; anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top; anchors.margins: 10; spacing: 4
-                                    Text { width: parent.width; text: bubble.parent.mine ? qsTr("Me") : (root.selectedContact ? root.selectedContact.label : modelData.label); color: bubble.parent.mine ? "#008069" : "#027eb5"; font.bold: true; font.pixelSize: 12 }
-                                    Text { id: messageText; width: parent.width; text: modelData.text; color: "#111b21"; wrapMode: Text.Wrap; font.pixelSize: 15 }
+                                    Text { width: parent.width; text: bubble.parent.mine ? qsTr("Me") : (root.selectedContact ? root.selectedContact.label : modelData.label); color: bubble.parent.mine ? "#4a2d00" : "#172033"; font.bold: true; font.pixelSize: 12 }
+                                    Text { id: messageText; width: parent.width; text: modelData.text; color: bubble.parent.mine ? "#211600" : "#172033"; wrapMode: Text.Wrap; font.pixelSize: 15 }
                                     Text {
-                                        width: parent.width; horizontalAlignment: Text.AlignRight; color: "#667781"; font.pixelSize: 10
+                                        width: parent.width; horizontalAlignment: Text.AlignRight; color: bubble.parent.mine ? "#4a2d00" : "#4b5563"; font.pixelSize: 10
                                         text: {
                                             var time = root.timestampLabel(modelData.timestamp)
                                             return time === "" ? root.statusLabel(modelData.status) : time + " · " + root.statusLabel(modelData.status)
@@ -184,13 +223,15 @@ Item {
                     Rectangle {
                         Layout.fillWidth: true; Layout.preferredHeight: composerColumn.implicitHeight + 20; color: "#f0f2f5"; visible: root.selectedContact !== null
                         ColumnLayout { id: composerColumn; anchors.left: parent.left; anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter; anchors.margins: 10; spacing: 6
-                            TextArea { id: composer; objectName: "messengerComposer"; Layout.fillWidth: true; Layout.preferredHeight: 92; enabled: currentWallet && currentWallet.messenger.preparedTransactionCount === 0; placeholderText: qsTr("Write an encrypted message (maximum 4,096 UTF-8 bytes)"); wrapMode: TextEdit.Wrap }
+                            Label { Layout.fillWidth: true; visible: root.selectedContact !== null && !root.selectedContact.confirmed; wrapMode: Text.WordWrap; color: "#a15c00"; text: qsTr("Verify this contact's complete fingerprint under Manage contacts before composing a message.") }
+                            TextArea { id: composer; objectName: "messengerComposer"; Layout.fillWidth: true; Layout.preferredHeight: 92; enabled: currentWallet && root.selectedContact && root.selectedContact.confirmed && currentWallet.messenger.preparedTransactionCount === 0; placeholderText: qsTr("Write an encrypted message (maximum 4,096 UTF-8 bytes)"); wrapMode: TextEdit.Wrap }
                             RowLayout { Layout.fillWidth: true
-                                Label { text: qsTr("UTF-8 bytes: %1 / 4096").arg(unescape(encodeURIComponent(composer.text)).length); color: unescape(encodeURIComponent(composer.text)).length > 4096 ? "#d93025" : "#667781" }
+                                Label { text: qsTr("UTF-8 bytes: %1 / 4096").arg(root.utf8Length(composer.text)); color: root.utf8Length(composer.text) > 4096 ? "#d93025" : "#667781" }
                                 Item { Layout.fillWidth: true }
                                 Button {
+                                    objectName: "messengerPrepareButton"
                                     text: qsTr("Encrypt & review")
-                                    enabled: root.selectedFingerprint !== "" && composer.text.length > 0 && unescape(encodeURIComponent(composer.text)).length <= 4096 && currentWallet.messenger.preparedTransactionCount === 0
+                                    enabled: currentWallet && root.selectedFingerprint !== "" && root.selectedContact && root.selectedContact.confirmed && composer.text.length > 0 && root.utf8Length(composer.text) <= 4096 && currentWallet.messenger.preparedTransactionCount === 0
                                     onClicked: if (currentWallet.messenger.prepare(root.selectedFingerprint, composer.text)) composer.clear()
                                 }
                             }
@@ -200,7 +241,7 @@ Item {
                                 RowLayout { id: planRow; anchors.fill: parent; anchors.margins: 8
                                     Label { Layout.fillWidth: true; wrapMode: Text.WordWrap; color: "#5f4b00"; text: currentWallet ? qsTr("Encrypted message ready for %1: %2 transaction(s), total fee %3 atomic QWC").arg(root.selectedContact ? root.selectedContact.label : "").arg(currentWallet.messenger.preparedTransactionCount).arg(currentWallet.messenger.preparedFee) : "" }
                                     Button { text: qsTr("Send encrypted message"); onClicked: currentWallet.messenger.commitPrepared() }
-                                    Button { text: qsTr("Cancel and delete draft"); onClicked: currentWallet.messenger.cancelPrepared() }
+                                    Button { text: qsTr("Cancel and delete draft"); enabled: currentWallet && currentWallet.messenger.canCancelPrepared; onClicked: currentWallet.messenger.cancelPrepared() }
                                 }
                             }
                             Label { Layout.fillWidth: true; wrapMode: Text.WordWrap; color: "#667781"; text: currentWallet ? currentWallet.messenger.status : "" }
