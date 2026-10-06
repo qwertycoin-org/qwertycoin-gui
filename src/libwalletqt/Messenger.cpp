@@ -1,8 +1,11 @@
 #include "Messenger.h"
 
 #include <QDateTime>
+#include <QHash>
 #include <QJsonDocument>
 #include <QJsonValue>
+#include <QSet>
+#include <QStringList>
 #include <QVariantMap>
 #include <algorithm>
 #include <cstring>
@@ -35,6 +38,17 @@ namespace
         for (auto it = source.begin(); it != source.end() && result.size() < limit; ++it)
             result.insert(it.key(), it.value());
         return result;
+    }
+
+    QString normalizedTransactionId(const QString &value)
+    {
+        const QByteArray candidate = value.trimmed().toLatin1().toLower();
+        if (candidate.size() != 64)
+            return {};
+        const QByteArray decoded = QByteArray::fromHex(candidate);
+        if (decoded.size() != 32 || decoded.toHex() != candidate)
+            return {};
+        return QString::fromLatin1(candidate);
     }
 }
 
@@ -349,6 +363,75 @@ QVariantList Messenger::messages() const
     return result;
 }
 
+QVariantList Messenger::transactionHistoryGroups() const
+{
+    QVariantList result;
+    if (!m_ready || !available())
+        return result;
+
+    struct Candidate {
+        QJsonObject message;
+        QStringList transactionIds;
+    };
+    QList<Candidate> candidates;
+    QHash<QString, int> claims;
+
+    for (const auto value : m_messages) {
+        const QJsonObject message = value.toObject();
+        if (message.value("direction").toString() != QLatin1String("out"))
+            continue;
+
+        const QJsonArray storedIds = message.value("transactionIds").toArray();
+        if (storedIds.isEmpty())
+            continue;
+
+        QStringList transactionIds;
+        QSet<QString> uniqueIds;
+        bool valid = true;
+        for (const auto storedId : storedIds) {
+            const QString transactionId = normalizedTransactionId(storedId.toString());
+            if (transactionId.isEmpty()) {
+                valid = false;
+                continue;
+            }
+            ++claims[transactionId];
+            if (uniqueIds.contains(transactionId)) {
+                valid = false;
+                continue;
+            }
+            uniqueIds.insert(transactionId);
+            transactionIds.push_back(transactionId);
+        }
+        if (!valid)
+            continue;
+        candidates.push_back({message, transactionIds});
+    }
+
+    for (const Candidate &candidate : candidates) {
+        bool unambiguous = true;
+        for (const QString &transactionId : candidate.transactionIds) {
+            if (claims.value(transactionId) != 1) {
+                unambiguous = false;
+                break;
+            }
+        }
+        if (!unambiguous)
+            continue;
+
+        bool feeOk = false;
+        const quint64 feeAtomic = candidate.message.value("fee").toString().toULongLong(&feeOk);
+        QVariantMap group;
+        group.insert("messageId", candidate.message.value("id").toString());
+        group.insert("transactionIds", candidate.transactionIds);
+        group.insert("transactionCount", candidate.transactionIds.size());
+        group.insert("fee", feeOk ? QString::fromStdString(Monero::Wallet::displayAmount(feeAtomic)) : QString());
+        group.insert("status", candidate.message.value("status").toString());
+        group.insert("timestamp", candidate.message.value("timestamp").toString());
+        result.push_back(group);
+    }
+    return result;
+}
+
 int Messenger::preparedTransactionCount() const
 {
     return available() && m_prepared ? int(m_prepared->txCount()) : 0;
@@ -566,6 +649,18 @@ bool Messenger::prepare(const QString &contactFingerprint, const QString &text)
         if (m_preparedJournal.isEmpty())
             throw std::runtime_error("wallet could not create encrypted QMS journal");
 
+        QJsonArray transactionIds;
+        QSet<QString> uniqueTransactionIds;
+        for (const std::string &rawTransactionId : m_prepared->txid()) {
+            const QString transactionId = normalizedTransactionId(QString::fromStdString(rawTransactionId));
+            if (transactionId.isEmpty() || uniqueTransactionIds.contains(transactionId))
+                throw std::runtime_error("wallet returned invalid or duplicate QMS transaction IDs");
+            uniqueTransactionIds.insert(transactionId);
+            transactionIds.push_back(transactionId);
+        }
+        if (transactionIds.size() != m_preparedTotalTransactions)
+            throw std::runtime_error("wallet returned incomplete QMS transaction IDs");
+
         QJsonObject message;
         message["id"] = m_preparedMessageId;
         message["contact"] = contactFingerprint;
@@ -574,6 +669,7 @@ bool Messenger::prepare(const QString &contactFingerprint, const QString &text)
         message["direction"] = "out";
         message["status"] = DOMAIN_STATUS_PREPARED;
         message["transactions"] = m_preparedTotalTransactions;
+        message["transactionIds"] = transactionIds;
         message["fee"] = QString::number(m_prepared->fee());
         message["timestamp"] = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
         m_messages.push_back(message);

@@ -16,6 +16,7 @@ class Messenger : public QObject
     Q_PROPERTY(QString ownFingerprint READ ownFingerprint NOTIFY stateChanged)
     Q_PROPERTY(QVariantList contacts READ contacts NOTIFY stateChanged)
     Q_PROPERTY(QVariantList messages READ messages NOTIFY stateChanged)
+    Q_PROPERTY(QVariantList transactionHistoryGroups READ transactionHistoryGroups NOTIFY stateChanged)
     Q_PROPERTY(int preparedTransactionCount READ preparedTransactionCount NOTIFY planChanged)
     Q_PROPERTY(quint64 preparedFee READ preparedFee NOTIFY planChanged)
     Q_PROPERTY(QString preparedContactFingerprint READ preparedContactFingerprint NOTIFY planChanged)
@@ -31,6 +32,7 @@ public:
     QString ownFingerprint() const;
     QVariantList contacts() const;
     QVariantList messages() const;
+    QVariantList transactionHistoryGroups() const;
     int preparedTransactionCount() const;
     quint64 preparedFee() const;
     QString preparedContactFingerprint() const { return m_preparedContactFingerprint; }

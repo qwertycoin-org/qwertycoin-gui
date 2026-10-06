@@ -178,6 +178,7 @@
         <file>components/TextPlain.qml</file>
         <file>components/TextPlainArea.qml</file>
         <file>js/TxUtils.js</file>
+        <file>js/QmsTransactionHistory.js</file>
         <file>images/warning.png</file>
         <file>images/warning@2x.png</file>
         <file>js/Windows.js</file>
