@@ -1209,6 +1209,7 @@ Wallet::Wallet(Monero::Wallet *w, QObject *parent)
     m_walletImpl->setListener(m_walletListener);
     connect(this, &Wallet::qmsCarrier, m_messenger, &Messenger::ingestCarrier);
     connect(this, &Wallet::qmsReorg, m_messenger, &Messenger::handleReorg);
+    connect(this, &Wallet::refreshed, m_messenger, &Messenger::reconcileTransactionHistory);
     m_currentSubaddressAccount = getCacheAttribute(ATTRIBUTE_SUBADDRESS_ACCOUNT).toUInt();
     // start cache timers
     m_connectionStatusTime.start();

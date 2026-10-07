@@ -53,6 +53,7 @@ public:
     Q_INVOKABLE void ingestCarrier(quint64 height, const QString &blockHash,
                                    const QString &txId, const QString &extraHex);
     Q_INVOKABLE void handleReorg(quint64 height, quint64 blocksDetached);
+    void reconcileTransactionHistory();
 
 signals:
     void stateChanged();
@@ -85,6 +86,8 @@ private:
     QJsonArray m_messages;
     QJsonObject m_incomplete;
     QJsonObject m_unknown;
+    QJsonObject m_chainCandidates;
+    QJsonObject m_chainHistory;
     Monero::PendingTransaction *m_prepared = nullptr;
     QString m_preparedMessageId;
     QString m_preparedContactFingerprint;

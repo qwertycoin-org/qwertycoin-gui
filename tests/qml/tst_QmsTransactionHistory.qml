@@ -98,6 +98,24 @@ Item {
             compare(grouped[0].amount, 0.00000001);
         }
 
+        function test_restored_chain_mapping_hides_ambiguous_change_amount() {
+            var grouped = QmsTransactionHistory.groupTransactions([
+                transactionWithFee(carrierA, 9.88337195, 20, "0.02308400")
+            ], [{
+                "messageId": "12121212121212121212121212121212",
+                "transactionIds": [carrierA],
+                "transactionCount": 1,
+                "fee": "",
+                "status": "confirmed"
+            }]);
+
+            compare(grouped.length, 1);
+            compare(grouped[0].isMessenger, true);
+            compare(grouped[0].amount, 0);
+            compare(grouped[0].displayAmount, "");
+            compare(grouped[0].fee, "0.02308400");
+        }
+
         function test_ambiguous_hash_claims_fail_open_as_payments() {
             var grouped = QmsTransactionHistory.groupTransactions([
                 transaction(carrierA, 0.00000001, 20)

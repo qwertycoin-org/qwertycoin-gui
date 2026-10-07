@@ -67,6 +67,18 @@ Rectangle {
     Clipboard { id: clipboard }
     ListModel { id: txListViewModel }
 
+    Connections {
+        target: currentWallet && currentWallet.messenger ? currentWallet.messenger : null
+        ignoreUnknownSignals: true
+        onStateChanged: {
+            if (!root.visible || !root.model || !currentWallet ||
+                    typeof currentWallet.history === "undefined")
+                return;
+            root.updateTransactionsFromModel();
+            root.updateFilter();
+        }
+    }
+
     color: "transparent"
 
     onTxMaxChanged: root.updateDisplay(root.txOffset, root.txMax);

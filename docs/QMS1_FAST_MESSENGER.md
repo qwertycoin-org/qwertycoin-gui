@@ -28,10 +28,13 @@ fragments and the unchanged 1,060-byte `tx_extra` relay limit.
 - Every prepared outgoing message persists the exact signed carrier transaction
   hashes in the encrypted QMS state. Transaction history uses only that mapping
   to classify and group carriers; it never guesses from the 1-atomic-unit
-  self-transfer amount. Missing, malformed, duplicate or ambiguously claimed
-  hashes remain ordinary payment rows. Messages created by older desktop
-  builds therefore remain unclassified unless an exact hash mapping is already
-  present; amount-only migration is intentionally forbidden.
+  self-transfer amount. During a full-wallet chain refresh, structurally valid
+  QMS carrier records are intersected with confirmed outgoing self-transfers
+  from that exact wallet. Exact matches are then persisted in the encrypted
+  cache, so seed-restored history can be reconstructed without the original
+  send journal. Missing, malformed, duplicate or ambiguously claimed hashes
+  remain ordinary payment rows; amount-only migration is intentionally
+  forbidden.
 - Confirmed incoming messages are deduplicated by signed message ID. Reorgs
   invalidate their chain proof, and a canonical replay restores confirmation.
   Incomplete and unknown-sender queues are bounded to 64 and 32 messages.
