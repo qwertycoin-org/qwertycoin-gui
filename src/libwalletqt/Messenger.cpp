@@ -1,8 +1,12 @@
 #include "Messenger.h"
 
 #include <QDateTime>
+#include <QHash>
 #include <QJsonDocument>
 #include <QJsonValue>
+#include <QMap>
+#include <QSet>
+#include <QStringList>
 #include <QVariantMap>
 #include <algorithm>
 #include <cstring>
@@ -20,6 +24,8 @@ namespace
     constexpr int MAX_MESSAGES = 10000;
     constexpr int MAX_INCOMPLETE_MESSAGES = 64;
     constexpr int MAX_UNKNOWN_MESSAGES = 32;
+    constexpr int MAX_CHAIN_CANDIDATES = 4096;
+    constexpr int MAX_CHAIN_HISTORY_CARRIERS = 10000;
 
     QJsonArray boundedArray(const QJsonArray &source, int limit)
     {
@@ -35,6 +41,28 @@ namespace
         for (auto it = source.begin(); it != source.end() && result.size() < limit; ++it)
             result.insert(it.key(), it.value());
         return result;
+    }
+
+    QString normalizedTransactionId(const QString &value)
+    {
+        const QByteArray candidate = value.trimmed().toLatin1().toLower();
+        if (candidate.size() != 64)
+            return {};
+        const QByteArray decoded = QByteArray::fromHex(candidate);
+        if (decoded.size() != 32 || decoded.toHex() != candidate)
+            return {};
+        return QString::fromLatin1(candidate);
+    }
+
+    QString normalizedMessageId(const QString &value)
+    {
+        const QByteArray candidate = value.trimmed().toLatin1().toLower();
+        if (candidate.size() != 32)
+            return {};
+        const QByteArray decoded = QByteArray::fromHex(candidate);
+        if (decoded.size() != 16 || decoded.toHex() != candidate)
+            return {};
+        return QString::fromLatin1(candidate);
     }
 }
 
@@ -121,6 +149,8 @@ void Messenger::clearSession()
     m_messages = {};
     m_incomplete = {};
     m_unknown = {};
+    m_chainCandidates = {};
+    m_chainHistory = {};
     m_preparedJournal.clear();
     m_preparedMessageId.clear();
     m_preparedContactFingerprint.clear();
@@ -255,6 +285,7 @@ void Messenger::load()
     m_messages = boundedArray(root.value("messages").toArray(), MAX_MESSAGES);
     m_incomplete = boundedObject(root.value("incomplete").toObject(), MAX_INCOMPLETE_MESSAGES);
     m_unknown = boundedObject(root.value("unknown").toObject(), MAX_UNKNOWN_MESSAGES);
+    m_chainHistory = boundedObject(root.value("chainHistory").toObject(), MAX_CHAIN_HISTORY_CARRIERS);
     m_preparedJournal = QByteArray::fromBase64(root.value("preparedJournal").toString().toLatin1());
     m_preparedMessageId = root.value("preparedMessageId").toString();
     m_preparedContactFingerprint = root.value("preparedContactFingerprint").toString();
@@ -293,6 +324,7 @@ bool Messenger::save()
     root["messages"] = m_messages;
     root["incomplete"] = m_incomplete;
     root["unknown"] = m_unknown;
+    root["chainHistory"] = m_chainHistory;
     root["preparedJournal"] = QString::fromLatin1(m_preparedJournal.toBase64());
     root["preparedMessageId"] = m_preparedMessageId;
     root["preparedContactFingerprint"] = m_preparedContactFingerprint;
@@ -346,6 +378,148 @@ QVariantList Messenger::messages() const
         return result;
     for (const auto value : m_messages)
         result.push_back(value.toObject().toVariantMap());
+    return result;
+}
+
+QVariantList Messenger::transactionHistoryGroups() const
+{
+    QVariantList result;
+    if (!m_ready || !available())
+        return result;
+
+    struct Candidate {
+        QJsonObject message;
+        QStringList transactionIds;
+    };
+    QList<Candidate> candidates;
+    QHash<QString, int> claims;
+
+    for (const auto value : m_messages) {
+        const QJsonObject message = value.toObject();
+        if (message.value("direction").toString() != QLatin1String("out"))
+            continue;
+
+        const QJsonArray storedIds = message.value("transactionIds").toArray();
+        if (storedIds.isEmpty())
+            continue;
+
+        QStringList transactionIds;
+        QSet<QString> uniqueIds;
+        bool valid = true;
+        for (const auto storedId : storedIds) {
+            const QString transactionId = normalizedTransactionId(storedId.toString());
+            if (transactionId.isEmpty()) {
+                valid = false;
+                continue;
+            }
+            ++claims[transactionId];
+            if (uniqueIds.contains(transactionId)) {
+                valid = false;
+                continue;
+            }
+            uniqueIds.insert(transactionId);
+            transactionIds.push_back(transactionId);
+        }
+        if (!valid)
+            continue;
+        candidates.push_back({message, transactionIds});
+    }
+
+    for (const Candidate &candidate : candidates) {
+        bool unambiguous = true;
+        for (const QString &transactionId : candidate.transactionIds) {
+            if (claims.value(transactionId) != 1) {
+                unambiguous = false;
+                break;
+            }
+        }
+        if (!unambiguous)
+            continue;
+
+        bool feeOk = false;
+        const quint64 feeAtomic = candidate.message.value("fee").toString().toULongLong(&feeOk);
+        QVariantMap group;
+        group.insert("messageId", candidate.message.value("id").toString());
+        group.insert("transactionIds", candidate.transactionIds);
+        group.insert("transactionCount", candidate.transactionIds.size());
+        group.insert("fee", feeOk ? QString::fromStdString(Monero::Wallet::displayAmount(feeAtomic)) : QString());
+        group.insert("status", candidate.message.value("status").toString());
+        group.insert("timestamp", candidate.message.value("timestamp").toString());
+        result.push_back(group);
+    }
+
+    struct RecoveredGroup {
+        int fragmentCount = 0;
+        QMap<int, QString> transactionIds;
+        bool valid = true;
+    };
+    QHash<QString, RecoveredGroup> recovered;
+    for (auto it = m_chainHistory.begin(); it != m_chainHistory.end(); ++it) {
+        const QString transactionId = normalizedTransactionId(it.key());
+        const QJsonObject record = it.value().toObject();
+        const QString storedTransactionId = normalizedTransactionId(record.value("transactionId").toString());
+        const QString messageId = normalizedMessageId(record.value("messageId").toString());
+        const QString blockHash = normalizedTransactionId(record.value("blockHash").toString());
+        const int fragmentIndex = record.value("fragmentIndex").toInt(-1);
+        const int fragmentCount = record.value("fragmentCount").toInt(0);
+        bool heightOk = false;
+        const quint64 height = record.value("height").toString().toULongLong(&heightOk);
+        if (transactionId.isEmpty() || storedTransactionId != transactionId || messageId.isEmpty() ||
+            blockHash.isEmpty() || !heightOk || height == 0 || fragmentCount < 1 ||
+            fragmentCount > int(qwertycoin::qms::MAX_FRAGMENTS) || fragmentIndex < 0 ||
+            fragmentIndex >= fragmentCount)
+            continue;
+
+        RecoveredGroup &group = recovered[messageId];
+        if (group.fragmentCount != 0 && group.fragmentCount != fragmentCount)
+            group.valid = false;
+        group.fragmentCount = fragmentCount;
+        if (group.transactionIds.contains(fragmentIndex) &&
+            group.transactionIds.value(fragmentIndex) != transactionId)
+            group.valid = false;
+        group.transactionIds.insert(fragmentIndex, transactionId);
+    }
+
+    QHash<QString, int> resultIndexByMessageId;
+    for (int index = 0; index < result.size(); ++index) {
+        const QString messageId = result[index].toMap().value("messageId").toString();
+        if (!messageId.isEmpty())
+            resultIndexByMessageId.insert(messageId, index);
+    }
+    for (auto it = recovered.begin(); it != recovered.end(); ++it) {
+        if (!it.value().valid || it.value().fragmentCount < 1 ||
+            it.value().transactionIds.size() != it.value().fragmentCount)
+            continue;
+        const QStringList recoveredIds = it.value().transactionIds.values();
+        const int existingIndex = resultIndexByMessageId.value(it.key(), -1);
+        if (existingIndex >= 0) {
+            QVariantMap group = result[existingIndex].toMap();
+            QStringList transactionIds = group.value("transactionIds").toStringList();
+            QSet<QString> seen;
+            for (const QString &transactionId : transactionIds)
+                seen.insert(transactionId);
+            for (const QString &transactionId : recoveredIds) {
+                if (!seen.contains(transactionId)) {
+                    seen.insert(transactionId);
+                    transactionIds.push_back(transactionId);
+                }
+            }
+            group.insert("transactionIds", transactionIds);
+            group.insert("transactionCount", transactionIds.size());
+            result[existingIndex] = group;
+            continue;
+        }
+
+        QVariantMap group;
+        group.insert("messageId", it.key());
+        group.insert("transactionIds", recoveredIds);
+        group.insert("transactionCount", recoveredIds.size());
+        group.insert("fee", QString());
+        group.insert("status", QStringLiteral("confirmed"));
+        group.insert("timestamp", QString());
+        resultIndexByMessageId.insert(it.key(), result.size());
+        result.push_back(group);
+    }
     return result;
 }
 
@@ -566,6 +740,18 @@ bool Messenger::prepare(const QString &contactFingerprint, const QString &text)
         if (m_preparedJournal.isEmpty())
             throw std::runtime_error("wallet could not create encrypted QMS journal");
 
+        QJsonArray transactionIds;
+        QSet<QString> uniqueTransactionIds;
+        for (const std::string &rawTransactionId : m_prepared->txid()) {
+            const QString transactionId = normalizedTransactionId(QString::fromStdString(rawTransactionId));
+            if (transactionId.isEmpty() || uniqueTransactionIds.contains(transactionId))
+                throw std::runtime_error("wallet returned invalid or duplicate QMS transaction IDs");
+            uniqueTransactionIds.insert(transactionId);
+            transactionIds.push_back(transactionId);
+        }
+        if (transactionIds.size() != m_preparedTotalTransactions)
+            throw std::runtime_error("wallet returned incomplete QMS transaction IDs");
+
         QJsonObject message;
         message["id"] = m_preparedMessageId;
         message["contact"] = contactFingerprint;
@@ -574,6 +760,7 @@ bool Messenger::prepare(const QString &contactFingerprint, const QString &text)
         message["direction"] = "out";
         message["status"] = DOMAIN_STATUS_PREPARED;
         message["transactions"] = m_preparedTotalTransactions;
+        message["transactionIds"] = transactionIds;
         message["fee"] = QString::number(m_prepared->fee());
         message["timestamp"] = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
         m_messages.push_back(message);
@@ -792,11 +979,37 @@ void Messenger::ingestCarrier(quint64 height, const QString &blockHash,
         return;
     try {
         const auto fragments = qwertycoin::qms::extract_carrier_fragments(bytes(unhex(extraHex)));
-        if (fragments.size() != 1 || !qwertycoin::qms::verify_fragment(m_invitation, genesis(), fragments[0]))
+        if (fragments.size() != 1)
             return;
 
         const auto &fragment = fragments[0];
+        const QString transactionId = normalizedTransactionId(txId);
+        const QString normalizedBlockHash = normalizedTransactionId(blockHash);
         const QString id = hex(fragment.message_id.data(), fragment.message_id.size());
+        if (height == 0 || transactionId.isEmpty() || normalizedBlockHash.isEmpty() ||
+            normalizedMessageId(id).isEmpty())
+            return;
+
+        QJsonObject chainCandidate;
+        chainCandidate["transactionId"] = transactionId;
+        chainCandidate["messageId"] = id;
+        chainCandidate["fragmentIndex"] = int(fragment.index);
+        chainCandidate["fragmentCount"] = int(fragment.count);
+        chainCandidate["height"] = QString::number(height);
+        chainCandidate["blockHash"] = normalizedBlockHash;
+        if (!m_chainHistory.contains(transactionId)) {
+            const QJsonObject existing = m_chainCandidates.value(transactionId).toObject();
+            if (!existing.isEmpty() && existing != chainCandidate) {
+                m_chainCandidates.remove(transactionId);
+                return;
+            }
+            if (existing.isEmpty() && m_chainCandidates.size() < MAX_CHAIN_CANDIDATES)
+                m_chainCandidates.insert(transactionId, chainCandidate);
+        }
+
+        if (!qwertycoin::qms::verify_fragment(m_invitation, genesis(), fragment))
+            return;
+
         if (messageExists(id, true))
             return;
 
@@ -864,6 +1077,54 @@ void Messenger::ingestCarrier(quint64 height, const QString &blockHash,
     }
 }
 
+void Messenger::reconcileTransactionHistory()
+{
+    if (!m_ready || !available() || m_chainCandidates.isEmpty())
+        return;
+
+    try {
+        Monero::TransactionHistory *history = m_wallet->history();
+        if (!history)
+            return;
+        history->refresh();
+
+        QSet<QString> outgoingSelfTransfers;
+        for (Monero::TransactionInfo *transaction : history->getAll()) {
+            if (!transaction || transaction->direction() != Monero::TransactionInfo::Direction_Out ||
+                transaction->isPending() || transaction->isFailed() || transaction->amount() != 0)
+                continue;
+            const QString transactionId = normalizedTransactionId(QString::fromStdString(transaction->hash()));
+            if (!transactionId.isEmpty())
+                outgoingSelfTransfers.insert(transactionId);
+        }
+
+        const QJsonObject previousChainHistory = m_chainHistory;
+        bool changed = false;
+        for (const QString &transactionId : outgoingSelfTransfers) {
+            if (m_chainHistory.contains(transactionId))
+                continue;
+            const QJsonObject candidate = m_chainCandidates.value(transactionId).toObject();
+            if (candidate.isEmpty())
+                continue;
+            if (m_chainHistory.size() >= MAX_CHAIN_HISTORY_CARRIERS) {
+                setStatus(tr("Messenger chain-history limit reached; additional carriers remain ordinary payments."));
+                break;
+            }
+            m_chainHistory.insert(transactionId, candidate);
+            changed = true;
+        }
+
+        if (changed && !save()) {
+            m_chainHistory = previousChainHistory;
+            setStatus(tr("Recovered Messenger history could not be persisted."));
+            return;
+        }
+        m_chainCandidates = {};
+    } catch (...) {
+        // Keep the bounded in-memory candidates for the next completed refresh.
+    }
+}
+
 void Messenger::handleReorg(quint64 height, quint64)
 {
     if (!requireReady())
@@ -898,6 +1159,20 @@ void Messenger::handleReorg(quint64 height, quint64)
             changed = true;
         }
     }
+    auto removeDetachedCarriers = [height, &changed](QJsonObject &records) {
+        for (auto it = records.begin(); it != records.end();) {
+            bool heightOk = false;
+            const quint64 recordHeight = it.value().toObject().value("height").toString().toULongLong(&heightOk);
+            if (!heightOk || recordHeight >= height) {
+                it = records.erase(it);
+                changed = true;
+            } else {
+                ++it;
+            }
+        }
+    };
+    removeDetachedCarriers(m_chainCandidates);
+    removeDetachedCarriers(m_chainHistory);
     if (changed && !save())
         setStatus(tr("Messenger reorg state could not be persisted."));
 }

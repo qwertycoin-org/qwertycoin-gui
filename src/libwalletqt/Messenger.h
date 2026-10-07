@@ -16,6 +16,7 @@ class Messenger : public QObject
     Q_PROPERTY(QString ownFingerprint READ ownFingerprint NOTIFY stateChanged)
     Q_PROPERTY(QVariantList contacts READ contacts NOTIFY stateChanged)
     Q_PROPERTY(QVariantList messages READ messages NOTIFY stateChanged)
+    Q_PROPERTY(QVariantList transactionHistoryGroups READ transactionHistoryGroups NOTIFY stateChanged)
     Q_PROPERTY(int preparedTransactionCount READ preparedTransactionCount NOTIFY planChanged)
     Q_PROPERTY(quint64 preparedFee READ preparedFee NOTIFY planChanged)
     Q_PROPERTY(QString preparedContactFingerprint READ preparedContactFingerprint NOTIFY planChanged)
@@ -31,6 +32,7 @@ public:
     QString ownFingerprint() const;
     QVariantList contacts() const;
     QVariantList messages() const;
+    QVariantList transactionHistoryGroups() const;
     int preparedTransactionCount() const;
     quint64 preparedFee() const;
     QString preparedContactFingerprint() const { return m_preparedContactFingerprint; }
@@ -51,6 +53,7 @@ public:
     Q_INVOKABLE void ingestCarrier(quint64 height, const QString &blockHash,
                                    const QString &txId, const QString &extraHex);
     Q_INVOKABLE void handleReorg(quint64 height, quint64 blocksDetached);
+    void reconcileTransactionHistory();
 
 signals:
     void stateChanged();
@@ -83,6 +86,8 @@ private:
     QJsonArray m_messages;
     QJsonObject m_incomplete;
     QJsonObject m_unknown;
+    QJsonObject m_chainCandidates;
+    QJsonObject m_chainHistory;
     Monero::PendingTransaction *m_prepared = nullptr;
     QString m_preparedMessageId;
     QString m_preparedContactFingerprint;

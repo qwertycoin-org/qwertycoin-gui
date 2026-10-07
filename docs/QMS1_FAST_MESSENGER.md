@@ -25,6 +25,16 @@ fragments and the unchanged 1,060-byte `tx_extra` relay limit.
   before broadcast. After an ambiguous broadcast failure, cancellation and
   transaction rebuilding are disabled; retry reuses only the remaining signed
   plan.
+- Every prepared outgoing message persists the exact signed carrier transaction
+  hashes in the encrypted QMS state. Transaction history uses only that mapping
+  to classify and group carriers; it never guesses from the 1-atomic-unit
+  self-transfer amount. During a full-wallet chain refresh, structurally valid
+  QMS carrier records are intersected with confirmed outgoing self-transfers
+  from that exact wallet. Exact matches are then persisted in the encrypted
+  cache, so seed-restored history can be reconstructed without the original
+  send journal. Missing, malformed, duplicate or ambiguously claimed hashes
+  remain ordinary payment rows; amount-only migration is intentionally
+  forbidden.
 - Confirmed incoming messages are deduplicated by signed message ID. Reorgs
   invalidate their chain proof, and a canonical replay restores confirmation.
   Incomplete and unknown-sender queues are bounded to 64 and 32 messages.
@@ -44,11 +54,16 @@ fingerprint, UTF-8 and ciphertext validation for the desktop client. The Web
 Wallet's independent JavaScript implementation is continuously checked against
 the same Core implementation.
 
-The desktop MVP uses its bootstrap invitation for contacts. It does not yet
-include the Web Wallet's encrypted backup format, per-contact invitation export,
-mempool placeholder, paginated history, unread counters or multi-profile state
-transfer. Those are local UX/storage features and do not prevent bidirectional
-QMS1/Fast messages.
+The desktop MVP uses its bootstrap invitation for contacts. Its transaction
+history offers **All**, **Payments** and **Messenger** views. Carrier
+transactions for one outgoing message are represented by one Messenger row
+with their total network fee; expanding the row exposes every underlying hash.
+The raw wallet history and CSV export remain unchanged and auditable.
+
+The desktop MVP does not yet include the Web Wallet's encrypted backup format,
+per-contact invitation export, mempool placeholder, unread counters or
+multi-profile state transfer. Those are local UX/storage features and do not
+prevent bidirectional QMS1/Fast messages.
 
 ## Verification
 
