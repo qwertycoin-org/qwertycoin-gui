@@ -61,6 +61,7 @@ Rectangle {
     property Advanced advancedView: Advanced { }
     property Settings settingsView: Settings { }
     property AddressBook addressBookView: AddressBook { }
+    property Messages messagesView: Messages { }
     property Keys keysView: Keys { }
     property Account accountView: Account { }
 
@@ -148,6 +149,10 @@ Rectangle {
                 name: "AddressBook"
                 PropertyChanges { target: root; currentView: addressBookView }
                 PropertyChanges { target: mainFlickable; contentHeight: addressBookView.addressbookHeight + 80 }
+            }, State {
+                name: "Messages"
+                PropertyChanges { target: root; currentView: messagesView }
+                PropertyChanges { target: mainFlickable; contentHeight: messagesView.contentHeight + 80 }
             }, State {
                 name: "Advanced"
                 PropertyChanges { target: root; currentView: advancedView }

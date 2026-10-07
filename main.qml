@@ -1823,6 +1823,7 @@ ApplicationWindow {
                 anchors.left: parent.left
                 anchors.bottom: parent.bottom
                 visible: rootItem.state == "normal" && middlePanel.state != "Merchant"
+                messengerAvailable: !!currentWallet && currentWallet.messenger.available
                 currentAccountIndex: currentWallet ? currentWallet.currentSubaddressAccount : 0
                 currentAccountLabel: {
                     if (currentWallet) {
@@ -1857,6 +1858,12 @@ ApplicationWindow {
 
                 onAddressBookClicked: {
                     middlePanel.state = "AddressBook";
+                    middlePanel.flickable.contentY = 0;
+                    updateBalance();
+                }
+
+                onMessagesClicked: {
+                    middlePanel.state = "Messages";
                     middlePanel.flickable.contentY = 0;
                     updateBalance();
                 }

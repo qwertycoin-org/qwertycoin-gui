@@ -38,6 +38,7 @@
 #include "UnsignedTransaction.h"
 #include "TransactionHistory.h"
 #include "AddressBook.h"
+#include "Messenger.h"
 #include "Subaddress.h"
 #include "SubaddressAccount.h"
 #include "model/TransactionHistoryModel.h"
@@ -211,7 +212,10 @@ QString Wallet::errorString() const
 
 bool Wallet::setPassword(const QString &password)
 {
-    return m_walletImpl->setPassword(password.toStdString());
+    const bool changed = m_walletImpl->setPassword(password.toStdString());
+    if (changed && m_messenger)
+        m_messenger->refreshAvailability();
+    return changed;
 }
 
 QString Wallet::address(quint32 accountIndex, quint32 addressIndex) const
@@ -1193,6 +1197,7 @@ Wallet::Wallet(Monero::Wallet *w, QObject *parent)
     , m_subaddress(new Subaddress(m_walletImpl->subaddress(), this))
     , m_subaddressModel(nullptr)
     , m_subaddressAccount(new SubaddressAccount(m_walletImpl->subaddressAccount(), this))
+    , m_messenger(new Messenger(m_walletImpl, this))
     , m_subaddressAccountModel(nullptr)
     , m_refreshNow(false)
     , m_refreshEnabled(false)
@@ -1202,6 +1207,9 @@ Wallet::Wallet(Monero::Wallet *w, QObject *parent)
 {
     m_walletListener = new WalletListenerImpl(this);
     m_walletImpl->setListener(m_walletListener);
+    connect(this, &Wallet::qmsCarrier, m_messenger, &Messenger::ingestCarrier);
+    connect(this, &Wallet::qmsReorg, m_messenger, &Messenger::handleReorg);
+    connect(this, &Wallet::refreshed, m_messenger, &Messenger::reconcileTransactionHistory);
     m_currentSubaddressAccount = getCacheAttribute(ATTRIBUTE_SUBADDRESS_ACCOUNT).toUInt();
     // start cache timers
     m_connectionStatusTime.start();

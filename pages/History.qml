@@ -42,6 +42,7 @@ import "../components/effects/" as MoneroEffects
 import "../components" as MoneroComponents
 import "../js/Utils.js" as Utils
 import "../js/TxUtils.js" as TxUtils
+import "../js/QmsTransactionHistory.js" as QmsTransactionHistory
 
 
 Rectangle {
@@ -60,10 +61,23 @@ Rectangle {
     property var txData: []  // representation of FILTERED transation data
     property var txDataCollapsed: []  // keep track of which txs are collapsed
     property string historyStatusMessage: ""
+    property string activityFilter: "all"
     property alias contentHeight: pageRoot.height
 
     Clipboard { id: clipboard }
     ListModel { id: txListViewModel }
+
+    Connections {
+        target: currentWallet && currentWallet.messenger ? currentWallet.messenger : null
+        ignoreUnknownSignals: true
+        onStateChanged: {
+            if (!root.visible || !root.model || !currentWallet ||
+                    typeof currentWallet.history === "undefined")
+                return;
+            root.updateTransactionsFromModel();
+            root.updateFilter();
+        }
+    }
 
     color: "transparent"
 
@@ -140,6 +154,41 @@ Rectangle {
                     }
                 }
             }
+        }
+
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.leftMargin: sideMargin
+            Layout.rightMargin: sideMargin
+            Layout.bottomMargin: 6
+            spacing: 8
+            visible: root.txModelData.length > 0
+
+            MoneroComponents.StandardButton {
+                objectName: "historyFilterAll"
+                small: true
+                primary: root.activityFilter === "all"
+                text: qsTr("All") + translationManager.emptyString
+                onClicked: root.setActivityFilter("all")
+            }
+
+            MoneroComponents.StandardButton {
+                objectName: "historyFilterPayments"
+                small: true
+                primary: root.activityFilter === "payments"
+                text: qsTr("Payments") + translationManager.emptyString
+                onClicked: root.setActivityFilter("payments")
+            }
+
+            MoneroComponents.StandardButton {
+                objectName: "historyFilterMessenger"
+                small: true
+                primary: root.activityFilter === "messenger"
+                text: qsTr("Messenger") + translationManager.emptyString
+                onClicked: root.setActivityFilter("messenger")
+            }
+
+            Item { Layout.fillWidth: true }
         }
 
         ColumnLayout {
@@ -597,7 +646,7 @@ Rectangle {
                 anchors.right: parent ? parent.right : undefined
                 height: {
                     if(!collapsed) return 60;
-                    return 320;
+                    return 320 + (isMessenger ? Math.max(0, messengerTransactionCount - 1) * 20 : 0);
                 }
                 color: {
                     if(!collapsed) return "transparent"
@@ -671,7 +720,7 @@ Rectangle {
                                 MoneroComponents.TextPlain {
                                     font.family: MoneroComponents.Style.fontRegular.name
                                     font.pixelSize: 15
-                                    text: (isout ? qsTr("Sent") : qsTr("Received")) + (isFailed ? " (" + qsTr("Failed") + ")" : (isPending ? " (" + qsTr("Pending") + ")" : "")) + translationManager.emptyString
+                                    text: (isMessenger ? qsTr("Messenger · Outgoing message") : (isout ? qsTr("Sent") : qsTr("Received"))) + (isFailed ? " (" + qsTr("Failed") + ")" : (isPending ? " (" + qsTr("Pending") + ")" : "")) + translationManager.emptyString
                                     color: MoneroComponents.Style.historyHeaderTextColor
                                     anchors.verticalCenter: parent.verticalCenter
                                     themeTransitionBlackColor: MoneroComponents.Style._b_historyHeaderTextColor
@@ -687,7 +736,7 @@ Rectangle {
                                 MoneroComponents.TextPlain {
                                     font.family: MoneroComponents.Style.fontRegular.name
                                     font.pixelSize: 15
-                                    text: (amount == 0 ? qsTr("Unknown amount") : displayAmount) + translationManager.emptyString
+                                    text: (isMessenger ? (messengerTransactionCount === 1 ? qsTr("1 carrier transaction") : qsTr("%1 carrier transactions").arg(messengerTransactionCount)) : (amount == 0 ? qsTr("Unknown amount") : displayAmount)) + translationManager.emptyString
                                     color: MoneroComponents.Style.defaultFontColor
                                     anchors.verticalCenter: parent.verticalCenter
 
@@ -721,7 +770,7 @@ Rectangle {
                                 MoneroComponents.TextPlain {
                                     font.family: MoneroComponents.Style.fontRegular.name
                                     font.pixelSize: 15
-                                    text: isout ? qsTr("Fee") : confirmationsRequired === 60 ? qsTr("Mined") : qsTr("Fee") + translationManager.emptyString
+                                    text: isMessenger ? qsTr("Network fee") : isout ? qsTr("Fee") : confirmationsRequired === 60 ? qsTr("Mined") : qsTr("Fee") + translationManager.emptyString
                                     color: MoneroComponents.Style.historyHeaderTextColor
                                     themeTransitionBlackColor: MoneroComponents.Style._b_historyHeaderTextColor
                                     themeTransitionWhiteColor: MoneroComponents.Style._w_historyHeaderTextColor
@@ -783,7 +832,7 @@ Rectangle {
                                 MoneroComponents.TextPlain {
                                     font.family: MoneroComponents.Style.fontRegular.name
                                     font.pixelSize: 15
-                                    text: (isout ? qsTr("To") : qsTr("In")) + translationManager.emptyString
+                                    text: (isMessenger ? qsTr("Type") : (isout ? qsTr("To") : qsTr("In"))) + translationManager.emptyString
                                     color: MoneroComponents.Style.historyHeaderTextColor
                                     themeTransitionBlackColor: MoneroComponents.Style._b_historyHeaderTextColor
                                     themeTransitionWhiteColor: MoneroComponents.Style._w_historyHeaderTextColor
@@ -801,6 +850,8 @@ Rectangle {
                                     font.family: MoneroComponents.Style.fontRegular.name
                                     font.pixelSize: 15
                                     text: {
+                                        if (isMessenger)
+                                            return qsTr("Messenger") + translationManager.emptyString;
                                         if (isout) {
                                             if (address) {
                                                 return (addressBookName ? FontAwesome.addressBook + " " + addressBookName : TxUtils.addressTruncate(address, 8));
@@ -977,6 +1028,7 @@ Rectangle {
 
                                 MoneroComponents.StandardButton {
                                     id: btnDetails
+                                    visible: !isMessenger
                                     text: FontAwesome.info
                                     small: true
                                     label.font.family: FontAwesome.fontFamily
@@ -1012,7 +1064,7 @@ Rectangle {
                                 }
 
                                 MoneroComponents.StandardButton {
-                                    visible: isout
+                                    visible: isout && !isMessenger
                                     enabled: currentWallet ? !currentWallet.isHwBacked() : false
                                     anchors.left: btnDetails.right
                                     anchors.leftMargin: 10
@@ -1057,7 +1109,7 @@ Rectangle {
                             MoneroComponents.TextPlain {
                                 font.family: MoneroComponents.Style.fontRegular.name
                                 font.pixelSize: 15
-                                text: qsTr("Description") + translationManager.emptyString
+                                text: (isMessenger ? qsTr("Message") : qsTr("Description")) + translationManager.emptyString
                                 color: MoneroComponents.Style.historyHeaderTextColor
                                 themeTransitionBlackColor: MoneroComponents.Style._b_historyHeaderTextColor
                                 themeTransitionWhiteColor: MoneroComponents.Style._w_historyHeaderTextColor
@@ -1074,7 +1126,7 @@ Rectangle {
                                 id: txNoteText
                                 font.family: MoneroComponents.Style.fontRegular.name
                                 font.pixelSize: 15
-                                text: tx_note !== "" ? tx_note : "-"
+                                text: isMessenger ? qsTr("Outgoing message") + translationManager.emptyString : (tx_note !== "" ? tx_note : "-")
                                 color: MoneroComponents.Style.defaultFontColor
                                 anchors.verticalCenter: parent.verticalCenter
 
@@ -1088,6 +1140,7 @@ Rectangle {
                             }
 
                             MoneroEffects.ImageMask {
+                                visible: !isMessenger
                                 anchors.top: parent.top
                                 anchors.left: txNoteText.right
                                 anchors.leftMargin: 12
@@ -1125,7 +1178,7 @@ Rectangle {
                             MoneroComponents.TextPlain {
                                 font.family: MoneroComponents.Style.fontRegular.name
                                 font.pixelSize: 15
-                                text: qsTr("Transaction ID") + translationManager.emptyString
+                                text: (isMessenger ? qsTr("Transaction IDs") : qsTr("Transaction ID")) + translationManager.emptyString
                                 color: MoneroComponents.Style.historyHeaderTextColor
                                 themeTransitionBlackColor: MoneroComponents.Style._b_historyHeaderTextColor
                                 themeTransitionWhiteColor: MoneroComponents.Style._w_historyHeaderTextColor
@@ -1136,12 +1189,12 @@ Rectangle {
                         Rectangle {
                             color: "transparent"
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 20
+                            Layout.preferredHeight: isMessenger ? Math.max(20, messengerTransactionCount * 20) : 20
 
                             MoneroComponents.TextPlain {
                                 font.family: MoneroComponents.Style.fontRegular.name
                                 font.pixelSize: 15
-                                text: hash
+                                text: isMessenger ? messengerTransactionIdsText : hash
                                 color: MoneroComponents.Style.defaultFontColor
                                 anchors.verticalCenter: parent.verticalCenter
 
@@ -1421,6 +1474,14 @@ Rectangle {
         root.updateDisplay(root.txOffset, root.txMax);
     }
 
+    function setActivityFilter(filter) {
+        if (filter !== "all" && filter !== "payments" && filter !== "messenger")
+            return;
+        root.activityFilter = filter;
+        root.txOffset = 0;
+        root.updateFilter();
+    }
+
     function reset(keepDate) {
         root.txOffset = 0;
 
@@ -1439,6 +1500,7 @@ Rectangle {
     function updateFilter(currentPage){
         // applying filters
         root.txData = JSON.parse(JSON.stringify(root.txModelData)); // deepcopy
+        root.txData = QmsTransactionHistory.filterTransactions(root.txData, root.activityFilter);
 
         const timezoneOffset = new Date().getTimezoneOffset() * 60;
         var fromDate = Math.floor(fromDatePicker.currentDate.getTime() / 86400000) * 86400 + timezoneOffset;
@@ -1473,6 +1535,10 @@ Rectangle {
                 } else if(typeof item.blockheight !== "undefined" && item.blockheight.toString().startsWith(root.sortSearchString)) {
                     txs.push(item);
                 } else if(item.tx_note.toLowerCase().indexOf(root.sortSearchString.toLowerCase()) !== -1) {
+                    txs.push(item);
+                } else if(item.isMessenger && item.messengerTransactionIdsText.toLowerCase().indexOf(root.sortSearchString.toLowerCase()) !== -1) {
+                    txs.push(item);
+                } else if(item.isMessenger && qsTr("Messenger").toLowerCase().indexOf(root.sortSearchString.toLowerCase()) !== -1) {
                     txs.push(item);
                 } else if (item.hash.startsWith(root.sortSearchString)){
                     txs.push(item);
@@ -1623,6 +1689,10 @@ Rectangle {
             });
         }
 
+        var historyGroups = [];
+        if (currentWallet && currentWallet.messenger && currentWallet.messenger.available)
+            historyGroups = currentWallet.messenger.transactionHistoryGroups;
+        root.txModelData = QmsTransactionHistory.groupTransactions(root.txModelData, historyGroups);
         root.txData = JSON.parse(JSON.stringify(root.txModelData)); // deepcopy
         root.txCount = root.txData.length;
     }
@@ -1673,7 +1743,7 @@ Rectangle {
         } else if (root.txData.length <= 0){
             root.historyStatusMessage = qsTr("No results.") + translationManager.emptyString;
         } else {
-            root.historyStatusMessage = qsTr("%1 transactions total, showing %2.").arg(root.txData.length).arg(txListViewModel.count) + translationManager.emptyString;
+            root.historyStatusMessage = qsTr("%1 history entries total, showing %2.").arg(root.txData.length).arg(txListViewModel.count) + translationManager.emptyString;
         }
     }
 

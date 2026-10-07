@@ -198,9 +198,11 @@ run IDs.
 Before creating any release, it verifies that every referenced run:
 
 - is a successful first-attempt `workflow_dispatch` execution of
-  `release.yml` on `master`, using the same reviewed workflow definition as the
-  assembler; the packaged `BUILD-INFO.txt` must independently bind the exact
-  requested source revision;
+  `release.yml` on `master`, or for a feature prerelease has a workflow
+  `head_sha` exactly equal to the requested immutable release revision. A
+  feature-branch name by itself is never sufficient. The run must use the same
+  reviewed workflow definition as the assembler, and the packaged
+  `BUILD-INFO.txt` must independently bind the exact requested source revision;
 - contains exactly one non-expired artifact with the expected platform name;
 - contains archives with safe paths and links, no case-folding collisions,
   complete matching per-file SHA-256 coverage and exact GUI/Core build metadata;
@@ -243,6 +245,11 @@ gh workflow run assemble-release.yml --ref master \
   -f macos_run_id=<macos-run-id> \
   -f confirmation=CREATE-DRAFT
 ```
+
+For a deliberate feature-branch prerelease, dispatch every candidate and the
+assembler on that feature branch. The workflow rejects the exception unless
+each run's `head_sha`, the assembler's `GITHUB_SHA` and `expected_revision` are
+the same exact commit. Stable publication remains restricted to `master`.
 
 After the exact stable-labelled native archives have passed independent review,
 the corresponding stable publication uses:

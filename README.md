@@ -19,6 +19,9 @@ The current Qwertycoin GUI source line provides:
 - Qwertycoin Core submodule at the explicit `qwertycoin/` path;
 - `qwertycoind` local daemon integration and QWC mainnet defaults;
 - typed asynchronous EPoSe observer and a dedicated EPoSe page;
+- experimental password-gated QMS1/Fast Messenger using the same wire profile
+  as the production Web Wallet, with explicit fingerprint verification and
+  prepare/review/send transaction handling;
 - explicit local EPoSe producer setup through the supported Core flags;
 - QWC 8-decimal amounts and `qwertycoin:` URI handling;
 - DNSSEC-validated update checks with fixed QWC GitHub release targets;
@@ -38,7 +41,14 @@ https://github.com/qwertycoin-org/qwertycoin.git
 
 This release line pins reviewed Core commit
 `766839bb49475200977f6302b60c01e34d66e253`. It contains the current QWC v2
-mainnet genesis and network identity.
+mainnet genesis, network identity and QMS1/Fast wallet APIs.
+
+QMS1/Fast is an application protocol carried in existing transaction nonce
+fields; it does not change consensus, fees, mining, EPoSe or relay limits. It
+provides authenticated end-to-end encryption but no forward secrecy,
+post-compromise recovery or post-quantum protection. Messenger state is kept in
+the wallet's encrypted cache and is exposed only for an unlocked full wallet
+with a non-empty session password. See [QMS1/Fast Messenger](docs/QMS1_FAST_MESSENGER.md).
 
 The cross-repository release and development pins are recorded in the
 [canonical compatibility matrix](https://github.com/qwertycoin-org/qwertycoin/blob/main/docs/releases/COMPATIBILITY.md).

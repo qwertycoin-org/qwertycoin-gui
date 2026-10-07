@@ -78,7 +78,12 @@ jobs:
           [[ "$MACOS_RUN_ID" =~ ^[1-9][0-9]*$ ]]
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           git cat-file -e "${EXPECTED_REVISION}^{commit}"
-          git merge-base --is-ancestor "$EXPECTED_REVISION" "$GITHUB_SHA"
+          if [[ "$GITHUB_REF_NAME" == master ]]; then
+            git merge-base --is-ancestor "$EXPECTED_REVISION" "$GITHUB_SHA"
+          else
+            test "$RELEASE_KIND" = draft-prerelease
+            test "$GITHUB_SHA" = "$EXPECTED_REVISION"
+          fi
           version_file=$(git show "${EXPECTED_REVISION}:CMakeLists.txt")
           major=$(sed -nE 's/^set\(VERSION_MAJOR "([0-9]+)"\)$/\1/p' <<<"$version_file")
           minor=$(sed -nE 's/^set\(VERSION_MINOR "([0-9]+)"\)$/\1/p' <<<"$version_file")
@@ -124,18 +129,23 @@ jobs:
           validate_run() {
             local run_id=$1 artifact_name=$2 job_name=$3
             run=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}")
-            local run_head
+            local run_head run_branch
             run_head=$(jq -er '.head_sha' <<<"$run")
+            run_branch=$(jq -er '.head_branch' <<<"$run")
             jq -e \
               '.name == "qwc/gui-release-candidate"
                and .path == ".github/workflows/release.yml"
                and .event == "workflow_dispatch"
-               and .head_branch == "master"
                and .status == "completed"
                and .conclusion == "success"
                and .run_attempt == 1' <<<"$run" >/dev/null
             git cat-file -e "${run_head}^{commit}"
-            git merge-base --is-ancestor "$EXPECTED_REVISION" "$run_head"
+            if [[ "$run_branch" == master ]]; then
+              git merge-base --is-ancestor "$EXPECTED_REVISION" "$run_head"
+            else
+              test "$RELEASE_KIND" = draft-prerelease
+              test "$run_head" = "$EXPECTED_REVISION"
+            fi
             test "$(git rev-parse "${run_head}:.github/workflows/release.yml")" = \
               "$(git rev-parse "${GITHUB_SHA}:.github/workflows/release.yml")"
 
