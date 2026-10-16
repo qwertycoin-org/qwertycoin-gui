@@ -37,7 +37,7 @@ https://github.com/qwertycoin-org/qwertycoin.git
 ```
 
 This release line pins reviewed Core commit
-`766839bb49475200977f6302b60c01e34d66e253`. It contains the current QWC v2
+`1e479cc9feda48e07dd07ba6abcb89ca3934b5e2` (Core `v2.0.4`). It contains the current QWC v2
 mainnet genesis and network identity.
 
 The cross-repository release and development pins are recorded in the
@@ -128,10 +128,10 @@ zone or any DNSSEC validation failure means "no update available". Existing
 v2.0.1 installations do not contain this QWC updater and therefore require a
 manual upgrade to the first release that enables it.
 
-The v2.0.2 and v2.0.3 downloaders detect newer DNSSEC-authenticated releases but
-do not follow GitHub's release-asset redirect. Those installed versions require
+The v2.0.2 downloader detects newer DNSSEC-authenticated releases but
+does not follow GitHub's release-asset redirect. That installed version requires
 one manual download from the public GUI release page before subsequent updates
-can use the corrected in-application download path.
+can use the corrected in-application download path included in v2.0.3 and later.
 
 ## Local verification
 
