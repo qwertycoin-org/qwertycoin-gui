@@ -62,6 +62,7 @@ signals:
     void availabilityChanged();
 
 private:
+    friend class MessengerTestAccess;
     void ensureIdentity();
     void load();
     bool save();

@@ -1229,6 +1229,11 @@ Wallet::~Wallet()
     m_walletImpl->stop();
     m_scheduler.shutdownWaitForFinished();
 
+    // Prepared Messenger transactions retain a reference to the Core wallet.
+    // Dispose them before that wallet; QObject child cleanup would run later.
+    delete m_messenger;
+    m_messenger = nullptr;
+
     //Monero::WalletManagerFactory::getWalletManager()->closeWallet(m_walletImpl);
     if (m_walletImpl->path().empty())
         qDebug("Discarding unsaved in-memory wallet");

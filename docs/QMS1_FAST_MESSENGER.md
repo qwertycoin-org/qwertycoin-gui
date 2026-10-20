@@ -25,6 +25,9 @@ fragments and the unchanged 1,060-byte `tx_extra` relay limit.
   before broadcast. After an ambiguous broadcast failure, cancellation and
   transaction rebuilding are disabled; retry reuses only the remaining signed
   plan.
+- Wallet shutdown disposes in-memory prepared transactions before destroying
+  the underlying Core wallet. The encrypted recovery journal remains intact
+  for reopening; closing a wallet does not broadcast or cancel its saved plan.
 - Every prepared outgoing message persists the exact signed carrier transaction
   hashes in the encrypted QMS state. Transaction history uses only that mapping
   to classify and group carriers; it never guesses from the 1-atomic-unit
@@ -72,10 +75,21 @@ tools/check_core_pin.sh
 cmake -S . -B build/gui-review -G Ninja \
   -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSTATIC=OFF -DMANUAL_SUBMODULES=1 \
   -DDEV_MODE=OFF -DUSE_DEVICE_TREZOR=OFF -DQML_TESTS=ON
-cmake --build build/gui-review --target qwertycoin-gui qms_unit_tests --parallel 2
+cmake --build build/gui-review --target qwertycoin-gui \
+  qwertycoin-gui-epose-tests qwertycoin-gui-updater-tests --parallel 2
 ctest --test-dir build/gui-review --output-on-failure
 QT_QPA_PLATFORM=offscreen build/gui-review/bin/qwertycoin-gui --test-qml
+cmake -S qwertycoin -B build/qms-review -G Ninja \
+  -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DBUILD_GUI_DEPS=ON \
+  -DUSE_DEVICE_TREZOR=OFF
+cmake --build build/qms-review --target qms_unit_tests --parallel 2
+build/qms-review/bin/qms_unit_tests
 ```
+
+The QML suite includes linked native-wallet regressions for passwordless
+fail-closed behavior, encrypted identity/contact persistence and prepared-plan
+disposal during wallet shutdown. Tests create unfunded temporary wallets and
+never connect them to a node.
 
 Release artifacts must still be built and smoke-tested by the repository's
 native Linux x86_64, Windows x86_64 and macOS Apple Silicon workflows. A Linux
