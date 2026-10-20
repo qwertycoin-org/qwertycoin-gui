@@ -78,12 +78,7 @@ jobs:
           [[ "$MACOS_RUN_ID" =~ ^[1-9][0-9]*$ ]]
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           git cat-file -e "${EXPECTED_REVISION}^{commit}"
-          if [[ "$GITHUB_REF_NAME" == master ]]; then
-            git merge-base --is-ancestor "$EXPECTED_REVISION" "$GITHUB_SHA"
-          else
-            test "$RELEASE_KIND" = draft-prerelease
-            test "$GITHUB_SHA" = "$EXPECTED_REVISION"
-          fi
+          git merge-base --is-ancestor "$EXPECTED_REVISION" "$GITHUB_SHA"
           version_file=$(git show "${EXPECTED_REVISION}:CMakeLists.txt")
           major=$(sed -nE 's/^set\(VERSION_MAJOR "([0-9]+)"\)$/\1/p' <<<"$version_file")
           minor=$(sed -nE 's/^set\(VERSION_MINOR "([0-9]+)"\)$/\1/p' <<<"$version_file")
@@ -129,23 +124,18 @@ jobs:
           validate_run() {
             local run_id=$1 artifact_name=$2 job_name=$3
             run=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}")
-            local run_head run_branch
+            local run_head
             run_head=$(jq -er '.head_sha' <<<"$run")
-            run_branch=$(jq -er '.head_branch' <<<"$run")
             jq -e \
               '.name == "qwc/gui-release-candidate"
                and .path == ".github/workflows/release.yml"
                and .event == "workflow_dispatch"
+               and .head_branch == "master"
                and .status == "completed"
                and .conclusion == "success"
                and .run_attempt == 1' <<<"$run" >/dev/null
             git cat-file -e "${run_head}^{commit}"
-            if [[ "$run_branch" == master ]]; then
-              git merge-base --is-ancestor "$EXPECTED_REVISION" "$run_head"
-            else
-              test "$RELEASE_KIND" = draft-prerelease
-              test "$run_head" = "$EXPECTED_REVISION"
-            fi
+            git merge-base --is-ancestor "$EXPECTED_REVISION" "$run_head"
             test "$(git rev-parse "${run_head}:.github/workflows/release.yml")" = \
               "$(git rev-parse "${GITHUB_SHA}:.github/workflows/release.yml")"
 
@@ -301,12 +291,12 @@ jobs:
 
           Windows installation:
 
-          - Prefer the `${WINDOWS_ARTIFACT}-setup.exe` download for a normal all-users installation with Start menu and optional desktop shortcuts.
-          - The portable `${WINDOWS_ARTIFACT}.zip` remains available. Installer upgrades replace the complete managed program package while retaining wallets, settings, blockchain data, EPoSE keystores and unknown user files.
+          - Prefer the \`${WINDOWS_ARTIFACT}-setup.exe\` download for a normal all-users installation with Start menu and optional desktop shortcuts.
+          - The portable \`${WINDOWS_ARTIFACT}.zip\` remains available. Installer upgrades replace the complete managed program package while retaining wallets, settings, blockchain data, EPoSE keystores and unknown user files.
 
           macOS installation:
 
-          - Prefer the `${MACOS_ARTIFACT}.dmg` download.
+          - Prefer the \`${MACOS_ARTIFACT}.dmg\` download.
           - Open the DMG and drag Qwertycoin to Applications. The tarball remains available as an alternative format.
           - Because the app is currently ad-hoc signed and not notarized, macOS may require **System Settings → Privacy & Security → Open Anyway** after the first launch attempt.
 
@@ -318,6 +308,10 @@ jobs:
 
           ${publication_note}
           EOF
+          if [[ -f "docs/releases/${RELEASE_TAG}.md" ]]; then
+            printf '\n---\n\n' >> release-assets/RELEASE-NOTES.md
+            cat "docs/releases/${RELEASE_TAG}.md" >> release-assets/RELEASE-NOTES.md
+          fi
 
       - name: Detect an exact existing release or refuse conflicts
         shell: bash

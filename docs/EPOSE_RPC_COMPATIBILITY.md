@@ -1,7 +1,7 @@
 # EPoSe GUI/Core compatibility matrix
 
 This matrix is normative for GUI Core pin
-`1e7de336faeff8f1dc6604fe75d038dc3568d7fa`. The pinned Core binds mainnet
+`f1db1c0df16b180c608d609a6e5966c701d1c292`. The pinned Core binds mainnet
 genesis `4f95857586e2c66063c277370eda99cd75897d773af09f0c3cd1e22f7e87db39`
 and network ID `515743324d41494e3230323652303102`
 and parameter hash
@@ -65,3 +65,22 @@ estimated from elapsed time.
 
 These values are displayed from verified Core responses or documented as the
 pin profile; they are not copied into GUI decision logic.
+
+## v2.0.5 memory and version compatibility
+
+The Core pin above includes the EPoSE reversible mutation journal optimization.
+It removes per-block full-state copies; it does not prune history, shorten the
+full undo horizon or impose a total RSS upper bound. Replay, rollback, deep
+replay and failure atomicity remain Core responsibilities. The GUI observes
+RPC state and does not reproduce journal or eligibility logic. Local producer
+flags, network/genesis-bound keystore paths and remote observation-only
+behavior remain unchanged.
+
+The GUI product version is `2.0.5`; the embedded daemon product version is
+`2.0.5`, while legacy hardware/ZMQ compatibility remains `2.0.5.0`. Core's
+`MONERO_*` source aliases remain available to the GUI wallet API. Native
+package provenance must record this exact Core SHA and the final merged GUI
+SHA; matching display versions alone are not sufficient.
+
+This remains a public-test client release. The EPoSE audit/readiness gate is
+`no-go` (0/13), not candidate-bound; this update does not claim audit readiness.

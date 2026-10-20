@@ -42,6 +42,7 @@
 #include "main/clipboardAdapter.h"
 #include "main/oshelper.h"
 #include "qt/KeysFiles.h"
+#include "version.h"
 
 class QmlTestSetup : public QObject
 {
@@ -74,6 +75,11 @@ public slots:
         engine->rootContext()->setContextProperty(QStringLiteral("isTails"), false);
         engine->rootContext()->setContextProperty(QStringLiteral("isOpenGL"), false);
         engine->rootContext()->setContextProperty(QStringLiteral("qtRuntimeVersion"), QString::fromLatin1(qVersion()));
+        // Match the product identity displayed by main.cpp; keep wire identity separate.
+        engine->rootContext()->setContextProperty(QStringLiteral("embeddedCoreVersion"), QWERTYCOIN_VERSION_FULL);
+        engine->rootContext()->setContextProperty(QStringLiteral("embeddedCoreProductVersion"), QWERTYCOIN_VERSION);
+        engine->rootContext()->setContextProperty(QStringLiteral("embeddedCoreCompatibleVersion"), QWERTYCOIN_COMPATIBLE_VERSION);
+        engine->rootContext()->setContextProperty(QStringLiteral("legacyCoreVersion"), MONERO_VERSION_FULL);
     }
 
 private:
