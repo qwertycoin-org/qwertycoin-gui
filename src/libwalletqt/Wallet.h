@@ -60,6 +60,7 @@ class Subaddress;
 class SubaddressModel;
 class SubaddressAccount;
 class SubaddressAccountModel;
+class Messenger;
 
 class Wallet : public QObject, public PassprasePrompter
 {
@@ -83,6 +84,7 @@ class Wallet : public QObject, public PassprasePrompter
     Q_PROPERTY(Subaddress * subaddress READ subaddress)
     Q_PROPERTY(SubaddressAccountModel * subaddressAccountModel READ subaddressAccountModel)
     Q_PROPERTY(SubaddressAccount * subaddressAccount READ subaddressAccount)
+    Q_PROPERTY(Messenger * messenger READ messenger CONSTANT)
     Q_PROPERTY(bool viewOnly READ viewOnly)
     Q_PROPERTY(QString secretViewKey READ getSecretViewKey)
     Q_PROPERTY(QString publicViewKey READ getPublicViewKey)
@@ -304,6 +306,7 @@ public:
 
     //! returns subaddress account
     SubaddressAccount *subaddressAccount() const;
+    Messenger *messenger() const { return m_messenger; }
 
     //! returns subadress account model
     SubaddressAccountModel *subaddressAccountModel() const;
@@ -388,6 +391,8 @@ signals:
     void moneyReceived(const QString &txId, quint64 amount);
     void unconfirmedMoneyReceived(const QString &txId, quint64 amount);
     void newBlock(quint64 height, quint64 targetHeight);
+    void qmsCarrier(quint64 height, const QString &blockHash, const QString &txId, const QString &extraHex);
+    void qmsReorg(quint64 height, quint64 blocksDetached);
     void backgroundSyncSetup() const;
     void backgroundSyncStarted() const;
     void backgroundSyncStopped() const;
@@ -482,6 +487,7 @@ private:
     Subaddress * m_subaddress;
     mutable SubaddressModel * m_subaddressModel;
     SubaddressAccount * m_subaddressAccount;
+    Messenger *m_messenger;
     mutable SubaddressAccountModel * m_subaddressAccountModel;
     QMutex m_asyncMutex;
     QMutex m_connectionStatusMutex;

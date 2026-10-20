@@ -72,5 +72,25 @@ Item {
             appWindow.walletMode = 2
             compare(eposeButton.visible, true)
         }
+
+        function test_messenger_is_between_send_and_transactions() {
+            var sendButton = findChild(panel, "sendMenuButton")
+            var messengerButton = findChild(panel, "messengerMenuButton")
+            var transactionsButton = findChild(panel, "transactionsMenuButton")
+            verify(sendButton !== null)
+            verify(messengerButton !== null)
+            verify(transactionsButton !== null)
+            compare(messengerButton.visible, false)
+            compare(messengerButton.height, 0)
+            panel.messengerAvailable = true
+            compare(messengerButton.visible, true)
+            tryVerify(function() { return messengerButton.height > 0 })
+            compare(messengerButton.under, null)
+            tryVerify(function() {
+                return messengerButton.y >= sendButton.y + sendButton.height
+                        && transactionsButton.y >= messengerButton.y + messengerButton.height
+            })
+            panel.messengerAvailable = false
+        }
     }
 }

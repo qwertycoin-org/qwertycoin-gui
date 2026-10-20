@@ -60,6 +60,18 @@ void WalletListenerImpl::newBlock(uint64_t height)
     emit m_wallet->newBlock(height, m_wallet->daemonBlockChainTargetHeight());
 }
 
+void WalletListenerImpl::qmsCarrier(uint64_t height, const std::string &blockHash,
+                                    const std::string &txId, const std::string &extraHex)
+{
+    emit m_wallet->qmsCarrier(height, QString::fromStdString(blockHash),
+                              QString::fromStdString(txId), QString::fromStdString(extraHex));
+}
+
+void WalletListenerImpl::qmsReorg(uint64_t height, uint64_t blocksDetached)
+{
+    emit m_wallet->qmsReorg(height, blocksDetached);
+}
+
 void WalletListenerImpl::updated()
 {
     emit m_wallet->updated();
