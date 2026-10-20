@@ -5,7 +5,7 @@
 | Component | Revision | Role |
 | --- | --- | --- |
 | GUI baseline | `25719fb7ab08af5465b1ce4d7a51208bcf9a1e8b` | Qwertycoin GUI baseline derived from Monero GUI `v0.18.5.2` |
-| Qwertycoin Core | `1e7de336faeff8f1dc6604fe75d038dc3568d7fa` | Reset-1 QWC v2 Core and release workflow line |
+| Qwertycoin Core | `f1db1c0df16b180c608d609a6e5966c701d1c292` | Reset-1 QWC v2 Core and release workflow line |
 | Core Reset-1 merge | `9953ea40a92a71fbfccc57ffe38e868ddfa9e00a` | Current consensus/network baseline contained by the pinned Core revision |
 
 The Core is a Git submodule at `qwertycoin/`, not `monero/`. Its remote is

@@ -291,12 +291,12 @@ jobs:
 
           Windows installation:
 
-          - Prefer the `${WINDOWS_ARTIFACT}-setup.exe` download for a normal all-users installation with Start menu and optional desktop shortcuts.
-          - The portable `${WINDOWS_ARTIFACT}.zip` remains available. Installer upgrades replace the complete managed program package while retaining wallets, settings, blockchain data, EPoSE keystores and unknown user files.
+          - Prefer the \`${WINDOWS_ARTIFACT}-setup.exe\` download for a normal all-users installation with Start menu and optional desktop shortcuts.
+          - The portable \`${WINDOWS_ARTIFACT}.zip\` remains available. Installer upgrades replace the complete managed program package while retaining wallets, settings, blockchain data, EPoSE keystores and unknown user files.
 
           macOS installation:
 
-          - Prefer the `${MACOS_ARTIFACT}.dmg` download.
+          - Prefer the \`${MACOS_ARTIFACT}.dmg\` download.
           - Open the DMG and drag Qwertycoin to Applications. The tarball remains available as an alternative format.
           - Because the app is currently ad-hoc signed and not notarized, macOS may require **System Settings → Privacy & Security → Open Anyway** after the first launch attempt.
 
@@ -308,6 +308,10 @@ jobs:
 
           ${publication_note}
           EOF
+          if [[ -f "docs/releases/${RELEASE_TAG}.md" ]]; then
+            printf '\n---\n\n' >> release-assets/RELEASE-NOTES.md
+            cat "docs/releases/${RELEASE_TAG}.md" >> release-assets/RELEASE-NOTES.md
+          fi
 
       - name: Detect an exact existing release or refuse conflicts
         shell: bash

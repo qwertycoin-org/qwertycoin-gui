@@ -37,7 +37,7 @@ https://github.com/qwertycoin-org/qwertycoin.git
 ```
 
 This release line pins reviewed Core commit
-`1e479cc9feda48e07dd07ba6abcb89ca3934b5e2` (Core `v2.0.4`). It contains the current QWC v2
+`f1db1c0df16b180c608d609a6e5966c701d1c292` (Core product `2.0.5`, compatibility `2.0.5.0`). It contains the current QWC v2
 mainnet genesis and network identity.
 
 The cross-repository release and development pins are recorded in the

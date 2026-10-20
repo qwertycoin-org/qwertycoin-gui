@@ -518,7 +518,7 @@ int main(int argc, char *argv[])
 #endif
     engine.rootContext()->setContextProperty("builtWithDesktopEntry", builtWithDesktopEntry);
 
-    engine.rootContext()->setContextProperty("embeddedCoreVersion", MONERO_VERSION_FULL);
+    engine.rootContext()->setContextProperty("embeddedCoreVersion", QWERTYCOIN_VERSION_FULL);
 
     // Load main window (context properties needs to be defined obove this line)
     engine.load(QUrl(QStringLiteral("qrc:///main.qml")));

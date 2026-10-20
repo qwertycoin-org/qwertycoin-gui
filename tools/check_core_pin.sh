@@ -3,7 +3,7 @@ set -euo pipefail
 
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 core_path="$repo_root/qwertycoin"
-expected_sha=1e479cc9feda48e07dd07ba6abcb89ca3934b5e2
+expected_sha=f1db1c0df16b180c608d609a6e5966c701d1c292
 expected_remote=https://github.com/qwertycoin-org/qwertycoin.git
 
 gitlink_sha=$(git -C "$repo_root" ls-files --stage -- qwertycoin | awk '$1 == "160000" {print $2}')
