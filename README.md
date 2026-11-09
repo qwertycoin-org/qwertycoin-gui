@@ -40,7 +40,7 @@ https://github.com/qwertycoin-org/qwertycoin.git
 ```
 
 This release line pins reviewed Core commit
-`d37b3efdab56171d888a0239566d54bbb436d14f` (Core product `2.0.6`, compatibility `2.0.6.0`). It contains the current QWC v2
+`aebdc13cdd0b2c0ed32bfc95fc1f867bd6a562ca` (Core product `2.0.6`, compatibility `2.0.6.0`). It contains the current QWC v2
 mainnet genesis, network identity and QMS1/Fast wallet APIs.
 
 QMS1/Fast is an application protocol carried in existing transaction nonce
