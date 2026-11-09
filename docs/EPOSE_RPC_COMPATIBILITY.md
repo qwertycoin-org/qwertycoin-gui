@@ -1,7 +1,7 @@
 # EPoSe GUI/Core compatibility matrix
 
 This matrix is normative for GUI Core pin
-`d37b3efdab56171d888a0239566d54bbb436d14f`. The pinned Core binds mainnet
+`aebdc13cdd0b2c0ed32bfc95fc1f867bd6a562ca`. The pinned Core binds mainnet
 genesis `4f95857586e2c66063c277370eda99cd75897d773af09f0c3cd1e22f7e87db39`
 and network ID `515743324d41494e3230323652303102`
 and parameter hash
