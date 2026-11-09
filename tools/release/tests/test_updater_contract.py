@@ -15,6 +15,12 @@ class UpdaterContractTests(unittest.TestCase):
         for build_tag in ("linux-x64", "mac-armv8", "win-x64"):
             self.assertIn(f"-DBUILD_TAG={build_tag}", workflow)
 
+    def test_macos_release_config_pins_openssl_three(self):
+        workflow = self.read(".github/workflows/release.yml")
+        macos_job = workflow.split("\n  macos-arm64:\n", 1)[1].split("\n  windows-x86_64:\n", 1)[0]
+        configure = macos_job.split("- name: Configure", 1)[1].split("- name: Build and deploy bundle", 1)[0]
+        self.assertIn('-DOPENSSL_ROOT_DIR="$(brew --prefix openssl@3)"', configure)
+
     def test_gui_uses_qwc_dnssec_metadata_without_inherited_signers(self):
         manager = self.read("src/libwalletqt/WalletManager.cpp")
         main_qml = self.read("main.qml")
