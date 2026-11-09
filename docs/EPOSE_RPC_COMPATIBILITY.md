@@ -1,7 +1,7 @@
 # EPoSe GUI/Core compatibility matrix
 
 This matrix is normative for GUI Core pin
-`f1db1c0df16b180c608d609a6e5966c701d1c292`. The pinned Core binds mainnet
+`d37b3efdab56171d888a0239566d54bbb436d14f`. The pinned Core binds mainnet
 genesis `4f95857586e2c66063c277370eda99cd75897d773af09f0c3cd1e22f7e87db39`
 and network ID `515743324d41494e3230323652303102`
 and parameter hash
@@ -84,3 +84,18 @@ SHA; matching display versions alone are not sufficient.
 
 This remains a public-test client release. The EPoSE audit/readiness gate is
 `no-go` (0/13), not candidate-bound; this update does not claim audit readiness.
+
+## v2.0.6 EPoSE and version compatibility
+
+The exact Core pin above includes the merged epoch-46 receipt-retention and
+epoch-47 admission-delivery fixes, bounded EPoSE endpoint DNS resolution, and
+the current finalized epoch checkpoints. The GUI remains an observer of Core
+RPC state; it does not implement qualification, receipt retention, admission,
+or consensus decisions. Existing daemon flags, network-bound keystore paths,
+and remote observation-only behavior are unchanged.
+
+The GUI and embedded Core product versions are `2.0.6`; the legacy
+hardware/ZMQ compatibility version remains `2.0.6.0`. The exact merged GUI
+revision and this Core Gitlink must both appear in package provenance. This is
+a public-test client release; the EPoSE audit/readiness evaluator remains
+`no-go` (0/13) and is not represented as audit-ready by the version update.
