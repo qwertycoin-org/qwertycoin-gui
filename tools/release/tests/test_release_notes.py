@@ -19,23 +19,23 @@ class ReleaseNotesTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             directory = Path(temporary)
             (directory / 'release-assets').mkdir()
-            notes = directory / 'docs/releases/v2.0.5.md'
+            notes = directory / 'docs/releases/v2.0.6.md'
             notes.parent.mkdir(parents=True)
-            source_notes = (ROOT / 'docs/releases/v2.0.5.md').read_text()
+            source_notes = (ROOT / 'docs/releases/v2.0.6.md').read_text()
             notes.write_text(source_notes)
-            environment = dict(os.environ, RELEASE_KIND='stable', RELEASE_TAG='v2.0.5',
+            environment = dict(os.environ, RELEASE_KIND='stable', RELEASE_TAG='v2.0.6',
                                EXPECTED_REVISION='a' * 40, CORE_REVISION='b' * 40,
                                GITHUB_REPOSITORY='qwertycoin-org/qwertycoin-gui',
                                LINUX_RUN_ID='1', WINDOWS_RUN_ID='2', MACOS_RUN_ID='3',
-                               WINDOWS_ARTIFACT='qwertycoin-gui-v2.0.5-windows-x86_64',
-                               MACOS_ARTIFACT='qwertycoin-gui-v2.0.5-macos-arm64')
+                               WINDOWS_ARTIFACT='qwertycoin-gui-v2.0.6-windows-x86_64',
+                               MACOS_ARTIFACT='qwertycoin-gui-v2.0.6-macos-arm64')
             process = subprocess.run(['bash', '-c', script], cwd=directory, env=environment,
                                      text=True, capture_output=True, check=True)
             self.assertEqual(process.stderr, '')
             result = (directory / 'release-assets/RELEASE-NOTES.md').read_text()
-            self.assertIn('`qwertycoin-gui-v2.0.5-windows-x86_64-setup.exe`', result)
-            self.assertIn('`qwertycoin-gui-v2.0.5-windows-x86_64.zip`', result)
-            self.assertIn('`qwertycoin-gui-v2.0.5-macos-arm64.dmg`', result)
+            self.assertIn('`qwertycoin-gui-v2.0.6-windows-x86_64-setup.exe`', result)
+            self.assertIn('`qwertycoin-gui-v2.0.6-windows-x86_64.zip`', result)
+            self.assertIn('`qwertycoin-gui-v2.0.6-macos-arm64.dmg`', result)
             self.assertTrue(result.endswith(source_notes))
             self.assertIn('`no-go` (0/13)', result)
 
