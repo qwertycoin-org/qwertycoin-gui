@@ -25,6 +25,8 @@ jobs:
           persist-credentials: false
       - name: Verify updater contract
         run: python3 tools/release/tests/test_updater_contract.py
+      - name: Verify macOS signing safety contracts
+        run: python3 -m unittest discover -s tools/release/tests -p 'test_*macos*.py'
       - name: Reject whitespace errors
         run: git diff --check
 
